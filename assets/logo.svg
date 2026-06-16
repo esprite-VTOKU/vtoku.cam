@@ -1,0 +1,15 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="VTOKU">
+  <defs>
+    <linearGradient id="g" x1="14" y1="14" x2="106" y2="106" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9D7BFF"/>
+      <stop offset="1" stop-color="#7C5CFF"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="104" height="104" rx="26" fill="#141019" stroke="url(#g)" stroke-width="3"/>
+  <!-- camera aperture / iris -->
+  <circle cx="60" cy="60" r="30" stroke="url(#g)" stroke-width="4"/>
+  <path d="M60 30 L73 53 H47 Z" fill="url(#g)" opacity="0.9"/>
+  <path d="M86 68 L65 78 L72 53 Z" fill="url(#g)" opacity="0.55"/>
+  <path d="M34 68 L55 78 L48 53 Z" fill="url(#g)" opacity="0.55"/>
+  <circle cx="60" cy="60" r="9" fill="#9D7BFF"/>
+</svg>

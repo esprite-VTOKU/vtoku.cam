@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support — VTOKU Cam</title>
+<meta name="description" content="Get help with VTOKU Cam: system requirements, troubleshooting FAQ, documentation, and how to contact support.">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt=""> VTOKU&nbsp;Cam</a>
+    <div class="nav-links">
+      <a href="/#features">Features</a>
+      <a href="/docs/" class="hide-sm">Docs</a>
+      <a href="/support.html">Support</a>
+      <a href="https://apps.apple.com/app/id6781006858" class="hide-sm">Download</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container reading">
+  <div class="page-head">
+    <p class="eyebrow">Help</p>
+    <h1>Support</h1>
+    <p class="updated">We're here to help you get VTOKU Cam connected and rolling.</p>
+  </div>
+
+  <main class="prose" style="padding-bottom:24px;">
+
+    <div class="note">
+      <p><strong>Need a hand?</strong> Email <a href="mailto:support@vtoku.com">support@vtoku.com</a> or
+      use the <a href="#contact">contact form below</a>. We typically reply within a couple of business
+      days. Please include your device model and iOS version.</p>
+    </div>
+
+    <h2>System requirements</h2>
+    <ul>
+      <li><strong>iOS / iPadOS 26</strong> or later.</li>
+      <li>An <strong>ARKit-capable iPhone or iPad</strong> (with a TrueDepth camera for face tracking; a
+        LiDAR-equipped device improves depth and placement).</li>
+      <li>For streaming to a computer (Warudo, NDI tools, FreeD receivers): both devices on the
+        <strong>same local network</strong>, ideally over Wi-Fi 5&nbsp;GHz or wired.</li>
+    </ul>
+
+    <h2>Getting started</h2>
+    <p>New to the app? Start with the <a href="/docs/getting-started.html">Getting Started guide</a>, then
+      see the full <a href="/docs/">documentation</a> for Warudo, pose streaming, NDI, avatars, and
+      recording.</p>
+
+    <h2 id="faq">Frequently asked questions</h2>
+
+    <h3>Warudo isn't receiving my camera</h3>
+    <p>Check that both devices are on the same network, that the VMC sender is enabled in VTOKU Cam, and
+      that the destination IP and port match Warudo's VMC receiver (default send port <code>19190</code>).
+      Make sure no firewall is blocking UDP. See <a href="/docs/warudo.html">Connect to Warudo</a>.</p>
+
+    <h3>FreeD data isn't arriving</h3>
+    <p>FreeD is sent over your subnet as UDP broadcast (default port <code>40000</code>). Confirm the
+      receiver listens on the same port and that your network allows broadcast traffic. Some networks
+      block broadcast on the guest/AP-isolation setting. See <a href="/docs/pose-streaming.html">Pose
+      streaming</a>.</p>
+
+    <h3>NDI sources don't show up</h3>
+    <p>NDI discovery relies on mDNS/multicast on your LAN. Make sure both devices are on the same subnet
+      and that multicast isn't blocked. If discovery fails on a restrictive network, enter the source
+      manually where supported. See <a href="/docs/ndi.html">NDI in &amp; out</a>.</p>
+
+    <h3>My avatar won't import</h3>
+    <p>VTOKU Cam imports <code>.vrm</code> avatar files. Copy yours into the app via the Files app, then
+      pick it in the Avatars sheet. If a model fails to load, it may be malformed or use an unsupported
+      VRM feature — try re-exporting it. See <a href="/docs/avatars.html">Avatars &amp; faces</a>.</p>
+
+    <h3>Face tracking isn't moving the avatar</h3>
+    <p>Face tracking needs a TrueDepth-capable device and the camera permission granted. If a Warudo VMC
+      feed is live, it overrides the on-device face capture by design. See
+      <a href="/docs/avatars.html#face">Face tracking</a>.</p>
+
+    <h3>Recordings aren't saving</h3>
+    <p>Grant the "Add to Photos" permission when prompted. Recordings save to your Photos library at the
+      end of a take. See <a href="/docs/recording.html">Recording takes</a>.</p>
+
+    <h2 id="contact">Contact us</h2>
+    <p>Email <a href="mailto:support@vtoku.com">support@vtoku.com</a>, or send a message with the form
+      below. It opens our main VTOKU contact form.</p>
+
+    <p><a class="btn btn-primary" href="https://vtoku.com/contact-us/" target="_blank" rel="noopener">Open the contact form →</a></p>
+
+    <iframe class="embed-frame" src="https://vtoku.com/contact-us/" title="VTOKU contact form" loading="lazy"></iframe>
+    <p class="muted" style="margin-top:8px;">If the form doesn't load above, use the button or email us
+      directly at <a href="mailto:support@vtoku.com">support@vtoku.com</a>.</p>
+
+    <h2 id="acknowledgements">Acknowledgements</h2>
+    <p>VTOKU Cam is built with the help of excellent third-party software. We gratefully acknowledge:</p>
+    <ul>
+      <li><strong>NDI®</strong> — NDI is a registered trademark of Vizrt NDI AB. Used under the NDI® SDK
+        license. Required NDI and bundled component notices are included in the app's About /
+        Acknowledgements screen.</li>
+      <li><strong>VRM / VRMKit</strong> and related open-source loaders, used under their respective
+        licenses (e.g. MIT).</li>
+      <li><strong>VMC (Virtual Motion Capture protocol)</strong> and <strong>FreeD</strong> — open
+        protocols for motion and camera data.</li>
+      <li><strong>Warudo</strong> — a trademark of its respective owner; referenced as a compatible
+        application, without endorsement.</li>
+      <li>Additional open-source components (streaming, math, and rendering helpers) under MIT/BSD-class
+        licenses, with full notices in the app's Acknowledgements screen.</li>
+    </ul>
+    <p class="muted">Full, verbatim license texts ship inside the app. Trademarks are the property of
+      their respective owners.</p>
+
+    <hr>
+    <p class="muted">VTOKU LLC · Honolulu, Hawai‘i, USA · <a href="mailto:support@vtoku.com">support@vtoku.com</a></p>
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="/"><img src="/assets/logo.svg" alt=""> VTOKU&nbsp;Cam</a>
+        <p class="muted" style="max-width:280px;margin-top:12px;">Virtual production for all. A VTOKU
+          app, made in Honolulu, Hawai‘i.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="/#features">Features</a></li>
+          <li><a href="/docs/">Documentation</a></li>
+          <li><a href="/support.html">Support</a></li>
+          <li><a href="https://apps.apple.com/app/id6781006858">Download</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/privacy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms &amp; EULA</a></li>
+          <li><a href="/support.html#acknowledgements">Acknowledgements</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://vtoku.com">VTOKU.com</a></li>
+          <li><a href="https://vtoku.com/about-us/">About</a></li>
+          <li><a href="https://vtoku.com/contact-us/">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="legal">© 2026 VTOKU LLC. All rights reserved.</span>
+      <span class="legal">VRM, Warudo, NDI, and VMC are trademarks of their respective owners.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

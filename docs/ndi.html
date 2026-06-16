@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NDI in &amp; out — VTOKU Cam docs</title>
+<meta name="description" content="Send your VTOKU Cam AR feed over NDI to your switcher, and bring NDI sources back into the app as an overlay.">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt=""> VTOKU&nbsp;Cam</a>
+    <div class="nav-links">
+      <a href="/#features">Features</a><a href="/docs/">Docs</a><a href="/support.html">Support</a>
+      <a href="https://apps.apple.com/app/id6781006858" class="hide-sm">Download</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container reading">
+  <div class="page-head">
+    <p class="crumb"><a href="/docs/">Docs</a> / NDI in &amp; out</p>
+    <h1>NDI in &amp; out</h1>
+  </div>
+  <main class="prose" style="padding-bottom:24px;">
+    <p>NDI® lets VTOKU Cam exchange video over your local network with no capture card. Send the
+      composited AR view to your switcher or recorder, and bring other NDI sources back into the app as
+      an overlay.</p>
+
+    <h2>Send your AR feed over NDI</h2>
+    <ol>
+      <li>Enable <strong>NDI Send</strong> in the app.</li>
+      <li>VTOKU Cam appears as an NDI source on your network, named after the device.</li>
+      <li>Select it as a source in your NDI-capable software (OBS with the NDI plugin, a TriCaster, vMix,
+        a Warudo NDI input, etc.).</li>
+    </ol>
+
+    <h2>Receive an NDI source</h2>
+    <ol>
+      <li>Enable <strong>NDI Receive</strong>.</li>
+      <li>Pick a discovered source from the list to bring it in as an overlay.</li>
+    </ol>
+
+    <h2>Networking notes</h2>
+    <ul>
+      <li>NDI discovery uses mDNS/multicast — keep both ends on the <strong>same subnet</strong>.</li>
+      <li>Wired or 5&nbsp;GHz Wi-Fi is strongly recommended for full-rate video.</li>
+      <li>If discovery is blocked, some tools let you add a source manually by host name.</li>
+    </ul>
+
+    <div class="note"><p><strong>Trademark:</strong> NDI® is a registered trademark of Vizrt NDI AB.
+      VTOKU Cam uses the NDI® SDK under license; see <a href="/support.html#acknowledgements">Acknowledgements</a>.</p></div>
+
+    <hr>
+    <p class="muted">Next: <a href="/docs/avatars.html">Avatars &amp; faces →</a></p>
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><a class="brand" href="/"><img src="/assets/logo.svg" alt=""> VTOKU&nbsp;Cam</a>
+        <p class="muted" style="max-width:280px;margin-top:12px;">Virtual production for all. A VTOKU app, made in Honolulu, Hawai‘i.</p></div>
+      <div><h4>Product</h4><ul><li><a href="/#features">Features</a></li><li><a href="/docs/">Documentation</a></li><li><a href="/support.html">Support</a></li><li><a href="https://apps.apple.com/app/id6781006858">Download</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="/privacy.html">Privacy Policy</a></li><li><a href="/terms.html">Terms &amp; EULA</a></li><li><a href="/support.html#acknowledgements">Acknowledgements</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="https://vtoku.com">VTOKU.com</a></li><li><a href="https://vtoku.com/about-us/">About</a></li><li><a href="https://vtoku.com/contact-us/">Contact</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span class="legal">© 2026 VTOKU LLC. All rights reserved.</span><span class="legal">VRM, Warudo, NDI, and VMC are trademarks of their respective owners.</span></div>
+  </div>
+</footer>
+</body>
+</html>

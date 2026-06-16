@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect to Warudo — VTOKU Cam docs</title>
+<meta name="description" content="Stream camera pose from VTOKU Cam into Warudo over VMC, and drive your avatar from Warudo back to the phone.">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt=""> VTOKU&nbsp;Cam</a>
+    <div class="nav-links">
+      <a href="/#features">Features</a><a href="/docs/">Docs</a><a href="/support.html">Support</a>
+      <a href="https://apps.apple.com/app/id6781006858" class="hide-sm">Download</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container reading">
+  <div class="page-head">
+    <p class="crumb"><a href="/docs/">Docs</a> / Connect to Warudo</p>
+    <h1>Connect to Warudo</h1>
+  </div>
+  <main class="prose" style="padding-bottom:24px;">
+    <p>Warudo is the most common destination for VTOKU Cam. The phone tracks the real camera and sends
+      pose to Warudo over <strong>VMC/OSC</strong>; Warudo can also send avatar bone and blendshape data
+      back to the phone so your VRM moves in AR.</p>
+
+    <h2>Before you start</h2>
+    <ul>
+      <li>Phone and computer on the <strong>same local network</strong>.</li>
+      <li>You know your computer's <strong>local IP address</strong> (e.g. <code>192.168.1.20</code>).</li>
+      <li>Warudo is running with a character loaded.</li>
+    </ul>
+
+    <h2>1. Send camera pose to Warudo</h2>
+    <ol>
+      <li>In Warudo, add a <strong>VMC Receiver</strong> and note its port (the VMC default is
+        <code>39539</code>).</li>
+      <li>In VTOKU Cam, open <strong>Senders</strong> and enable <strong>VMC/OSC</strong>.</li>
+      <li>Set the destination IP to your computer's IP and the port to match Warudo's receiver.</li>
+      <li>VTOKU Cam streams <code>/VMC/Ext/Cam</code> (camera transform + FOV), plus root position and
+        lens messages, phase-locked to the ARKit frame.</li>
+    </ol>
+    <div class="note"><p><strong>Tip:</strong> VTOKU Cam's default VMC <em>send</em> port is
+      <code>19190</code>. Make sure the port you set matches whatever your Warudo VMC receiver listens on.</p></div>
+
+    <h2>2. Drive the avatar from Warudo (optional)</h2>
+    <p>To have Warudo animate the VRM shown on the phone, send VMC back to the device:</p>
+    <ol>
+      <li>In Warudo, add a <strong>VMC Sender</strong> targeting the phone's IP on port
+        <code>39539</code>.</li>
+      <li>VTOKU Cam receives bones and blendshapes and applies them to your avatar. While a Warudo VMC
+        feed is live, it <strong>overrides on-device ARKit face capture</strong> by design.</li>
+    </ol>
+
+    <h2>3. Audio (optional)</h2>
+    <p>VTOKU Cam can receive Warudo audio so the avatar's voice plays in sync on the phone. This uses a
+      separate UDP path and self-corrects timing over long sessions.</p>
+
+    <h2>Troubleshooting</h2>
+    <ul>
+      <li><strong>Nothing arrives in Warudo:</strong> re-check IP/port, confirm both devices are on the
+        same subnet, and that Local Network permission is granted on the phone.</li>
+      <li><strong>Avatar doesn't move:</strong> confirm Warudo's VMC Sender targets the phone and that the
+        phone isn't on a guest network with client isolation.</li>
+      <li><strong>Pose drifts:</strong> re-anchor by tapping a fresh floor point; keep good lighting for
+        ARKit tracking.</li>
+    </ul>
+
+    <hr>
+    <p class="muted">Next: <a href="/docs/pose-streaming.html">Pose streaming — VMC &amp; FreeD →</a></p>
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><a class="brand" href="/"><img src="/assets/logo.svg" alt=""> VTOKU&nbsp;Cam</a>
+        <p class="muted" style="max-width:280px;margin-top:12px;">Virtual production for all. A VTOKU app, made in Honolulu, Hawai‘i.</p></div>
+      <div><h4>Product</h4><ul><li><a href="/#features">Features</a></li><li><a href="/docs/">Documentation</a></li><li><a href="/support.html">Support</a></li><li><a href="https://apps.apple.com/app/id6781006858">Download</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="/privacy.html">Privacy Policy</a></li><li><a href="/terms.html">Terms &amp; EULA</a></li><li><a href="/support.html#acknowledgements">Acknowledgements</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="https://vtoku.com">VTOKU.com</a></li><li><a href="https://vtoku.com/about-us/">About</a></li><li><a href="https://vtoku.com/contact-us/">Contact</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span class="legal">© 2026 VTOKU LLC. All rights reserved.</span><span class="legal">VRM, Warudo, NDI, and VMC are trademarks of their respective owners.</span></div>
+  </div>
+</footer>
+</body>
+</html>
