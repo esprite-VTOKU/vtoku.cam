@@ -1,64 +1,79 @@
 # DESIGN.md — vtoku.cam
 
-Persistent design system for the **VTOKU Cam** website. Aesthetic family: **Cinematic Dark**
-(RunwayML / NVIDIA lineage), tuned to the VTOKU brand (vtoku.com — dark + violet). Keep new pages
-on-system by reading this file first; the tokens here are mirrored as CSS custom properties in
-`assets/style.css`.
+Persistent design system for the **VTOKU Cam** website. Aesthetic: **Apple-style glass /
+soft-futurism** — light canvas, frosted-glass cards, soft violet gradients, generous space,
+rounded geometry. It mirrors the feel of an iOS 26 app and uses the app's own brand violet. The
+tokens here are mirrored as CSS custom properties in `assets/style.css`. Read this before adding
+pages.
 
 ## Principles
 
-- **Cinematic, not busy.** Near-black canvas, generous negative space, one confident violet accent
-  with a soft glow. Imagery (AR/avatar) carries the drama; chrome stays quiet.
-- **Editorial legibility.** Docs and legal pages must read effortlessly — measured line length
-  (~68ch), strong heading hierarchy, calm body color.
-- **Restraint in motion.** Subtle hover transitions and a gentle fade-in only. No parallax, no
-  autoplay, no heavy JS. Respect `prefers-reduced-motion`.
-- **Accessible.** Body text meets WCAG AA on the dark canvas; visible focus rings; semantic HTML.
+- Light and airy. Off-white canvas (`#FBFBFD`), white sections, lots of breathing room.
+- Glass surfaces. Cards use a translucent white fill with `backdrop-filter: blur`, hairline
+  borders, and soft layered shadows rather than hard outlines.
+- Soft depth. Gentle radial violet/blue gradients behind the hero; nothing harsh or neon.
+- One brand color. Violet (`#6C5CE7`, from the app icon) for accents, buttons, and icon tiles.
+- Apple typography. System font stack (SF Pro), large semibold headings in sentence case,
+  comfortable body at ~68ch for reading pages.
+- Quiet motion. Small hover lifts and a single fade-in. Respect `prefers-reduced-motion`.
+- Accessible. Dark text on light meets WCAG AA; visible focus rings; semantic HTML.
 
 ## Color tokens
 
 | Token | Value | Use |
 |---|---|---|
-| `--bg` | `#08070A` | Page canvas (near-black) |
-| `--bg-2` | `#0E0B14` | Raised sections |
-| `--surface` | `#141019` | Cards |
-| `--surface-2` | `#1B1622` | Card hover / inputs |
-| `--border` | `#2A2335` | Hairline borders |
-| `--text` | `#EDEAF2` | Primary text |
-| `--text-dim` | `#A79FB5` | Secondary text |
-| `--text-faint` | `#6F6880` | Muted / captions |
-| `--accent` | `#7C5CFF` | Primary violet |
-| `--accent-bright` | `#9D7BFF` | Hover / highlights |
-| `--accent-soft` | `rgba(124,92,255,.16)` | Tints, glows |
-| `--good` | `#4ADE80` | Success notes |
-| `--warn` | `#FBBF24` | Caution notes |
+| `--bg` | `#FBFBFD` | Page canvas |
+| `--bg-2` | `#FFFFFF` | Raised sections, footer |
+| `--bg-tint` | `#F4F2FB` | Faint violet wash (hero, tinted sections) |
+| `--surface` | `rgba(255,255,255,.65)` | Glass card fill (over a blur) |
+| `--border` | `rgba(0,0,0,.08)` | Hairline borders |
+| `--text` | `#1D1D1F` | Primary text |
+| `--text-dim` | `#56565B` | Secondary text |
+| `--text-faint` | `#86868B` | Muted / captions |
+| `--accent` | `#6C5CE7` | Brand violet |
+| `--accent-bright` | `#5B49E0` | Links / hover |
+| `--accent-deep` | `#4B3BC2` | Code, deep hover |
 
-Violet **glow** = `box-shadow: 0 0 40px rgba(124,92,255,.35)` on CTAs and the hero.
+Shadows: `--shadow-sm` for resting cards, `--shadow-md` for hover and the hero icon.
 
 ## Type
 
-- Stack: `"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif`.
-- Display: 700–800 weight, tight tracking (`-0.02em`), clamp-scaled hero up to ~4rem.
-- Body: 400/500, 1.0625rem, line-height 1.7, max width ~68ch.
-- Mono (ports, code): `"SF Mono", ui-monospace, "JetBrains Mono", monospace`.
+- Stack: `-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif`.
+- Display: 700 weight, tight tracking, clamp-scaled hero up to ~4.2rem.
+- Body: 400, 1.0625rem, line-height 1.62, reading column ~720px.
+- Mono (ports, code): `ui-monospace, "SF Mono", monospace`.
 
-## Spacing & shape
+## Shape & spacing
 
-- Spacing scale (px): 4, 8, 12, 16, 24, 32, 48, 64, 96.
-- Radius: 12px cards, 999px pills/buttons, 8px small.
-- Container max-width: 1080px; reading column 720px.
+- Radius: 20px cards, 26px phone mocks, 999px buttons, 12px small.
+- Spacing scale (px): 4, 8, 12, 16, 24, 32, 48, 72, 96.
+- Container 1080px; reading column 720px.
 
 ## Components
 
-- **Buttons:** pill. Primary = violet fill + glow; secondary = transparent + hairline border.
-- **Cards:** `--surface`, hairline border, 12px radius; on hover lift + border brightens to accent.
-- **Nav:** sticky, translucent dark with blur (`backdrop-filter`), hairline bottom border.
-- **Hero:** centered, radial violet glow behind headline, App Store badge CTA.
-- **Callouts:** left accent-bar note boxes (info/caution) for docs.
-- **Footer:** muted, social links (YouTube/X/Instagram/Discord), © VTOKU LLC, legal links.
+- Buttons: pill. Primary = violet fill + soft glow shadow; ghost = translucent white + hairline.
+- Cards: glass fill + blur + hairline + soft shadow; hover lifts and deepens the shadow. Icon
+  tiles use a violet gradient with a white glyph.
+- Nav: sticky, translucent light with blur, hairline bottom border.
+- Hero: centered, the real app icon up top, soft gradient wash behind, App Store badge CTA.
+- Callouts: hairline note boxes with a left accent bar (info / caution) for docs.
 
-## Anti-slop guardrails
+## Brand assets
 
-- No generic gradient-purple-on-everything; accent is a spotlight, surfaces stay neutral dark.
-- No emoji as iconography in chrome. No drop-shadow stacking. No filler lorem on shipped pages.
-- Real content only (grounded in the app's actual features/permissions).
+- `assets/app-icon.png` — the real app icon (chrome "VT" on violet). Used as the nav mark, hero
+  icon, favicon, and apple-touch-icon.
+- `assets/ndi-logo.png` — official NDI logo for the acknowledgements area.
+
+## Iconography
+
+Feature icons are original SVGs drawn to echo the **SF Symbols the app actually uses** (`scope`,
+`person.crop.square`, `face.smiling`, `figure.dance`, `film.stack`, plus a broadcast glyph for
+streaming), so the site and app read as one product. (SF Symbols themselves are an Apple asset and
+aren't embedded directly; these are look-alike SVGs.)
+
+## Voice (copy)
+
+De-AI'd per the humanizer rules: plain verbs (is/has, not "serves as"/"boasts"), few or no em
+dashes, no forced triads, no significance inflation or promo filler ("nestled", "seamless",
+"the whole pipeline"), sentence-case headings, straight quotes. Ground every claim in what the app
+actually does. Keep brand/protocol names (VTOKU, Warudo, VMC, FreeD, NDI, SRT, VRM) in English.
