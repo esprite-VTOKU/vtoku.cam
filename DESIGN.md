@@ -1,79 +1,68 @@
 # DESIGN.md — vtoku.cam
 
-Persistent design system for the **VTOKU Cam** website. Aesthetic: **Apple-style glass /
-soft-futurism** — light canvas, frosted-glass cards, soft violet gradients, generous space,
-rounded geometry. It mirrors the feel of an iOS 26 app and uses the app's own brand violet. The
-tokens here are mirrored as CSS custom properties in `assets/style.css`. Read this before adding
-pages.
+Persistent design system for the **VTOKU Cam** website. Aesthetic: **Liquid Glass /
+glassmorphism**. Frosted, semi-transparent panels float over a soft pastel mesh-gradient backdrop,
+with bright edge highlights and real depth. It echoes iOS 26 Liquid Glass and uses the app's brand
+violet. Tokens here mirror `assets/style.css`. Read this before adding pages.
 
 ## Principles
 
-- Light and airy. Off-white canvas (`#FBFBFD`), white sections, lots of breathing room.
-- Glass surfaces. Cards use a translucent white fill with `backdrop-filter: blur`, hairline
-  borders, and soft layered shadows rather than hard outlines.
-- Soft depth. Gentle radial violet/blue gradients behind the hero; nothing harsh or neon.
-- One brand color. Violet (`#6C5CE7`, from the app icon) for accents, buttons, and icon tiles.
-- Apple typography. System font stack (SF Pro), large semibold headings in sentence case,
-  comfortable body at ~68ch for reading pages.
-- Quiet motion. Small hover lifts and a single fade-in. Respect `prefers-reduced-motion`.
-- Accessible. Dark text on light meets WCAG AA; visible focus rings; semantic HTML.
+- Color shows through glass. The page has a fixed pastel mesh gradient (lavender, periwinkle,
+  blush, aqua). Panels are translucent white with `backdrop-filter: blur` so the gradient blooms
+  behind them. Never put panels on a flat white page; the gradient is what makes glass read as glass.
+- Frosted, layered, lit. Cards use ~40-60% white fill, a light hairline border, a bright inner top
+  highlight (`inset 0 1px 0`), and a soft violet-tinted drop shadow.
+- Readable first. Long text (legal, docs) sits inside a stronger frosted "sheet" (`.reading`) so it
+  stays legible over the gradient. Dark text (`#1A1726`) throughout.
+- One brand color. Violet (`#6C5CE7`, from the app icon) for accents and buttons. The VRL wordmark
+  uses a violet-to-pink gradient text fill.
+- Apple typography. System font stack (SF Pro), large bold headings in sentence case.
+- Quiet motion. Small hover lifts, one fade-in. Respect `prefers-reduced-motion`.
 
 ## Color tokens
 
 | Token | Value | Use |
 |---|---|---|
-| `--bg` | `#FBFBFD` | Page canvas |
-| `--bg-2` | `#FFFFFF` | Raised sections, footer |
-| `--bg-tint` | `#F4F2FB` | Faint violet wash (hero, tinted sections) |
-| `--surface` | `rgba(255,255,255,.65)` | Glass card fill (over a blur) |
-| `--border` | `rgba(0,0,0,.08)` | Hairline borders |
-| `--text` | `#1D1D1F` | Primary text |
-| `--text-dim` | `#56565B` | Secondary text |
-| `--text-faint` | `#86868B` | Muted / captions |
+| body bg | pastel mesh gradient, fixed | The canvas behind all glass |
+| `--glass` | `rgba(255,255,255,.42)` | Default panel fill |
+| `--glass-strong` | `rgba(255,255,255,.60)` | Reading sheet, ghost button, eyebrow pill |
+| `--glass-edge` | `rgba(255,255,255,.75)` | Inner top highlight |
+| `--glass-border` | `rgba(255,255,255,.55)` | Panel hairline |
+| `--text` | `#1A1726` | Primary text |
+| `--text-dim` | `#4C4860` | Secondary text |
 | `--accent` | `#6C5CE7` | Brand violet |
-| `--accent-bright` | `#5B49E0` | Links / hover |
-| `--accent-deep` | `#4B3BC2` | Code, deep hover |
+| `--accent-deep` | `#4226A8` | Links/code/hover on glass |
 
-Shadows: `--shadow-sm` for resting cards, `--shadow-md` for hover and the hero icon.
-
-## Type
-
-- Stack: `-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif`.
-- Display: 700 weight, tight tracking, clamp-scaled hero up to ~4.2rem.
-- Body: 400, 1.0625rem, line-height 1.62, reading column ~720px.
-- Mono (ports, code): `ui-monospace, "SF Mono", monospace`.
-
-## Shape & spacing
-
-- Radius: 20px cards, 26px phone mocks, 999px buttons, 12px small.
-- Spacing scale (px): 4, 8, 12, 16, 24, 32, 48, 72, 96.
-- Container 1080px; reading column 720px.
+Blur token: `--blur: saturate(180%) blur(22px)`. Glass shadow: `--shadow-glass` (drop + inner
+highlight + faint inner border).
 
 ## Components
 
-- Buttons: pill. Primary = violet fill + soft glow shadow; ghost = translucent white + hairline.
-- Cards: glass fill + blur + hairline + soft shadow; hover lifts and deepens the shadow. Icon
-  tiles use a violet gradient with a white glyph.
-- Nav: sticky, translucent light with blur, hairline bottom border.
-- Hero: centered, the real app icon up top, soft gradient wash behind, App Store badge CTA.
-- Callouts: hairline note boxes with a left accent bar (info / caution) for docs.
+- `.glass` primitive: fill + blur + border + `--shadow-glass`. Cards, nav, footer, sheet, notes,
+  shots all build on it.
+- Nav: sticky translucent glass bar with a hairline.
+- Hero: app icon on top, eyebrow as a glass pill, big headline. `Go VRL.` with `.vrl` gradient text.
+- Cards: frosted panels that lift on hover; violet gradient icon tiles with a white glyph.
+- `.section-tint`: a faint extra frosted band (via `::before`) to vary rhythm between sections.
+- `.reading`: a centered frosted sheet wrapping legal/docs prose for readability.
 
 ## Brand assets
 
-- `assets/app-icon.png` — the real app icon (chrome "VT" on violet). Used as the nav mark, hero
-  icon, favicon, and apple-touch-icon.
-- `assets/ndi-logo.png` — official NDI logo for the acknowledgements area.
+- `assets/app-icon.png` — the real app icon (chrome "VT" on violet). Nav mark, hero icon, favicon.
+- `assets/ndi-logo.png` — official NDI logo for acknowledgements.
 
 ## Iconography
 
-Feature icons are original SVGs drawn to echo the **SF Symbols the app actually uses** (`scope`,
-`person.crop.square`, `face.smiling`, `figure.dance`, `film.stack`, plus a broadcast glyph for
-streaming), so the site and app read as one product. (SF Symbols themselves are an Apple asset and
-aren't embedded directly; these are look-alike SVGs.)
+Feature icons are original SVGs that echo the **SF Symbols the app uses** (`scope`,
+`person.crop.square`, `face.smiling`, `figure.dance`, `film.stack`, plus a link/bond glyph for
+SRTLA). SF Symbols can't be embedded directly on the web, so these are look-alikes.
 
 ## Voice (copy)
 
-De-AI'd per the humanizer rules: plain verbs (is/has, not "serves as"/"boasts"), few or no em
-dashes, no forced triads, no significance inflation or promo filler ("nestled", "seamless",
-"the whole pipeline"), sentence-case headings, straight quotes. Ground every claim in what the app
-actually does. Keep brand/protocol names (VTOKU, Warudo, VMC, FreeD, NDI, SRT, VRM) in English.
+- Tagline: **Go VRL** (VR + IRL), decoded as "virtual real life streaming." Brand line, paired with
+  the plain descriptor "virtual production camera" for clarity and App Store search.
+- Say **perform as a VTuber**, not "perform a VRM avatar" (VRM stays as the file-format term in docs).
+- Highlight the real **SRTLA bonded streaming** (Wi-Fi + cellular link aggregation).
+- De-AI'd per the humanizer rules: plain verbs, no em dashes, no forced triads, no promo filler,
+  sentence-case headings, straight quotes. Keep brand/protocol names (VTOKU, Warudo, VMC, FreeD, NDI,
+  SRT, SRTLA, VRM) in English.

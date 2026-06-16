@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bonded live streaming, VTOKU Cam docs</title>
+<meta name="description" content="Go live from VTOKU Cam over SRT, and bond multiple connections (Wi-Fi and cellular) with SRTLA for resilient on-the-go streaming.">
+<link rel="icon" href="../assets/app-icon.png" sizes="any">
+<link rel="apple-touch-icon" href="../assets/app-icon.png">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="../"><img src="../assets/app-icon.png" alt=""> VTOKU&nbsp;Cam</a>
+    <div class="nav-links">
+      <a href="../index.html#features">Features</a><a href="./">Docs</a><a href="../support.html">Support</a>
+      <a href="https://apps.apple.com/app/id6781006858" class="hide-sm">Download</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container reading">
+  <div class="page-head">
+    <p class="crumb"><a href="./">Docs</a> / Bonded live streaming</p>
+    <h1>Bonded live streaming</h1>
+  </div>
+  <main class="prose" style="padding-bottom:24px;">
+    <p>VTOKU Cam can take your VRL feed live over <strong>SRT</strong>, and bond several network
+      connections at once with <strong>SRTLA</strong> so the stream stays up when any single connection
+      gets shaky. This is the part that makes streaming out in the real world hold together.</p>
+
+    <h2>SRT</h2>
+    <p>SRT (Secure Reliable Transport) sends low-latency, error-corrected video to a compatible server
+      or encoder. Point VTOKU Cam at your SRT endpoint and stream.</p>
+    <ul>
+      <li>Enter your SRT URL, including host, port, and any stream id your server expects.</li>
+      <li>Set the latency and bitrate to match your server and your uplink.</li>
+    </ul>
+
+    <h2>SRTLA bonding</h2>
+    <p>SRTLA (SRT Link Aggregation) spreads one SRT stream across multiple links. If you have Wi-Fi and
+      cellular available, or more than one modem, SRTLA uses them together. When one link drops or slows,
+      the others carry the stream, so you don't drop frames the moment you walk out of range.</p>
+    <ul>
+      <li>Point VTOKU Cam at your <strong>SRTLA receiver</strong> (for example an SRTLA-capable gateway
+        or a Belabox-style server) instead of a plain SRT endpoint.</li>
+      <li>Enable the connections you want to bond. The app aggregates the available links into one
+        resilient stream.</li>
+      <li>Your server reassembles the bonded links and forwards a single SRT stream onward to your
+        platform or switcher.</li>
+    </ul>
+
+    <div class="note"><p><strong>Why it matters for VRL.</strong> Real-life streaming moves. Bonding
+      Wi-Fi and cellular keeps you live through dead spots and congestion, the same approach pro IRL
+      streamers use, running on the phone in your hand.</p></div>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>Give each link real headroom. Set a total bitrate the weakest expected combination can carry.</li>
+      <li>Higher SRT latency rides out spotty mobile networks; lower latency feels snappier on good ones.</li>
+      <li>Test your full path to the server before going live, then watch the link stats while you stream.</li>
+    </ul>
+
+    <hr>
+    <p class="muted">Back to <a href="./">all documentation</a>.</p>
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><a class="brand" href="../"><img src="../assets/app-icon.png" alt=""> VTOKU&nbsp;Cam</a>
+        <p class="muted" style="max-width:280px;margin-top:12px;">A VTOKU app, made in Honolulu, Hawai‘i.</p></div>
+      <div><h4>Product</h4><ul><li><a href="../index.html#features">Features</a></li><li><a href="./">Documentation</a></li><li><a href="../support.html">Support</a></li><li><a href="https://apps.apple.com/app/id6781006858">Download</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="../privacy.html">Privacy Policy</a></li><li><a href="../terms.html">Terms &amp; EULA</a></li><li><a href="../support.html#acknowledgements">Acknowledgements</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="https://vtoku.com">VTOKU.com</a></li><li><a href="https://vtoku.com/about-us/">About</a></li><li><a href="https://vtoku.com/contact-us/">Contact</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span class="legal">© 2026 VTOKU LLC. All rights reserved.</span><span class="legal">VRM, Warudo, NDI, and VMC are trademarks of their respective owners.</span></div>
+  </div>
+</footer>
+</body>
+</html>
