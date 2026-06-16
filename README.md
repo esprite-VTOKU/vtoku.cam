@@ -48,7 +48,28 @@ The repo's GitHub Pages custom domain is `vtoku.cam` (see `CNAME`). At the domai
 
 After DNS propagates, enable **Enforce HTTPS** in the repo's Pages settings.
 
+## Beta signups (Tally → Notion)
+
+Pre-launch, the primary CTA is **Join the beta** (`beta.html`), which embeds a Tally form that feeds
+the **"VTOKU Cam — Beta Waitlist"** Notion database
+(<https://app.notion.com/p/b4a35f50a4ba463c9aa16cb5ac5f200e>).
+
+To finish wiring it:
+1. Create a form in Tally (tally.so) with fields matching the Notion DB: Name, Email, Device, Role,
+   "Interested in Pro", and an optional revenue band.
+2. In Tally, add the **Notion integration** and map the form to the Beta Waitlist database.
+3. Copy the Tally form id and replace `REPLACE_WITH_TALLY_FORM_ID` in `beta.html`.
+4. Optional: set the Tally post-submit redirect/thank-you to your public TestFlight link so approved
+   testers get the invite immediately.
+
+The "Pro" pricing on the landing reflects a one-time Pro unlock (NDI|HX + commercial-use license for
+companies or creators earning $100k/yr or more). The full definition lives in `terms.html`.
+
 ## TODO before launch
+
+- [ ] Finish the Tally form and paste its id into `beta.html` (see "Beta signups" above).
+- [ ] Set the real public TestFlight invite link (Tally thank-you redirect, or swap CTAs back to a
+      direct link once the App Store build is live).
 
 - [ ] Replace the placeholder screenshot frames in `index.html` with real App Store screenshots
       (drop images into `assets/screenshots/` and wire them into the `.shots` section).
