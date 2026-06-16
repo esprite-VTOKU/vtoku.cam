@@ -263,7 +263,7 @@ a.card:hover h3 { color: var(--accent-deep); }
 .hero-note { margin-top: 14px; font-size: .9rem; color: var(--text-faint); }
 .hero-art { position: relative; display: grid; place-items: center; min-height: 440px; }
 .hero-art .hero-appicon {
-  position: relative; z-index: 2; width: min(260px, 66%); aspect-ratio: 1; border-radius: 24%;
+  position: relative; z-index: 2; width: min(260px, 66%); aspect-ratio: 1; border-radius: 15%;
   box-shadow: 0 28px 64px rgba(70,50,140,.40), inset 0 0 0 1px rgba(255,255,255,.12);
 }
 .hero-art .sparkle { position: absolute; z-index: 3; width: 26px; filter: drop-shadow(0 4px 8px rgba(108,92,231,.4)); animation: twinkle 3.2s ease-in-out infinite; }
