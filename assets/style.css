@@ -263,6 +263,7 @@ a.card:hover h3 { color: var(--accent-deep); }
 .hero-note { margin-top: 14px; font-size: .9rem; color: var(--text-faint); }
 .hero-art { position: relative; display: grid; place-items: center; min-height: 440px; }
 .hero-art .mascot { position: relative; z-index: 2; width: min(380px, 84%); filter: drop-shadow(0 22px 44px rgba(70,50,140,.34)); }
+.hero-art .logo-mark { position: relative; z-index: 2; width: min(320px, 76%); height: auto; filter: drop-shadow(0 12px 26px rgba(70,50,140,.22)); }
 .hero-art .ring { position: absolute; z-index: 1; width: min(440px, 96%); opacity: .85; animation: spin 48s linear infinite; }
 .hero-art .sparkle { position: absolute; z-index: 3; width: 26px; filter: drop-shadow(0 4px 8px rgba(108,92,231,.4)); animation: twinkle 3.2s ease-in-out infinite; }
 .hero-art .s1 { top: 8%; left: 12%; width: 34px; animation-delay: .2s; }
