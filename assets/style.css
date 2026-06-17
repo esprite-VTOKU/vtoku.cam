@@ -164,7 +164,8 @@ a.card:hover h3 { color: var(--accent-deep); }
 
 /* ---------- section heading ---------- */
 .section-head { text-align: center; margin-bottom: 44px; }
-.section-head p { color: var(--text-dim); max-width: 600px; margin: 14px auto 0; font-size: 1.1rem; }
+.section-head h2 { margin-bottom: 0; }
+.section-head p { color: var(--text-dim); max-width: 600px; margin: 4px auto 0; font-size: 1.1rem; }
 
 /* tinted glass band */
 .section-tint { position: relative; }
