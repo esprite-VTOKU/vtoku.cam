@@ -272,18 +272,18 @@ a.card:hover h3 { color: var(--accent-deep); }
 .mascot-char { position: relative; z-index: 2; display: block; width: auto; max-width: 100%;
   max-height: calc(100vh - 80px); height: auto;
   filter: drop-shadow(0 16px 34px rgba(70,50,140,.16));
-  animation: tp-reveal 1.3s cubic-bezier(.22,.7,.2,1) both; }
+  animation: tp-reveal 1.15s cubic-bezier(.22,.7,.2,1) both; }
 
 /* white "energy form" duplicate, sits exactly over the color image and dissolves to reveal it */
 .mascot-ghost { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3;
   object-fit: contain; object-position: center bottom; pointer-events: none; opacity: 0;
-  animation: tp-ghost 1.3s cubic-bezier(.22,.7,.2,1) both; }
+  animation: tp-ghost 1.15s cubic-bezier(.22,.7,.2,1) both; }
 
 /* the color character reveals bottom-to-top */
 @keyframes tp-reveal {
   0%   { opacity: 0; clip-path: inset(0 0 100% 0); }
-  8%   { opacity: 1; }
-  40%  { clip-path: inset(0 0 0 0); }
+  6%   { opacity: 1; }
+  36%  { clip-path: inset(0 0 0 0); }
   100% { opacity: 1; clip-path: inset(0 0 0 0); }
 }
 
@@ -291,10 +291,10 @@ a.card:hover h3 { color: var(--accent-deep); }
 @keyframes tp-ghost {
   0%   { opacity: 0; clip-path: inset(0 0 100% 0);
          filter: brightness(0) invert(1) blur(4px) drop-shadow(0 0 28px rgba(160,120,255,.95)); }
-  8%   { opacity: 1; }
-  40%  { opacity: 1; clip-path: inset(0 0 0 0);
+  6%   { opacity: 1; }
+  36%  { opacity: 1; clip-path: inset(0 0 0 0);
          filter: brightness(0) invert(1) blur(0) drop-shadow(0 0 26px rgba(160,120,255,.9)); }
-  58%  { opacity: .95; filter: brightness(0) invert(1) drop-shadow(0 0 22px rgba(160,120,255,.85)); }
+  52%  { opacity: 1; filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(160,120,255,.8)); }
   100% { opacity: 0; clip-path: inset(0 0 0 0);
          filter: brightness(0) invert(1) drop-shadow(0 0 6px rgba(160,120,255,0)); }
 }
@@ -304,13 +304,13 @@ a.card:hover h3 { color: var(--accent-deep); }
   content: ""; position: absolute; left: 50%; top: -4%; transform: translateX(-50%); z-index: 1;
   width: 40%; height: 110%; pointer-events: none; opacity: 0; border-radius: 50%;
   background: linear-gradient(to top, rgba(140,100,255,0), rgba(170,130,255,.55) 42%, rgba(220,190,255,.75) 50%, rgba(170,130,255,.55) 58%, rgba(140,100,255,0));
-  filter: blur(16px); animation: tp-beam 1.3s ease-out both;
+  filter: blur(16px); animation: tp-beam 1.15s ease-out both;
 }
 @keyframes tp-beam {
-  0%   { opacity: 0; transform: translateX(-50%) scaleX(.4) scaleY(.2); }
-  14%  { opacity: 1; transform: translateX(-50%) scaleX(1) scaleY(1); }
-  42%  { opacity: .75; }
-  72%  { opacity: 0; transform: translateX(-50%) scaleX(.25) scaleY(1); }
+  0%   { opacity: 0; transform: translateX(-50%) scaleX(.4) scaleY(.15); }
+  12%  { opacity: 1; transform: translateX(-50%) scaleX(1) scaleY(1); }
+  36%  { opacity: .8; }
+  60%  { opacity: 0; transform: translateX(-50%) scaleX(.25) scaleY(1); }
   100% { opacity: 0; }
 }
 
@@ -319,13 +319,13 @@ a.card:hover h3 { color: var(--accent-deep); }
   content: ""; position: absolute; left: -4%; right: -4%; bottom: 0; height: 12px; z-index: 4;
   pointer-events: none; opacity: 0; border-radius: 50%;
   background: linear-gradient(90deg, transparent, rgba(210,180,255,.95) 50%, transparent);
-  filter: blur(3px); animation: tp-scan 1.3s ease-out both;
+  filter: blur(3px); animation: tp-scan 1.15s ease-out both;
 }
 @keyframes tp-scan {
   0%   { opacity: 0; bottom: 0; }
-  10%  { opacity: 1; }
-  40%  { opacity: 1; bottom: 100%; }
-  48%  { opacity: 0; bottom: 100%; }
+  8%   { opacity: 1; }
+  36%  { opacity: 1; bottom: 100%; }
+  42%  { opacity: 0; bottom: 100%; }
   100% { opacity: 0; bottom: 100%; }
 }
 
