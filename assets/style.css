@@ -13,8 +13,8 @@
   --warn: #9A5B00;
 
   /* glass */
-  --glass: rgba(255, 255, 255, .42);
-  --glass-strong: rgba(255, 255, 255, .60);
+  --glass: rgba(255, 255, 255, .26);
+  --glass-strong: rgba(255, 255, 255, .44);
   --glass-edge: rgba(255, 255, 255, .75);
   --glass-border: rgba(255, 255, 255, .55);
   --hairline: rgba(60, 40, 120, .12);
@@ -86,7 +86,7 @@ section { padding: 72px 0; }
 /* ---------- nav ---------- */
 .nav {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(255, 255, 255, .45);
+  background: rgba(255, 255, 255, .32);
   -webkit-backdrop-filter: var(--blur);
   backdrop-filter: var(--blur);
   border-bottom: 1px solid var(--glass-border);
@@ -140,7 +140,7 @@ section { padding: 72px 0; }
 @media (max-width: 860px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } }
 
 .card {
-  background: rgba(255, 255, 255, .72);
+  background: rgba(255, 255, 255, .5);
   -webkit-backdrop-filter: saturate(180%) blur(30px);
   backdrop-filter: saturate(180%) blur(30px);
   border: 1px solid var(--glass-border); border-radius: var(--radius);
