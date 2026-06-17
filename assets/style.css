@@ -277,30 +277,13 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: a
 .mascot-char { position: relative; z-index: 2; display: block; width: auto; max-width: 100%;
   max-height: calc(100vh - 80px); height: auto;
   filter: drop-shadow(0 16px 34px rgba(70,50,140,.16));
-  animation: tp-reveal 1.1s cubic-bezier(.22,.7,.2,1) both; will-change: opacity, clip-path; }
+  animation: tp-in .8s ease-out both; will-change: opacity, transform; }
 
-/* white "energy form" duplicate, sits exactly over the color image and dissolves to reveal it.
-   Static filter (computed once); only opacity + clip-path animate, so it stays GPU-cheap. */
-.mascot-ghost { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3;
-  object-fit: contain; object-position: center bottom; pointer-events: none; opacity: 0;
-  filter: brightness(0) invert(1);
-  animation: tp-ghost 1.1s cubic-bezier(.22,.7,.2,1) both; will-change: opacity, clip-path; }
-
-/* the color character reveals bottom-to-top */
-@keyframes tp-reveal {
-  0%   { opacity: 0; clip-path: inset(0 0 100% 0); }
-  6%   { opacity: 1; }
-  38%  { clip-path: inset(0 0 0 0); }
-  100% { opacity: 1; clip-path: inset(0 0 0 0); }
-}
-
-/* the white form reveals with her, holds a beat, then dissolves away */
-@keyframes tp-ghost {
-  0%   { opacity: 0; clip-path: inset(0 0 100% 0); }
-  6%   { opacity: 1; }
-  38%  { opacity: 1; clip-path: inset(0 0 0 0); }
-  54%  { opacity: 1; }
-  100% { opacity: 0; clip-path: inset(0 0 0 0); }
+/* single-image entrance: opacity + transform only (compositor-cheap, always aligned) */
+@keyframes tp-in {
+  0%   { opacity: 0; transform: translateY(14px); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: none; }
 }
 
 /* violet light bloom behind her (opacity only, static blur) */
