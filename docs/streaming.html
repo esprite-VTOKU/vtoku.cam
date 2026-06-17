@@ -43,13 +43,28 @@
       cellular available, or more than one modem, SRTLA uses them together. When one link drops or slows,
       the others carry the stream, so you don't drop frames the moment you walk out of range.</p>
     <ul>
-      <li>Point VTOKU Cam at your <strong>SRTLA receiver</strong> (for example an SRTLA-capable gateway
-        or a Belabox-style server) instead of a plain SRT endpoint.</li>
+      <li>Point VTOKU Cam at your <strong>SRTLA receiver</strong> instead of a plain SRT endpoint.</li>
       <li>Enable the connections you want to bond. The app aggregates the available links into one
         resilient stream.</li>
       <li>Your server reassembles the bonded links and forwards a single SRT stream onward to your
         platform or switcher.</li>
     </ul>
+
+    <h2>SRTLA servers</h2>
+    <p>SRTLA needs a receiving server to reassemble the bonded links. You can rent a managed one or host
+      your own:</p>
+    <ul>
+      <li><a href="https://belabox.net/" target="_blank" rel="noopener">BELABOX Cloud</a> — managed
+        SRTLA relays from the team behind the SRTLA project.</li>
+      <li><a href="https://irlserver.com/" target="_blank" rel="noopener">IRLServer</a> — managed SRT,
+        SRTLA, and RTMP relay endpoints for IRL streamers.</li>
+      <li>Self-host with the open-source <a href="https://github.com/BELABOX/srtla" target="_blank" rel="noopener">srtla</a>
+        receiver on your own VPS.</li>
+    </ul>
+    <div class="note"><p><strong>Auto scene switching.</strong> Pair your server with
+      <a href="https://github.com/715209/nginx-obs-automatic-low-bitrate-switching" target="_blank" rel="noopener">NOALBS</a>
+      to automatically switch to a "low bitrate" or BRB scene when your connection drops, then switch
+      back when it recovers.</p></div>
 
     <div class="note"><p><strong>Why it matters for VRL.</strong> Real-life streaming moves. Bonding
       Wi-Fi and cellular keeps you live through dead spots and congestion, the same approach pro IRL

@@ -79,6 +79,22 @@
     <p>VTOKU Cam can receive Warudo audio so the avatar's voice plays in sync on the phone. This uses a
       separate UDP path and self-corrects timing over long sessions.</p>
 
+    <h2>Connecting across networks (VPN or Tailscale)</h2>
+    <p>The phone and computer don't have to be on the same Wi-Fi. If they're on different networks, or
+      you want to stream from somewhere else entirely, put them on the same virtual network first, then
+      use the address that network assigns.</p>
+    <ul>
+      <li><strong>Tailscale</strong> (easiest): install it on both the phone and the computer and sign in
+        to the same account. Use each device's Tailscale IP (the <code>100.x.x.x</code> address) as the
+        destination instead of the local IP. Everything else stays the same.</li>
+      <li><strong>A VPN</strong> that puts both devices on one subnet (a home VPN, WireGuard, or similar)
+        works the same way: connect both ends, then use the VPN-assigned address.</li>
+    </ul>
+    <div class="note"><p><strong>Heads up:</strong> over a VPN or Tailscale, use the device's
+      virtual-network IP, not its <code>192.168.x.x</code> LAN address. Broadcast and auto-discovery
+      don't cross these networks, so enter the IP manually. Higher latency is normal off the local
+      network; the manual Motion-delay trim helps.</p></div>
+
     <h2>Troubleshooting</h2>
     <ul>
       <li><strong>Nothing arrives in Warudo:</strong> re-check IP/port, confirm both devices are on the
