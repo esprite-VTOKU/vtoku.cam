@@ -266,7 +266,7 @@ a.card:hover h3 { color: var(--accent-deep); }
 .stage-rail { position: absolute; top: 0; right: 0; bottom: 0; z-index: 1;
   width: clamp(420px, 48vw, 800px); display: flex; justify-content: flex-end; }
 .mascot-figure { margin: 0 -96px 0 0; position: sticky; top: 72px; align-self: flex-start;
-  display: flex; flex-direction: column; }
+  display: flex; flex-direction: column; transform: translateX(-100px); }
 .mascot-stage { position: relative; display: block; }
 .mascot-char { position: relative; z-index: 2; display: block; width: auto; max-width: 100%;
   max-height: calc(100vh - 80px); height: auto;
@@ -287,6 +287,8 @@ a.card:hover h3 { color: var(--accent-deep); }
 .content-rail .hero { text-align: left; padding: 84px 0 60px; }
 .content-rail .hero p.lede { margin-left: 0; margin-right: 0; max-width: 560px; }
 .content-rail .hero-cta { justify-content: flex-start; }
+.hero .cta-wrap { display: inline-block; }
+.hero .cta-wrap .hero-note { text-align: center; }
 /* homepage section headings/CTA left-align with the content, clear of the character */
 .content-rail .section-head { text-align: left; }
 .content-rail .section-head p { margin-left: 0; margin-right: 0; }
@@ -295,7 +297,7 @@ a.card:hover h3 { color: var(--accent-deep); }
 
 @media (max-width: 980px) {
   .stage-rail { position: static; width: auto; justify-content: center; padding: 20px 0 4px; }
-  .mascot-figure { margin: 0; position: static; }
+  .mascot-figure { margin: 0; position: static; transform: none; }
   .mascot-char { width: min(82vw, 440px); max-width: 100%; max-height: none; }
   .content-rail .hero { text-align: center; padding: 26px 0 52px; }
   .content-rail .hero > .container { max-width: none; margin: 0 auto; }
