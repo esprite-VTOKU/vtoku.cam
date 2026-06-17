@@ -190,6 +190,7 @@ a.card:hover h3 { color: var(--accent-deep); }
   box-shadow: var(--shadow-glass);
   display: grid; place-items: center; color: var(--text-faint); font-size: .85rem; text-align: center; padding: 16px;
 }
+img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: auto; }
 
 /* ---------- reading sheet (legal/docs) ---------- */
 .reading {
