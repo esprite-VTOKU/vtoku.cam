@@ -278,6 +278,22 @@ a.card:hover h3 { color: var(--accent-deep); }
   .hero-art { order: -1; min-height: 320px; }
 }
 
+/* ---------- mascot band ---------- */
+.mascot-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 40px; align-items: center; }
+.mascot-figure { margin: 0; position: relative; display: grid; justify-items: center; }
+.mascot-figure img { display: block; width: auto; max-width: 100%; max-height: 560px;
+  filter: drop-shadow(0 30px 60px rgba(70,50,140,.42)); }
+.mascot-credit { margin-top: 14px; font-size: .82rem; color: var(--text-faint); letter-spacing: .01em; }
+.mascot-credit a { color: var(--accent-deep); font-weight: 600; }
+.mascot-copy .eyebrow { display: inline-block; color: var(--accent-deep); font-weight: 600;
+  letter-spacing: .04em; font-size: .82rem; text-transform: uppercase; margin-bottom: 6px; }
+.mascot-copy h2 { margin: 8px 0 0; }
+.mascot-copy p.lede { color: var(--text-dim); font-size: 1.2rem; margin: 18px 0 0; line-height: 1.5; }
+@media (max-width: 860px) {
+  .mascot-grid { grid-template-columns: 1fr; gap: 20px; text-align: center; }
+  .mascot-figure img { max-height: 460px; }
+}
+
 /* sparkle accent on section headings */
 .section-head h2 { position: relative; display: inline-block; }
 .section-head h2::after { content: ""; position: absolute; top: -10px; right: -26px; width: 18px; height: 18px;
