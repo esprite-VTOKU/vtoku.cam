@@ -267,7 +267,7 @@ a.card:hover h3 { color: var(--accent-deep); }
 .stage-rail { position: absolute; top: 0; right: 0; bottom: 0; z-index: 1;
   width: clamp(420px, 48vw, 800px); display: flex; justify-content: flex-end; }
 .mascot-figure { margin: 0 -96px 0 0; position: sticky; top: 72px; align-self: flex-start;
-  display: flex; flex-direction: column; transform: translateX(-100px); }
+  display: flex; flex-direction: column; transform: translateX(-150px); }
 .mascot-stage { position: relative; display: block; }
 .mascot-char { position: relative; z-index: 2; display: block; width: auto; max-width: 100%;
   max-height: calc(100vh - 80px); height: auto;
