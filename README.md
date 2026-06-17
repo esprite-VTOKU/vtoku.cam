@@ -17,6 +17,25 @@ virtual-production camera by VTOKU. Served as a static site on **GitHub Pages** 
 
 No build step — plain HTML + CSS. Edit a file, commit, push; GitHub Pages redeploys.
 
+## Warudo Workshop plugin
+
+The VTOKU Cam Workshop plugin for [Warudo](https://warudo.app) lives at
+[`assets/VTokuCam.warudo`](assets/VTokuCam.warudo).
+
+**Download:** <https://vtoku.cam/assets/VTokuCam.warudo>
+(or [direct from GitHub](https://github.com/esprite-VTOKU/vtoku.cam/raw/main/assets/VTokuCam.warudo))
+
+**Install:**
+
+1. Download `VTokuCam.warudo`.
+2. Drop it into Warudo's plugins folder: `Warudo_Data/StreamingAssets/Plugins`
+   (in Warudo: **Settings → About → Open Data Folder**, then `StreamingAssets/Plugins` —
+   create the `Plugins` folder if it isn't there).
+3. Restart Warudo. The plugin loads automatically.
+
+Full setup guide: [docs/warudo.html](docs/warudo.html) (live at
+<https://vtoku.cam/docs/warudo.html>).
+
 ## Local preview
 
 ```bash
