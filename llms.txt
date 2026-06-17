@@ -1,0 +1,29 @@
+# VTOKU Cam
+
+> VTOKU Cam turns an iPhone or iPad into a virtual camera for Warudo and a standalone AR VTuber
+> camera. Track the device in real space, perform a VRM avatar in AR with face tracking, record
+> video, and go live anywhere with SRT and SRTLA bonded streaming. By VTOKU LLC (Honolulu, Hawai‘i).
+> iOS and iPadOS 26. Free to use; an optional one-time Pro unlock adds NDI|HX and a commercial-use
+> license. Currently in free TestFlight beta. Brand tagline: "Go VRL" (VR meets IRL).
+
+## What you can do
+- Use your phone as a moving virtual camera in Warudo (sends camera pose over the network).
+- Perform a VRM avatar in AR with real-time face tracking, plus idle and dance motion.
+- Record your performance to video.
+- Go live anywhere, bonding Wi-Fi and cellular with SRTLA so the stream holds up on the move.
+- Works standalone (no PC) and scales into a Warudo or NDI studio setup.
+
+## Key pages
+- Home: https://vtoku.cam/
+- Documentation: https://vtoku.cam/docs/
+- Connect with Warudo: https://vtoku.cam/docs/warudo.html
+- Bonded live streaming (SRT/SRTLA): https://vtoku.cam/docs/streaming.html
+- Support and FAQ: https://vtoku.cam/support.html
+- Join the beta: https://vtoku.cam/beta.html
+- Privacy Policy: https://vtoku.cam/privacy.html
+- Terms and EULA: https://vtoku.cam/terms.html
+
+## Notes
+- Audience: VTubers, IRL streamers, animators, and virtual-production creators, especially Warudo users.
+- Privacy: camera, microphone, and face data are processed on device; the app collects no user data.
+- Contact: support@vtoku.com
