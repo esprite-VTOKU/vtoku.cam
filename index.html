@@ -37,7 +37,7 @@
 
 <nav class="nav">
   <div class="container nav-inner">
-    <a class="brand" href="index.html"><img src="assets/app-icon.png" alt=""> VTOKU&nbsp;Cam</a>
+    <a class="brand" href="index.html"><img class="brand-logo" src="assets/vtoku-logo.png" alt="VTOKU"></a>
     <div class="nav-links">
       <a href="index.html#features">Features</a>
       <a href="docs/" class="hide-sm">Docs</a>
@@ -47,24 +47,32 @@
   </div>
 </nav>
 
-<header class="hero">
-  <div class="container hero-grid fade-in">
-    <div class="hero-copy">
-      <h1>Go <span class="vrl">VRL.</span></h1>
-      <p class="lede">VR meets IRL. Use your phone as a virtual camera, perform as your VTuber in AR,
-        and take the show live anywhere.</p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="beta.html">Join the waitlist</a>
-        <a class="btn btn-ghost" href="docs/getting-started.html">Read the docs</a>
+<div class="layout">
+
+  <aside class="stage-rail">
+    <figure class="mascot-figure">
+      <div class="mascot-stage">
+        <img class="mascot-char" src="assets/mascot-hero.webp" alt="VTOKU Cam mascot, a violet-haired cat-eared virtual camera operator" width="1551" height="2062">
+        <img class="sparkle ms1" src="assets/sparkle.png" alt="" aria-hidden="true">
+        <img class="sparkle ms2" src="assets/sparkle.png" alt="" aria-hidden="true">
+        <img class="sparkle ms3" src="assets/sparkle.png" alt="" aria-hidden="true">
       </div>
-      <p class="hero-note">Beta coming soon. Free, and no account needed.</p>
+      <figcaption class="mascot-credit">Art by <a href="https://x.com/Ravensherald" rel="noopener" target="_blank">@Ravensherald</a></figcaption>
+    </figure>
+  </aside>
+
+  <div class="content-rail">
+
+<header class="hero">
+  <div class="container fade-in">
+    <h1>Go <span class="vrl">VRL.</span></h1>
+    <p class="lede">VR meets IRL. Use your phone as a virtual camera, perform as your VTuber in AR,
+      and take the show live anywhere.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="beta.html">Join the waitlist</a>
+      <a class="btn btn-ghost" href="docs/getting-started.html">Read the docs</a>
     </div>
-    <div class="hero-art">
-      <img class="hero-appicon" src="assets/app-icon.png" alt="VTOKU Cam app icon">
-      <img class="sparkle s1" src="assets/sparkle.png" alt="">
-      <img class="sparkle s2" src="assets/sparkle.png" alt="">
-      <img class="sparkle s3" src="assets/sparkle.png" alt="">
-    </div>
+    <p class="hero-note">Beta coming soon.</p>
   </div>
 </header>
 
@@ -130,24 +138,10 @@
       <div class="card">
         <h3>Connect with Warudo</h3>
         <p style="margin-top:10px;">Send your camera and avatar straight into Warudo over your network,
-          and bring its motion back onto your phone. Warudo Workshop plugins are on the way. See the
-          <a href="docs/warudo.html">docs</a>.</p>
+          and bring its motion back onto your phone. Grab the
+          <a href="assets/VTokuCam.warudo" download>Workshop plugin</a> and follow the
+          <a href="docs/warudo.html">setup guide</a>.</p>
       </div>
-    </div>
-  </div>
-</section>
-
-<section class="mascot-band section-tint">
-  <div class="container mascot-grid">
-    <figure class="mascot-figure fade-in">
-      <img src="assets/mascot-hero.webp" alt="VTOKU Cam mascot, a violet-haired cat-eared virtual camera operator" loading="lazy" width="903" height="1200">
-      <figcaption class="mascot-credit">Art by <a href="https://x.com/Ravensherald" rel="noopener" target="_blank">@Ravensherald</a></figcaption>
-    </figure>
-    <div class="mascot-copy">
-      <span class="eyebrow">Meet the crew</span>
-      <h2>Your <span class="vrl">VRL</span> co-pilot</h2>
-      <p class="lede">Part streamer, part camera operator, all VRL. Bring your own avatar, point the
-        phone, and take the show anywhere.</p>
     </div>
   </div>
 </section>
@@ -173,6 +167,9 @@
     <a class="btn btn-primary" href="beta.html">Join the waitlist</a>
   </div>
 </section>
+
+  </div><!-- /content-rail -->
+</div><!-- /layout -->
 
 <footer class="footer">
   <div class="container">
