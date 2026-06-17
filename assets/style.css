@@ -271,7 +271,7 @@ a.card:hover h3 { color: var(--accent-deep); }
 .mascot-stage { position: relative; display: block; }
 .mascot-char { position: relative; z-index: 2; display: block; width: auto; max-width: 100%;
   max-height: calc(100vh - 80px); height: auto;
-  filter: drop-shadow(0 24px 50px rgba(70,50,140,.28));
+  filter: drop-shadow(0 16px 34px rgba(70,50,140,.16));
   animation: mascot-teleport 1.15s cubic-bezier(.2,.75,.2,1) both; }
 
 /* anime "teleport in": materialize from the feet up, flash, quick glitch, settle */
@@ -281,7 +281,7 @@ a.card:hover h3 { color: var(--accent-deep); }
   45%  { opacity: 1; clip-path: inset(0 0 0 0); transform: translateY(0) scale(1.01);
          filter: brightness(1.6) saturate(.8) blur(0) drop-shadow(0 0 26px rgba(140,100,255,.8)); }
   70%  { filter: brightness(1.12) drop-shadow(0 0 16px rgba(124,92,255,.45)); }
-  100% { opacity: 1; transform: none; filter: drop-shadow(0 24px 50px rgba(70,50,140,.28)); }
+  100% { opacity: 1; transform: none; filter: drop-shadow(0 16px 34px rgba(70,50,140,.16)); }
 }
 
 /* scan beam that sweeps down as she materializes */
