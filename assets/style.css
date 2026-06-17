@@ -276,15 +276,11 @@ a.card:hover h3 { color: var(--accent-deep); }
 
 /* anime "teleport in": materialize from the feet up, flash, quick glitch, settle */
 @keyframes mascot-teleport {
-  0%   { opacity: 0; transform: translateY(10px) scale(.94); clip-path: inset(0 0 100% 0);
+  0%   { opacity: 0; transform: translateY(8px) scale(.97); clip-path: inset(0 0 100% 0);
          filter: brightness(2.4) saturate(.2) blur(7px) drop-shadow(0 0 34px rgba(140,100,255,.95)); }
-  30%  { opacity: 1; clip-path: inset(0 0 0 0); transform: translateY(0) scale(1.015);
-         filter: brightness(1.7) saturate(.7) blur(0) drop-shadow(0 0 28px rgba(140,100,255,.85)); }
-  38%  { transform: translate(-7px,0) scale(1.015); }
-  43%  { transform: translate(6px,0) scale(1.01); }
-  48%  { transform: translate(-3px,0) scale(1.005); }
-  53%  { transform: translate(0,0) scale(1); }
-  72%  { filter: brightness(1.15) drop-shadow(0 0 18px rgba(124,92,255,.5)); }
+  45%  { opacity: 1; clip-path: inset(0 0 0 0); transform: translateY(0) scale(1.01);
+         filter: brightness(1.6) saturate(.8) blur(0) drop-shadow(0 0 26px rgba(140,100,255,.8)); }
+  70%  { filter: brightness(1.12) drop-shadow(0 0 16px rgba(124,92,255,.45)); }
   100% { opacity: 1; transform: none; filter: drop-shadow(0 24px 50px rgba(70,50,140,.28)); }
 }
 
