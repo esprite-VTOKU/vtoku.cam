@@ -129,7 +129,9 @@ section { padding: 72px 0; }
   border: 1px solid var(--glass-border); border-radius: 999px; padding: 6px 14px; box-shadow: inset 0 1px 0 var(--glass-edge); }
 .hero h1 { margin: 22px 0 0; }
 .hero .vrl { background: linear-gradient(120deg, #7C5CFF, #B05CFF 55%, #FF7AC8); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.hero p.lede { color: var(--text-dim); font-size: 1.3rem; max-width: 660px; margin: 22px auto 34px; line-height: 1.5; letter-spacing: -.012em; }
+.hero .vrl-define { margin: 14px 0 0; font-size: .92rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--text-faint); }
+.hero .vrl-define b { color: var(--accent-bright); font-weight: 800; }
+.hero p.lede { color: var(--text-dim); font-size: 1.3rem; max-width: 660px; margin: 18px auto 34px; line-height: 1.5; letter-spacing: -.012em; }
 .hero-cta { display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap; }
 
 /* ---------- feature grid ---------- */
