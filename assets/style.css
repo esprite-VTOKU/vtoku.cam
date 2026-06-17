@@ -18,7 +18,7 @@
   --glass-edge: rgba(255, 255, 255, .75);
   --glass-border: rgba(255, 255, 255, .55);
   --hairline: rgba(60, 40, 120, .12);
-  --blur: saturate(180%) blur(22px);
+  --blur: saturate(150%) blur(12px);
 
   --maxw: 1100px;
   --readw: 760px;
@@ -145,8 +145,8 @@ section { padding: 72px 0; }
 
 .card {
   background: rgba(255, 255, 255, .5);
-  -webkit-backdrop-filter: saturate(180%) blur(30px);
-  backdrop-filter: saturate(180%) blur(30px);
+  -webkit-backdrop-filter: saturate(150%) blur(14px);
+  backdrop-filter: saturate(150%) blur(14px);
   border: 1px solid var(--glass-border); border-radius: var(--radius);
   padding: 26px; box-shadow: var(--shadow-glass);
   transition: transform .2s ease, box-shadow .25s ease;
