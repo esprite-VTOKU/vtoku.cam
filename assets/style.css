@@ -239,6 +239,18 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
 /* ---------- contact embed ---------- */
 .embed-frame { width: 100%; min-height: 760px; border: 1px solid var(--glass-border); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow-soft); }
 
+/* docs image placeholders (replace .ph with an <img> once captured) */
+.docshot { margin: 26px 0; }
+.docshot .ph {
+  aspect-ratio: 16 / 10; border: 1.5px dashed rgba(108,92,231,.45); border-radius: 14px;
+  background: rgba(255,255,255,.35); display: grid; place-items: center; text-align: center;
+  color: var(--accent-deep); font-size: .9rem; font-weight: 500; padding: 20px;
+}
+.docshot.phone .ph { aspect-ratio: 9 / 19.5; max-width: 260px; margin: 0 auto; }
+.docshot img { display: block; width: 100%; border-radius: 14px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); }
+.docshot.phone img { max-width: 260px; margin: 0 auto; }
+.docshot figcaption { margin-top: 8px; font-size: .85rem; color: var(--text-faint); text-align: center; }
+
 /* ---------- footer ---------- */
 .footer {
   margin-top: 56px; padding: 52px 0 40px;
