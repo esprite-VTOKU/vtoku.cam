@@ -26,9 +26,9 @@
     <h1>Connect to Warudo</h1>
   </div>
   <main class="prose" style="padding-bottom:24px;">
-    <p>Warudo is the most common destination for VTOKU Cam. The phone tracks the real camera and sends
-      pose to Warudo over <strong>VMC/OSC</strong>; Warudo can also send avatar bone and blendshape data
-      back to the phone so your VRM moves in AR.</p>
+    <p>Warudo is the most common destination for VTOKU Cam. Install the VTOKU Cam Warudo plugin, then the
+      phone sends its camera to the plugin over <strong>OSC and FreeD</strong>. Warudo can also send
+      avatar bone and blendshape data back to the phone over <strong>VMC</strong> so your VRM moves in AR.</p>
 
     <h2>Workshop plugin</h2>
     <p>The VTOKU Cam Workshop plugin adds VTOKU Cam nodes and assets to Warudo for a tighter setup.</p>
@@ -57,19 +57,22 @@
     <figure class="docshot"><div class="ph">UI: VTOKU Cam plugin loaded in Warudo (desktop)</div>
       <figcaption>The VTOKU Cam Workshop plugin in Warudo.</figcaption></figure>
 
-    <h2>1. Send camera pose to Warudo</h2>
-    <figure class="docshot phone"><img src="../assets/screenshots/senders.jpg" alt="VTOKU Cam Senders panel with VMC/OSC enabled" loading="lazy" width="360" height="782">
-      <figcaption>Enabling the VMC/OSC sender in VTOKU Cam.</figcaption></figure>
+    <h2>1. Send your camera to Warudo</h2>
+    <figure class="docshot phone"><img src="../assets/screenshots/senders.jpg" alt="VTOKU Cam Senders panel with OSC and FreeD enabled" loading="lazy" width="360" height="782">
+      <figcaption>Enabling the senders in VTOKU Cam.</figcaption></figure>
     <ol>
-      <li>In Warudo, add a <strong>VMC Receiver</strong> and note its port (the VMC default is
-        <code>39539</code>).</li>
-      <li>In VTOKU Cam, open <strong>Senders</strong> and enable <strong>VMC/OSC</strong>.</li>
-      <li>Set the destination IP to your computer's IP and the port to match Warudo's receiver.</li>
-      <li>VTOKU Cam streams <code>/VMC/Ext/Cam</code> (camera transform + FOV), plus root position and
-        lens messages, phase-locked to the ARKit frame.</li>
+      <li>In Warudo, add the <strong>VTOKU Camera</strong> asset from the plugin (installed above), and
+        bind it to your scene's camera.</li>
+      <li>In VTOKU Cam, open <strong>Senders</strong> and enable <strong>VMC/OSC</strong> and/or
+        <strong>FreeD</strong>, then set the destination IP to your computer.</li>
+      <li>Match the ports between the app and the VTOKU Camera asset (VTOKU Cam defaults: OSC
+        <code>19190</code>, FreeD <code>40000</code>).</li>
+      <li>The asset applies the camera transform and FOV to your Warudo camera, phase-locked to the
+        ARKit frame.</li>
     </ol>
-    <div class="note"><p><strong>Tip:</strong> VTOKU Cam's default VMC <em>send</em> port is
-      <code>19190</code>. Make sure the port you set matches whatever your Warudo VMC receiver listens on.</p></div>
+    <div class="note caution"><p><strong>Use the VTOKU Camera asset, not Warudo's VMC Receiver.</strong>
+      Warudo's built-in VMC Receiver doesn't understand the camera format. The VTOKU Camera asset reads
+      the camera over OSC and FreeD instead.</p></div>
 
     <h2>2. Drive the avatar from Warudo (optional)</h2>
     <p>To have Warudo animate the VRM shown on the phone, send VMC back to the device:</p>
