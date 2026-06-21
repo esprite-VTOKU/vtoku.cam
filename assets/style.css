@@ -166,6 +166,18 @@ a.card { color: inherit; display: block; }
 a.card:hover { text-decoration: none; }
 a.card:hover h3 { color: var(--accent-deep); }
 
+/* plain card — a flat, non-glass surface that breaks up the glass rhythm so the
+   frosted panels read as a deliberate choice rather than the default everywhere.
+   Used for content sitting on a .section-tint band (avoids glass-on-glass). */
+.card-plain {
+  background: transparent;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  border: none; border-top: 1px solid var(--glass-border);
+  border-radius: 0; box-shadow: none;
+  padding: 24px 2px 4px;
+}
+.card-plain:hover { transform: none; box-shadow: none; }
+
 /* ---------- section heading ---------- */
 .section-head { text-align: center; margin-bottom: 44px; }
 .section-head h2 { margin-bottom: 0; }
