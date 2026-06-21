@@ -18,6 +18,9 @@ violet. Tokens here mirror `assets/style.css`. Read this before adding pages.
   uses a violet-to-pink gradient text fill.
 - Apple typography. System font stack (SF Pro), large bold headings in sentence case.
 - Quiet motion. Small hover lifts, one fade-in. Respect `prefers-reduced-motion`.
+- Not everything is glass. Glass should feel chosen, not automatic. Keep some plain
+  surfaces (flat or transparent) so the frosted panels have something to contrast against,
+  and never stack glass on glass. Content sitting on a `.section-tint` band uses plain cards.
 
 ## Color tokens
 
@@ -43,6 +46,9 @@ highlight + faint inner border).
 - Nav: sticky translucent glass bar with a hairline.
 - Hero: app icon on top, eyebrow as a glass pill, big headline. `Go VRL.` with `.vrl` gradient text.
 - Cards: frosted panels that lift on hover; violet gradient icon tiles with a white glyph.
+- `.card-plain`: a flat, non-glass card (transparent, hairline top divider, no blur or shadow).
+  Used for content on a `.section-tint` band so the band reads as the surface and the glass
+  feature grid above it stays the standout, not one of three stacked glass layers.
 - `.section-tint`: a faint extra frosted band (via `::before`) to vary rhythm between sections.
 - `.reading`: a centered frosted sheet wrapping legal/docs prose for readability.
 
