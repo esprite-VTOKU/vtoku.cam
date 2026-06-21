@@ -1,19 +1,18 @@
 # DESIGN.md — vtoku.cam
 
-Persistent design system for the **VTOKU Cam** website. Aesthetic: **Liquid Glass /
-glassmorphism**. Frosted, semi-transparent panels float over a soft pastel mesh-gradient backdrop,
-with bright edge highlights and real depth. It echoes iOS 26 Liquid Glass and uses the app's brand
-violet. Tokens here mirror `assets/style.css`. Read this before adding pages.
+Persistent design system for the **VTOKU Cam** website. Aesthetic: **soft frosted panels** with
+bright edge highlights and real depth, over a calm off-white background. It echoes iOS 26 Liquid
+Glass and uses the app's brand violet. Tokens here mirror `assets/style.css`. Read this before
+adding pages.
 
 ## Principles
 
-- Color shows through glass. The page has a fixed pastel mesh gradient (lavender, periwinkle,
-  blush, aqua). Panels are translucent white with `backdrop-filter: blur` so the gradient blooms
-  behind them. Never put panels on a flat white page; the gradient is what makes glass read as glass.
+- Calm background. The page sits on a single soft off-white solid (`#F5F3FB`), no gradient.
+  Panels read as light frosted cards held by their borders, inner top highlight, and soft shadow.
 - Frosted, layered, lit. Cards use ~40-60% white fill, a light hairline border, a bright inner top
   highlight (`inset 0 1px 0`), and a soft violet-tinted drop shadow.
 - Readable first. Long text (legal, docs) sits inside a stronger frosted "sheet" (`.reading`) so it
-  stays legible over the gradient. Dark text (`#1A1726`) throughout.
+  stays legible. Dark text (`#1A1726`) throughout.
 - One brand color. Violet (`#6C5CE7`, from the app icon) for accents and buttons. The VRL wordmark
   uses a violet-to-pink gradient text fill.
 - Apple typography. System font stack (SF Pro), large bold headings in sentence case.
@@ -26,7 +25,7 @@ violet. Tokens here mirror `assets/style.css`. Read this before adding pages.
 
 | Token | Value | Use |
 |---|---|---|
-| body bg | pastel mesh gradient, fixed | The canvas behind all glass |
+| body bg | `#F5F3FB` soft off-white solid | The canvas behind all panels |
 | `--glass` | `rgba(255,255,255,.42)` | Default panel fill |
 | `--glass-strong` | `rgba(255,255,255,.60)` | Reading sheet, ghost button, eyebrow pill |
 | `--glass-edge` | `rgba(255,255,255,.75)` | Inner top highlight |

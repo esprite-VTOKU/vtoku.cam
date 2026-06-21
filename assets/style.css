@@ -1,4 +1,4 @@
-/* vtoku.cam — Liquid Glass / glassmorphism. Frosted translucent panels over a soft mesh gradient.
+/* vtoku.cam — soft frosted panels over a calm off-white background.
    Tokens mirror DESIGN.md. */
 
 :root {
@@ -45,17 +45,7 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   min-height: 100vh;
-  background: #F3EEFF;
-}
-/* fixed gradient layer (cheaper than background-attachment: fixed on scroll) */
-body::before {
-  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(40% 38% at 12% 8%,  rgba(173, 150, 255, .38), transparent 60%),
-    radial-gradient(42% 40% at 88% 6%,  rgba(150, 190, 255, .34), transparent 60%),
-    radial-gradient(46% 44% at 82% 72%, rgba(255, 168, 224, .20), transparent 60%),
-    radial-gradient(46% 42% at 14% 88%, rgba(150, 224, 255, .28), transparent 60%),
-    linear-gradient(160deg, #F3EEFF 0%, #EEF3FF 50%, #FCEFF7 100%);
+  background: #F5F3FB;
 }
 
 a { color: var(--accent-bright); text-decoration: none; }
