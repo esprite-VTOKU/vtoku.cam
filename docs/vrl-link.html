@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VRL Link, VTOKU Cam docs</title>
+<meta name="description" content="VRL Link connects a remote performer to VTOKU Cam: receive their motion and voice to drive the avatar, and send your camera, video, and audio back over a two-way link.">
+<link rel="icon" href="../assets/app-icon.png" sizes="any">
+<link rel="apple-touch-icon" href="../assets/app-icon.png">
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="../"><img class="brand-logo" src="../assets/vtoku-logo.png" alt="VTOKU"></a>
+    <div class="nav-links">
+      <a class="nav-discord" href="https://discord.gg/" target="_blank" rel="noopener" aria-label="Join our Discord"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.08.08 0 0 0-.07.04c-.18.33-.39.76-.53 1.09a16.1 16.1 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09A.08.08 0 0 0 8.99 4c-1.5.26-2.93.71-4.27 1.33a.07.07 0 0 0-.03.03C1.97 9.43 1.22 13.39 1.59 17.31a.09.09 0 0 0 .03.06 16.2 16.2 0 0 0 5.24 2.65.08.08 0 0 0 .09-.03c.4-.55.76-1.13 1.07-1.74a.08.08 0 0 0-.04-.11c-.57-.22-1.11-.48-1.64-.78a.08.08 0 0 1-.01-.13c.11-.08.22-.17.33-.25a.08.08 0 0 1 .08-.01c3.44 1.57 7.15 1.57 10.55 0a.08.08 0 0 1 .08.01c.11.09.22.17.33.26a.08.08 0 0 1-.01.13c-.52.31-1.07.56-1.64.78a.08.08 0 0 0-.04.11c.32.61.68 1.19 1.07 1.74a.08.08 0 0 0 .09.03 16.15 16.15 0 0 0 5.25-2.65.08.08 0 0 0 .03-.06c.44-4.53-.73-8.46-3.1-11.95a.06.06 0 0 0-.03-.03zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/></svg></a>
+      <a href="../index.html#features">Features</a><a href="./">Docs</a><a href="../support.html">Support</a>
+      <a href="../beta.html">Join beta</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container reading">
+  <div class="page-head">
+    <p class="crumb"><a href="./">Docs</a> / VRL Link</p>
+    <h1>VRL Link</h1>
+  </div>
+  <main class="prose" style="padding-bottom:24px;">
+    <p>VRL Link is a two-way link between a remote performer and VTOKU Cam. The performer drives the
+      avatar on your phone with their motion and voice, while you operate the camera in the real world.
+      You can send your program back over the same link, so a VTuber performing from home can appear in a
+      shot you are filming somewhere else.</p>
+
+    <div class="note"><p><strong>In beta.</strong> VRL Link is in beta and free to use during the
+      TestFlight period. Setup may change as it develops.</p></div>
+
+    <h2>VRL Link for Windows</h2>
+    <p>VRL Link has two halves: the app on your phone, and the <strong>VRL Link</strong> desktop app on
+      the performer's PC. The desktop app sits between <a href="warudo.html">Warudo</a> (motion and voice)
+      and the room the phone joins, and routes the returning program video and audio into OBS. The
+      performer runs it on their PC; the camera operator only needs the phone.</p>
+    <p><strong>You'll need:</strong> Windows 10 or 11, <a href="https://warudo.app" target="_blank" rel="noopener">Warudo</a>
+      with a character loaded, and OBS for the return video.</p>
+    <p>
+      <a class="btn btn-primary" href="https://github.com/esprite-VTOKU/vrl-bridge-releases/releases/latest" target="_blank" rel="noopener">Download VRL Link for Windows</a>
+    </p>
+    <p>Download <strong>VrlBridge-win-Setup.exe</strong> from the latest release and run it. It installs
+      the VRL Link app and adds the VRL Link sender to Warudo.</p>
+
+    <div class="note caution"><p><strong>A Windows security warning is expected.</strong> VRL Link is a
+      new app and isn't widely recognised by Microsoft SmartScreen yet, so Windows may show
+      <em>&ldquo;Windows protected your PC.&rdquo;</em> This does not mean anything is wrong with the
+      download. Click <strong>More info</strong>, then <strong>Run anyway</strong> to continue. Only run
+      installers you downloaded from the official release link above.</p></div>
+
+    <p>Once VRL Link is installed on the PC and connected to the same room, set up the phone side under
+      <strong>Settings &rsaquo; VRL Link</strong>.</p>
+
+    <h2>1. Pair the two ends</h2>
+    <p>Both ends connect with a shared secret. On the phone, tap <strong>Generate</strong> to create one,
+      then <strong>Copy</strong> it and share it with the remote performer over a private channel. They
+      enter the same secret on their end. Anyone with the secret can join, so keep it private and
+      regenerate it if it leaks.</p>
+
+    <h2>2. Connect and receive the performance</h2>
+    <p>Turn on <strong>Connect</strong>. The phone receives the remote performer's motion and voice, and
+      the avatar lip-syncs to it. Two controls smooth the incoming motion:</p>
+    <ul>
+      <li><strong>Offset</strong>, adds delay (up to 600&nbsp;ms) to line the motion up with audio or a
+        switcher.</li>
+      <li><strong>Smoothing</strong>, evens out jitter on a less stable connection.</li>
+    </ul>
+    <p>To hear the remote audio on the room speakers or an interface, turn on <strong>Monitor PC
+      audio</strong> and pick the output device.</p>
+
+    <h2>3. Send your program back (optional)</h2>
+    <p>Once connected, return this phone's program to the remote end:</p>
+    <ul>
+      <li><strong>Send video</strong>, sends the composited camera view back, with resolution (540p,
+        720p, 1080p) and bitrate controls.</li>
+      <li><strong>Send camera</strong>, sends the camera move so the remote scene matches your shot. VRL
+        Link carries this over VMC.</li>
+      <li><strong>Send audio</strong>, sends a microphone back to the performer, with a mic picker and
+        bitrate control.</li>
+    </ul>
+
+    <h2>When to use VRL Link vs. Warudo</h2>
+    <p>Use <a href="warudo.html">Warudo</a> when the performer and the PC are on your local network. Use
+      VRL Link when the performer is somewhere else entirely: it carries motion, voice, camera, and video
+      over the internet in both directions, with no shared LAN required.</p>
+
+    <h2>Troubleshooting</h2>
+    <ul>
+      <li><strong>Avatar doesn't move:</strong> confirm both ends entered the exact same secret and that
+        Connect is on.</li>
+      <li><strong>Motion lags or jitters:</strong> raise Smoothing, and use Offset to realign it with the
+        audio.</li>
+      <li><strong>No remote audio:</strong> turn on Monitor PC audio and check the selected output
+        device.</li>
+    </ul>
+
+    <hr>
+    <p class="muted">Back to <a href="./">all documentation</a>.</p>
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><a class="brand" href="../"><img src="../assets/app-icon.png" alt=""> VTOKU&nbsp;Cam</a>
+        <p class="muted" style="max-width:280px;margin-top:12px;">Virtual production for all. A VTOKU app.</p></div>
+      <div><h4>Product</h4><ul><li><a href="../index.html#features">Features</a></li><li><a href="./">Documentation</a></li><li><a href="../support.html">Support</a></li><li><a href="../beta.html">Join the beta</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="../privacy.html">Privacy Policy</a></li><li><a href="../terms.html">Terms &amp; EULA</a></li><li><a href="../support.html#acknowledgements">Acknowledgements</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="https://vtoku.com">VTOKU.com</a></li><li><a href="https://vtoku.com/about-us/">About</a></li><li><a href="https://vtoku.com/contact-us/">Contact</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span class="legal">© 2026 VTOKU LLC. All rights reserved.</span><span class="legal">VRM, Warudo, NDI, and VMC are trademarks of their respective owners.</span></div>
+  </div>
+</footer>
+</body>
+</html>

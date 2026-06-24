@@ -47,6 +47,24 @@
       <li>Enable <strong>NDI Receive</strong>.</li>
       <li>Pick a discovered source from the list to bring it in as an overlay.</li>
     </ol>
+    <div class="note"><p><strong>Receive shows in VR mode only.</strong> The received feed appears when
+      you switch to VR mode. In AR mode ingest stops automatically so it uses no bandwidth. Turn NDI
+      Receive off to never receive.</p></div>
+
+    <h2 id="mask">Send a mask over NDI</h2>
+    <p>To key the avatar onto another background in your compositor, send a matte alongside the main feed.
+      VTOKU Cam appears as a second NDI source named <strong>&ldquo;[device] Mask&rdquo;</strong> that you
+      apply as alpha or a luma key on the paired feed. Set it up in
+      <strong>Settings &rsaquo; Graphics &rsaquo; Masking</strong>:</p>
+    <ul>
+      <li><strong>Mask contents</strong>, choose <strong>Occlusion mask</strong> (real-world depth for
+        keying) or <strong>Avatar + shadow matte</strong> (the avatar and her ground shadow only).</li>
+      <li><strong>Depth source</strong> (for the occlusion mask), <strong>LiDAR (realtime)</strong> or
+        <strong>Neural (still camera)</strong> for crisper edges when the camera holds still.</li>
+      <li><strong>Send mask over NDI</strong>, turn it on to publish the second source. Requires a
+        LiDAR-capable device and a placed anchor.</li>
+    </ul>
+    <p>See <a href="look-camera.html#occlusion">Occlusion and masking</a> for how the depth modes work.</p>
 
     <div class="note"><p><strong>NDI|HX output requires Pro.</strong> Standard NDI send and receive are
       free. The more bandwidth-efficient <strong>NDI|HX</strong> (HEVC) output is unlocked by the

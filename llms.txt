@@ -9,16 +9,20 @@
 
 ## What you can do
 - Use your phone as a moving virtual camera in Warudo (sends camera pose over the network).
-- Perform a VRM avatar in AR with real-time face tracking, plus idle and dance motion.
-- Record your performance to video.
+- Perform a VRM avatar in AR with real-time face tracking, plus idle and dance motion. (Full-body motion tracking is coming soon.)
+- Hide the avatar behind real-world objects with on-device occlusion (LiDAR plus a neural depth model), defocus her with lens-accurate depth of field, and grade the frame with the Screen FX anime look.
+- Record your performance to video, send and receive NDI, output over HDMI, or go live over SRT/SRTLA.
 - Go live anywhere, bonding Wi-Fi and cellular with SRTLA so the stream holds up on the move.
+- Link a remote performer with VRL Link: receive their motion and voice to drive the avatar, and send your camera, video, and audio back.
 - Works standalone (no PC) and scales into a Warudo or NDI studio setup.
 
 ## Key pages
 - Home: https://vtoku.cam/
 - Documentation: https://vtoku.cam/docs/
 - Connect with Warudo: https://vtoku.cam/docs/warudo.html
+- Look and camera (occlusion, depth of field, Screen FX, HDMI): https://vtoku.cam/docs/look-camera.html
 - Bonded live streaming (SRT/SRTLA): https://vtoku.cam/docs/streaming.html
+- VRL Link (remote performer link): https://vtoku.cam/docs/vrl-link.html
 - Support and FAQ: https://vtoku.cam/support.html
 - Join the beta: https://vtoku.cam/beta.html
 - Privacy Policy: https://vtoku.cam/privacy.html

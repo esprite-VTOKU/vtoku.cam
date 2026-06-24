@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Look &amp; camera, VTOKU Cam docs</title>
+<meta name="description" content="Real-world occlusion, lens-accurate depth of field, autofocus, the Screen FX anime grade, graphics quality, and HDMI monitoring in VTOKU Cam.">
+<link rel="icon" href="../assets/app-icon.png" sizes="any">
+<link rel="apple-touch-icon" href="../assets/app-icon.png">
+<link rel="stylesheet" href="../assets/style.css?v=2">
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="../"><img class="brand-logo" src="../assets/vtoku-logo.png" alt="VTOKU"></a>
+    <div class="nav-links">
+      <a class="nav-discord" href="https://discord.gg/" target="_blank" rel="noopener" aria-label="Join our Discord"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.08.08 0 0 0-.07.04c-.18.33-.39.76-.53 1.09a16.1 16.1 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09A.08.08 0 0 0 8.99 4c-1.5.26-2.93.71-4.27 1.33a.07.07 0 0 0-.03.03C1.97 9.43 1.22 13.39 1.59 17.31a.09.09 0 0 0 .03.06 16.2 16.2 0 0 0 5.24 2.65.08.08 0 0 0 .09-.03c.4-.55.76-1.13 1.07-1.74a.08.08 0 0 0-.04-.11c-.57-.22-1.11-.48-1.64-.78a.08.08 0 0 1-.01-.13c.11-.08.22-.17.33-.25a.08.08 0 0 1 .08-.01c3.44 1.57 7.15 1.57 10.55 0a.08.08 0 0 1 .08.01c.11.09.22.17.33.26a.08.08 0 0 1-.01.13c-.52.31-1.07.56-1.64.78a.08.08 0 0 0-.04.11c.32.61.68 1.19 1.07 1.74a.08.08 0 0 0 .09.03 16.15 16.15 0 0 0 5.25-2.65.08.08 0 0 0 .03-.06c.44-4.53-.73-8.46-3.1-11.95a.06.06 0 0 0-.03-.03zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/></svg></a>
+      <a href="../index.html#features">Features</a><a href="./">Docs</a><a href="../support.html">Support</a>
+      <a href="../beta.html">Join beta</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container reading">
+  <div class="page-head">
+    <p class="crumb"><a href="./">Docs</a> / Look &amp; camera</p>
+    <h1>Look &amp; camera</h1>
+  </div>
+  <main class="prose" style="padding-bottom:24px;">
+    <p>VTOKU Cam gives you cinema-style control over how the shot looks: real-world occlusion so the
+      avatar sits in the room, lens-accurate depth of field, autofocus that follows your subject, an
+      anime color grade, and a graphics-quality setting. These live under
+      <strong>Settings &rsaquo; Graphics</strong>, and they apply to the viewfinder and every output
+      (recording, HDMI, NDI, SRT, VRL Link).</p>
+
+    <h2 id="occlusion">Occlusion and masking</h2>
+    <p>With occlusion on, the avatar is hidden behind real-world objects and people in front of her, so
+      she sits inside the scene instead of floating over it. Open
+      <strong>Settings &rsaquo; Graphics &rsaquo; Masking</strong>.</p>
+    <ul>
+      <li><strong>Occlude in the live camera</strong>, hides the avatar behind real-world objects in the
+        viewfinder and every output, using the device's depth sensor. Requires a LiDAR-capable device.</li>
+      <li><strong>Sharpen with neural depth when still</strong>, when the camera holds still it occludes
+        with an on-device neural depth model for crisper edges, then falls back to LiDAR the moment you
+        move.</li>
+    </ul>
+    <div class="note"><p><strong>On-device and private.</strong> The neural depth model (about 50&nbsp;MB)
+      downloads on first use and runs entirely on the device. No camera or depth data is sent to VTOKU
+      (see the <a href="../privacy.html">Privacy Policy</a>).</p></div>
+    <p>You can also send the occlusion or avatar matte to a compositor as a separate NDI source. See
+      <a href="ndi.html#mask">Send a mask over NDI</a>.</p>
+
+    <h2 id="dof">Depth of field</h2>
+    <p>Turn on <strong>Depth of field</strong> to defocus the background and foreground around your
+      subject. It is modelled on the real lens, so the avatar blurs at the same rate as the room behind
+      her. At &times;1 it matches true phone optics; raise <strong>Blur strength</strong> to open the
+      effective aperture for a shallower, more cinematic look.</p>
+
+    <h2 id="focus">Autofocus and focus tracking</h2>
+    <p>The real lens focus is controlled from the <strong>FOCUS</strong> dial (tap the dial to toggle
+      auto and manual, drag to rack focus by hand). On top of that, VTOKU Cam tracks focus for you:</p>
+    <ul>
+      <li><strong>Tap to track focus</strong>, tap anywhere in the viewfinder to lock focus on that
+        point; tap the reticle to release it.</li>
+      <li><strong>Follow the avatar</strong>, frame the avatar and focus racks to her whole body, not
+        just her head.</li>
+      <li><strong>Face-priority for real people</strong>, when a real person is in shot the hardware
+        autofocus prioritises their face.</li>
+      <li><strong>Share the shot</strong>, a virtual avatar and a live person can both stay in focus, so
+        a VTuber and an IRL guest can appear together.</li>
+    </ul>
+
+    <h2 id="screen-fx">Screen FX</h2>
+    <p>Screen FX applies an anime color grade over the whole frame, in the viewfinder and every output.
+      Open <strong>Settings &rsaquo; Graphics &rsaquo; Screen FX</strong>, pick a preset, then fine-tune
+      it. Adjustable parameters include intensity, exposure, contrast, saturation, bloom, gradients,
+      vignette, grain, color fringing, anamorphic flare, and dust motes. Save your own settings as a
+      preset to reuse later.</p>
+
+    <h2 id="quality">Graphics quality</h2>
+    <p>The <strong>Quality</strong> setting trades visual fidelity for performance: <strong>Auto</strong>
+      matches your device, and <strong>Low</strong> / <strong>Medium</strong> / <strong>High</strong>
+      let you set it by hand. Lower quality is lighter to render, which helps keep streaming smooth and
+      the device cooler. You can also tune the avatar's ground shadow strength, length, and softness
+      here.</p>
+
+    <h2 id="hdmi">HDMI monitoring</h2>
+    <p>Connect the device to an external display over USB-C or HDMI, then turn on <strong>HDMI</strong>
+      under <strong>Settings &rsaquo; Output</strong> to mirror the live program to that display, clean
+      of the on-screen controls. Turn on <strong>Include microphone audio</strong> to route sound to the
+      display as well; the phone speaker is restored when HDMI output is off. HDMI output is off at every
+      launch.</p>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>Occlusion and the neural depth model need a LiDAR-capable device; on other devices the avatar
+        renders without real-world occlusion.</li>
+      <li>Set your look (depth of field, Screen FX) before you hit record or go live so the take is
+        consistent.</li>
+      <li>If streaming feels heavy or the device runs hot, drop the Quality setting a notch.</li>
+    </ul>
+
+    <hr>
+    <p class="muted">Next: <a href="recording.html">Recording takes &rarr;</a></p>
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><a class="brand" href="../"><img src="../assets/app-icon.png" alt=""> VTOKU&nbsp;Cam</a>
+        <p class="muted" style="max-width:280px;margin-top:12px;">Virtual production for all. A VTOKU app.</p></div>
+      <div><h4>Product</h4><ul><li><a href="../index.html#features">Features</a></li><li><a href="./">Documentation</a></li><li><a href="../support.html">Support</a></li><li><a href="../beta.html">Join the beta</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="../privacy.html">Privacy Policy</a></li><li><a href="../terms.html">Terms &amp; EULA</a></li><li><a href="../support.html#acknowledgements">Acknowledgements</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="https://vtoku.com">VTOKU.com</a></li><li><a href="https://vtoku.com/about-us/">About</a></li><li><a href="https://vtoku.com/contact-us/">Contact</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span class="legal">© 2026 VTOKU LLC. All rights reserved.</span><span class="legal">VRM, Warudo, NDI, and VMC are trademarks of their respective owners.</span></div>
+  </div>
+</footer>
+</body>
+</html>

@@ -68,9 +68,17 @@
       length with the Lens controls. FOV is included in the VMC camera message so your virtual lens
       matches the phone.</p>
 
-    <h2>iFacialMocap</h2>
-    <p>VTOKU Cam can also speak iFacialMocap for face data, with auto-discovery on the LAN. If discovery
-      is blocked by your network, enter the destination manually where supported.</p>
+    <h2 id="face">Send face tracking</h2>
+    <p>Separately from the camera, VTOKU Cam can stream on-device face capture to your PC. In
+      <strong>Settings &rsaquo; Motion</strong>, turn on <strong>Send Face Tracking</strong>. It sends
+      over VMC and is compatible with iFacialMocap receivers, so tools like Warudo and VSeeFace can read
+      it.</p>
+    <ul>
+      <li>Send to the <strong>same destination as the camera</strong>, or set a <strong>custom IP and
+        port</strong> when your face receiver lives on a different machine.</li>
+      <li>To capture and tune the face on the device first, see
+        <a href="avatars.html#face">Avatars &amp; faces</a>.</li>
+    </ul>
 
     <hr>
     <p class="muted">Next: <a href="ndi.html">NDI in &amp; out →</a></p>

@@ -28,7 +28,8 @@
   </div>
   <main class="prose" style="padding-bottom:24px;">
     <p>VTOKU Cam renders a VRM avatar in AR with a cel and toon look, live lighting, and ground contact
-      shadows. You can drive its face and body from the device, or from Warudo over VMC.</p>
+      shadows. You can drive its face from the device or from Warudo over VMC, and play built-in idle and
+      dance motion. Full-body motion tracking is coming soon.</p>
 
     <figure class="docshot phone"><img src="../assets/screenshots/avatars.jpg" alt="VTOKU Cam Avatars sheet" loading="lazy" width="360" height="782">
       <figcaption>The Avatars sheet.</figcaption></figure>
@@ -47,19 +48,33 @@
     <p>Avatars render with a cel / toon shader for a clean anime-style result, with live lighting that
       responds to the room (key-light direction and warmth estimated from the AR scene) and soft ground
       contact shadows under the feet.</p>
+    <p>The avatar can also be hidden behind real-world objects and defocused like a real subject. See
+      <a href="look-camera.html#occlusion">occlusion</a>, <a href="look-camera.html#dof">depth of
+      field</a>, and the <a href="look-camera.html#screen-fx">Screen FX</a> grade in
+      <a href="look-camera.html">Look &amp; camera</a>.</p>
 
     <figure class="docshot phone"><img src="../assets/screenshots/face.jpg" alt="VTOKU Cam face tuning and calibration settings" loading="lazy" width="360" height="782">
       <figcaption>Face tracking settings.</figcaption></figure>
 
     <h2 id="face">Face tracking</h2>
-    <p>On a TrueDepth-capable device, ARKit blendshapes drive the avatar's expressions:</p>
+    <p>Turn on <strong>Face tracking</strong> under <strong>Settings &rsaquo; Motion</strong>, then pick
+      the face source:</p>
+    <ul>
+      <li><strong>On-device</strong>, the front TrueDepth camera drives the face with ARKit blendshapes.</li>
+      <li><strong>VMC</strong>, a Warudo (or other VMC) feed drives the face from your PC.</li>
+      <li><strong>iFacialMocap</strong>, receive face data from an iFacialMocap sender on the network.</li>
+    </ul>
+    <p>For on-device capture, tap <strong>Calibrate neutral face</strong> with a relaxed expression so
+      the avatar rests correctly. ARKit blendshapes map to the avatar two ways:</p>
     <ul>
       <li><strong>Perfect-sync</strong>, if your VRM ships custom expression clips named after the ARKit
         blendshapes, the app drives the full set by name.</li>
       <li><strong>Basic</strong>, otherwise it maps to the standard VRM expression presets.</li>
-      <li><strong>Warudo override</strong>, when a Warudo VMC feed is live, its face/blend data takes
-        over from on-device capture.</li>
+      <li><strong>VMC override</strong>, when a VMC feed is live, its face data takes over from on-device
+        capture.</li>
     </ul>
+    <p>You can also send the captured face out to other tools (iFacialMocap-compatible). See
+      <a href="pose-streaming.html#face">Send face tracking</a>.</p>
 
     <h2>Idle &amp; dance animation</h2>
     <p>The app can play built-in idle motion and VRMA dance animations on your avatar when it isn't being
@@ -74,7 +89,7 @@
     </ul>
 
     <hr>
-    <p class="muted">Next: <a href="recording.html">Recording takes →</a></p>
+    <p class="muted">Next: <a href="look-camera.html">Look &amp; camera →</a></p>
   </main>
 </div>
 
