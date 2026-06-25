@@ -85,6 +85,24 @@
         bitrate control.</li>
     </ul>
 
+    <h2>4. Show the return video in OBS</h2>
+    <p>On Windows, VRL Link hands the returning program video to OBS over <strong>Spout</strong>, a local
+      GPU texture share, so it stays on the one machine with no extra network. You need the Spout2 plugin
+      for OBS to receive it:</p>
+    <ol>
+      <li>Install the <a href="https://github.com/Off-World-Live/obs-spout2-plugin/releases" target="_blank" rel="noopener">OBS Spout2 plugin</a>
+        (Off-World-Live), then restart OBS.</li>
+      <li>In OBS, add a <strong>Spout2 Capture</strong> source.</li>
+      <li>Set its sender to the VRL Link program output (listed as
+        <strong>&ldquo;VRL Bridge Program&rdquo;</strong>).</li>
+    </ol>
+    <p>Return audio (the performer's voice and your operator mic) is sent to separate output devices that
+      you capture in OBS, so you can balance the mix in your own software.</p>
+    <div class="note"><p><strong>Remote OBS?</strong> Spout is Windows-only and same-machine. If OBS runs
+      on another computer, switch the video output to <strong>NDI</strong> and add a
+      <a href="https://github.com/DistroAV/DistroAV" target="_blank" rel="noopener">DistroAV</a> NDI
+      source instead.</p></div>
+
     <h2>When to use VRL Link vs. Warudo</h2>
     <p>Use <a href="warudo.html">Warudo</a> when the performer and the PC are on your local network. Use
       VRL Link when the performer is somewhere else entirely: it carries motion, voice, camera, and video
