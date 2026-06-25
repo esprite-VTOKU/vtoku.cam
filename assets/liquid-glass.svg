@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- Subtle refraction for the glass cards. Ported from the SVG-displacement
+       technique in github.com/samasante/liquid-glass, as plain SVG (no React,
+       no build). Referenced from style.css as a backdrop-filter. -->
+  <filter id="liquidGlass" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.009 0.013" numOctaves="2" seed="11" result="noise"/>
+    <feGaussianBlur in="noise" stdDeviation="1.4" result="soft"/>
+    <feDisplacementMap in="SourceGraphic" in2="soft" scale="12" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>

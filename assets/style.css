@@ -375,3 +375,25 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- liquid-glass refraction (progressive enhancement) ----------
+   A subtle SVG-displacement refraction layered ON TOP of the existing card
+   blur, ported from the technique in github.com/samasante/liquid-glass as
+   plain CSS + SVG (no React, no build step). The base .card blur above is left
+   untouched, so this can only add, never subtract: browsers without SVG
+   backdrop-filter support (Safari and Firefox today) keep the frosted blur as
+   is. Scoped to Chromium on wider viewports to protect scroll performance and
+   because phones here are iOS/Safari. Tune the look via `scale` and
+   `baseFrequency` in assets/liquid-glass.svg. */
+@supports ((backdrop-filter: url("#x")) or (-webkit-backdrop-filter: url("#x"))) {
+  @media (min-width: 861px) {
+    .card:not(.card-plain) { position: relative; }
+    .card:not(.card-plain) > * { position: relative; z-index: 1; }
+    .card:not(.card-plain)::before {
+      content: ""; position: absolute; inset: 0; z-index: 0;
+      border-radius: inherit; pointer-events: none;
+      -webkit-backdrop-filter: url(liquid-glass.svg#liquidGlass);
+      backdrop-filter: url(liquid-glass.svg#liquidGlass);
+    }
+  }
+}
