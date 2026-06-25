@@ -28,8 +28,9 @@
   </div>
   <main class="prose" style="padding-bottom:24px;">
     <p>VTOKU Cam renders a VRM avatar in AR with a cel and toon look, live lighting, and ground contact
-      shadows. You can drive its face from the device or from Warudo over VMC, and play built-in idle and
-      dance motion. Full-body motion tracking is coming soon.</p>
+      shadows. You can drive its face from the device, drive its face and body from any VMC app on your
+      network (Warudo, Movin Studio, and others), and play built-in idle and dance motion. On-device
+      full-body tracking is coming soon.</p>
 
     <figure class="docshot phone"><img src="../assets/screenshots/avatars.jpg" alt="VTOKU Cam Avatars sheet" loading="lazy" width="360" height="782">
       <figcaption>The Avatars sheet.</figcaption></figure>
@@ -43,6 +44,24 @@
     <div class="note caution"><p><strong>Make sure you have the rights</strong> to any avatar you import
       and use, especially for commercial or public broadcasts. You own and control the files you import;
       VTOKU never receives them.</p></div>
+
+    <h2 id="vmc">Drive the avatar over VMC</h2>
+    <p>VTOKU Cam can receive a body and face performance over <strong>VMC</strong> and apply it to the
+      avatar on the phone. It listens on UDP port <code>39539</code>, the same default that Warudo's VMC
+      receiver uses, so any VMC source on your network can drive the avatar. Point the sender at your
+      phone's IP on port <code>39539</code>. While a VMC feed is live it overrides on-device face capture
+      by design.</p>
+    <ul>
+      <li><strong>Warudo</strong>, add a <strong>VMC Sender</strong> targeting the phone's IP on
+        <code>39539</code>. See <a href="warudo.html#drive">Connect to Warudo</a>.</li>
+      <li><strong>Movin Studio</strong>, enable VMC streaming and set the destination to your phone's IP
+        on port <code>39539</code> (in place of the usual <code>127.0.0.1</code> Warudo address). See
+        Movin's <a href="https://help.movin3d.com/movin-studio-usage-guide/live-streaming/streaming-mocap-data-into-warudo" target="_blank" rel="noopener">VMC streaming guide</a>.
+        To layer Movin's motion with a Warudo scene, send Movin into Warudo and let Warudo forward VMC to
+        the phone instead.</li>
+      <li><strong>Other VMC apps</strong> (VSeeFace and similar) work the same way: aim their VMC output
+        at the phone's IP on <code>39539</code>.</li>
+    </ul>
 
     <h2>The cel look</h2>
     <p>Avatars render with a cel / toon shader for a clean anime-style result, with live lighting that
