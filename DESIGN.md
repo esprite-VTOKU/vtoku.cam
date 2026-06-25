@@ -9,7 +9,7 @@ adding pages.
 
 - Calm background. The page sits on a single soft off-white solid (`#F5F3FB`), no gradient.
   Panels read as light frosted cards held by their borders, inner top highlight, and soft shadow.
-- Frosted, layered, lit. Cards use ~40-60% white fill, a light hairline border, a bright inner top
+- Frosted, layered, lit. Cards use ~26-50% white fill, a light hairline border, a bright inner top
   highlight (`inset 0 1px 0`), and a soft violet-tinted drop shadow.
 - Readable first. Long text (legal, docs) sits inside a stronger frosted "sheet" (`.reading`) so it
   stays legible. Dark text (`#1A1726`) throughout.
@@ -26,8 +26,8 @@ adding pages.
 | Token | Value | Use |
 |---|---|---|
 | body bg | `#F5F3FB` soft off-white solid | The canvas behind all panels |
-| `--glass` | `rgba(255,255,255,.42)` | Default panel fill |
-| `--glass-strong` | `rgba(255,255,255,.60)` | Reading sheet, ghost button, eyebrow pill |
+| `--glass` | `rgba(255,255,255,.26)` | Default panel fill |
+| `--glass-strong` | `rgba(255,255,255,.44)` | Reading sheet, ghost button, eyebrow pill |
 | `--glass-edge` | `rgba(255,255,255,.75)` | Inner top highlight |
 | `--glass-border` | `rgba(255,255,255,.55)` | Panel hairline |
 | `--text` | `#1A1726` | Primary text |
@@ -35,7 +35,7 @@ adding pages.
 | `--accent` | `#6C5CE7` | Brand violet |
 | `--accent-deep` | `#4226A8` | Links/code/hover on glass |
 
-Blur token: `--blur: saturate(180%) blur(22px)`. Glass shadow: `--shadow-glass` (drop + inner
+Blur token: `--blur: saturate(150%) blur(12px)`. Glass shadow: `--shadow-glass` (drop + inner
 highlight + faint inner border).
 
 ## Components
