@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Look &amp; camera, VTOKU Cam docs</title>
-<meta name="description" content="Real-world occlusion, lens-accurate depth of field, autofocus, the Screen FX anime grade, graphics quality, and HDMI monitoring in VTOKU Cam.">
+<meta name="description" content="Real-world occlusion, lens-accurate depth of field, autofocus, the Screen FX anime grade, graphics quality, Outdoor tracking mode, and HDMI monitoring in VTOKU Cam.">
 <link rel="icon" href="../assets/app-icon.png" sizes="any">
 <link rel="apple-touch-icon" href="../assets/app-icon.png">
 <link rel="stylesheet" href="../assets/style.css?v=3">
@@ -14,7 +14,6 @@
   <div class="container nav-inner">
     <a class="brand" href="../"><img class="brand-logo" src="../assets/vtoku-logo.png" alt="VTOKU"></a>
     <div class="nav-links">
-      <a class="nav-discord" href="https://discord.gg/K8wbUDNjVM" target="_blank" rel="noopener" aria-label="Join our Discord"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.08.08 0 0 0-.07.04c-.18.33-.39.76-.53 1.09a16.1 16.1 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09A.08.08 0 0 0 8.99 4c-1.5.26-2.93.71-4.27 1.33a.07.07 0 0 0-.03.03C1.97 9.43 1.22 13.39 1.59 17.31a.09.09 0 0 0 .03.06 16.2 16.2 0 0 0 5.24 2.65.08.08 0 0 0 .09-.03c.4-.55.76-1.13 1.07-1.74a.08.08 0 0 0-.04-.11c-.57-.22-1.11-.48-1.64-.78a.08.08 0 0 1-.01-.13c.11-.08.22-.17.33-.25a.08.08 0 0 1 .08-.01c3.44 1.57 7.15 1.57 10.55 0a.08.08 0 0 1 .08.01c.11.09.22.17.33.26a.08.08 0 0 1-.01.13c-.52.31-1.07.56-1.64.78a.08.08 0 0 0-.04.11c.32.61.68 1.19 1.07 1.74a.08.08 0 0 0 .09.03 16.15 16.15 0 0 0 5.25-2.65.08.08 0 0 0 .03-.06c.44-4.53-.73-8.46-3.1-11.95a.06.06 0 0 0-.03-.03zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/></svg></a>
       <a href="../index.html#features">Features</a><a href="./">Docs</a><a href="../support.html">Support</a>
       <a href="../beta.html">Join beta</a>
     </div>
@@ -84,6 +83,18 @@
       the device cooler. You can also tune the avatar's ground shadow strength, length, and softness
       here.</p>
 
+    <h2 id="outdoor">Outdoor mode</h2>
+    <p>Outdoors and in large rooms the LiDAR sensor runs past its range, so the noisy depth it reads can
+      pull on the world anchor and make the scene drift. Turn on <strong>Outdoor mode</strong> under
+      <strong>Settings &rsaquo; Camera</strong> to drop LiDAR depth and track from the camera and motion
+      sensors alone, which holds steady far from walls. Placement and live lighting still work. Real-world
+      occlusion, depth-of-field focus, and ground reflections turn off while it is on, and tracking
+      restarts when you toggle it.</p>
+    <p>The <strong>TRK</strong> status tells you when tracking is struggling and why: <em>LOW DETAIL</em>
+      when the scene is too plain to track, <em>SLOW DOWN</em> when the device is moving too fast, and
+      <em>RELOCATING</em> while it finds its place again. If you sit in LOW DETAIL for a few seconds, the
+      app suggests Outdoor mode once.</p>
+
     <h2 id="hdmi">HDMI monitoring</h2>
     <p>Connect the device to an external display over USB-C or HDMI, then turn on <strong>HDMI</strong>
       under <strong>Settings &rsaquo; Output</strong> to mirror the live program to that display, clean
@@ -95,6 +106,8 @@
     <ul>
       <li>Occlusion and the neural depth model need a LiDAR-capable device; on other devices the avatar
         renders without real-world occlusion.</li>
+      <li>Filming outdoors or in a large space? If the scene drifts, turn on
+        <a href="#outdoor">Outdoor mode</a>. It trades occlusion and focus tracking for steadier pose.</li>
       <li>Set your look (depth of field, Screen FX) before you hit record or go live so the take is
         consistent.</li>
       <li>If streaming feels heavy or the device runs hot, drop the Quality setting a notch.</li>
