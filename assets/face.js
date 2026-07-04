@@ -141,9 +141,17 @@ let returnAudioMuted = false;   // mute the operator's return audio (e.g. when O
 let detectFails = 0, lastGoodDetect = 0, lastErrMsg = "", cpuFallbackTried = false, reinitBusy = false, stalled = false;
 let lastVideoTime = -1, refQuatInv = null, wantRecenter = true;
 let pktCount = 0, pktWindowStart = 0, faceSeen = false;
-let sentKeys = new Set(), sentBones = new Set();
+let sentKeys = new Set();
+// Persistent last-known bone rotations (name → quaternion). Warudo/the Windows bridge send EVERY
+// humanoid bone EVERY frame; Kalidokit only solves a subset and skips any bone that fails a given
+// frame. Emitting only that frame's solved bones makes the stream sparse + jittery ("hit or miss")
+// and lets the app's per-bone hold / body-liveness flap. We cache last-known values and re-emit the
+// full active set each frame, so the phone gets a dense, steady stream like Warudo's.
+let boneCache = new Map();
 let hintTimer = 0;
 let lastTrackTime = 0, faceRelaxed = false;   // debounce face-neutralize on brief tracking blips
+let lastFaceSolve = 0, lastPoseSolve = 0;     // per-part solve times → hold the cache through blips only
+const HOLD_MS = 500;                           // re-emit a cached part for this long after its last solve
 
 roomInput.value = localStorage.getItem("vrlRoom") || "";
 // Pre-join messages land in the dialog; once it hides, they surface as an overlay chip.
@@ -311,7 +319,7 @@ async function join() {
     if (!camOn) await cameraOn();
     await connectRoom(roomCode);
     joined = true; leaving = false;
-    sentKeys = new Set(); sentBones = new Set();
+    sentKeys = new Set(); boneCache = new Map();
     pktCount = 0; pktWindowStart = performance.now();
     stage.classList.add("live");
     chipRoom.hidden = false; chipRoom.textContent = maskRoom(roomCode);
@@ -442,13 +450,15 @@ function neutralizeFace() {
 // Unity-space VMC bone message. `amp` tames or boosts a chain if it overshoots on device.
 // Non-finite eulers are dropped — Kalidokit emits NaN on degenerate landmarks, and one NaN
 // quaternion freezes the bone on the receiving end.
-function pushBone(messages, mirror, name, e, amp = 1) {
+// Solve → cache one bone's rotation (does NOT emit; the full cache is emitted once per frame).
+// Non-finite eulers are dropped — Kalidokit emits NaN on degenerate landmarks, and one NaN
+// quaternion freezes the bone on the receiving end.
+function cacheBone(mirror, name, e, amp = 1) {
   if (!e || !Number.isFinite(e.x) || !Number.isFinite(e.y) || !Number.isFinite(e.z)) return;
   let q = toUnity(quatFromEuler(e.x * amp, e.y * amp, e.z * amp));
   let n = name;
   if (mirror) { n = mirrorName(name); q = mirrorQ(q); }
-  sentBones.add(n);
-  messages.push(boneMsg(n, q));
+  boneCache.set(n, q);
 }
 function sendFrame(result) {
   if (!joined || !room || room.state !== "connected") return;
@@ -470,7 +480,7 @@ function sendFrame(result) {
   const mirror = optMirror.checked;
   const messages = [];
 
-  // Head (Kalidokit face solve over the holistic landmarks).
+  // Head (Kalidokit face solve over the holistic landmarks) → cache.
   if (hasFace) try {
     const f = Kalidokit.Face.solve(result.faceLandmarks[0], { runtime: "mediapipe", video });
     if (f?.head) {
@@ -478,30 +488,29 @@ function sendFrame(result) {
       if (wantRecenter) { refQuatInv = qConj(headQ); wantRecenter = false; }
       if (refQuatInv) headQ = qMul(refQuatInv, headQ);
       if (mirror) headQ = mirrorQ(headQ);
-      sentBones.add("Head");
-      messages.push(boneMsg("Head", headQ));
+      boneCache.set("Head", headQ);
+      lastFaceSolve = performance.now();
     }
   } catch { /* face solve can fail on partial landmarks */ }
 
-  // Upper body + hands.
+  // Upper body + hands → cache. A bone that fails to solve this frame keeps its last cached value
+  // (re-emitted below), so the stream stays dense/steady instead of dropping the bone.
   if (bOn) try {
     if (result.poseWorldLandmarks?.[0] && result.poseLandmarks?.[0]) {
       const rig = Kalidokit.Pose.solve(result.poseWorldLandmarks[0], result.poseLandmarks[0],
                                        { runtime: "mediapipe", video });
       if (rig) {
-        pushBone(messages, mirror, "Spine", rig.Spine, 0.6);
-        pushBone(messages, mirror, "LeftUpperArm", rig.LeftUpperArm);
-        pushBone(messages, mirror, "LeftLowerArm", rig.LeftLowerArm);
-        pushBone(messages, mirror, "RightUpperArm", rig.RightUpperArm);
-        pushBone(messages, mirror, "RightLowerArm", rig.RightLowerArm);
+        lastPoseSolve = performance.now();
+        cacheBone(mirror, "Spine", rig.Spine, 0.6);
+        cacheBone(mirror, "LeftUpperArm", rig.LeftUpperArm);
+        cacheBone(mirror, "LeftLowerArm", rig.LeftLowerArm);
+        cacheBone(mirror, "RightUpperArm", rig.RightUpperArm);
+        cacheBone(mirror, "RightLowerArm", rig.RightLowerArm);
         // Wrist fallback from pose; overwritten below when the hand solver has real data.
-        if (!result.leftHandLandmarks?.[0]) pushBone(messages, mirror, "LeftHand", rig.LeftHand);
-        if (!result.rightHandLandmarks?.[0]) pushBone(messages, mirror, "RightHand", rig.RightHand);
+        if (!result.leftHandLandmarks?.[0]) cacheBone(mirror, "LeftHand", rig.LeftHand);
+        if (!result.rightHandLandmarks?.[0]) cacheBone(mirror, "RightHand", rig.RightHand);
       }
     }
-    // On a pose/hand dropout we simply STOP sending those bones (no identity/rest — that snapped
-    // the rig to its bind pose). The app holds the last real pose, then eases to idle if the gap
-    // outlasts its body-liveness window.
     for (const side of ["Left", "Right"]) {
       const lms = result[`${side.toLowerCase()}HandLandmarks`]?.[0];
       if (!lms) continue;
@@ -509,10 +518,21 @@ function sendFrame(result) {
       if (!hand) continue;
       for (const [key, e] of Object.entries(hand)) {
         const bone = key === `${side}Wrist` ? `${side}Hand` : key;   // VMC/Unity wrist name
-        pushBone(messages, mirror, bone, e);
+        cacheBone(mirror, bone, e);
       }
     }
-  } catch { /* solver hiccup — skip body this frame, face still sends */ }
+  } catch { /* solver hiccup — the cache holds last-known, so the stream doesn't gap */ }
+
+  // Emit the FULL active bone set every frame (Warudo-style density) — holding each part through
+  // short solve gaps, but stopping once its solve has been stale > HOLD_MS so a part that genuinely
+  // left frame relaxes to idle app-side instead of freezing.
+  const nowE = performance.now();
+  const faceFresh = nowE - lastFaceSolve < HOLD_MS;
+  const poseFresh = nowE - lastPoseSolve < HOLD_MS;
+  for (const [name, q] of boneCache) {
+    const active = name === "Head" ? (fOn && faceFresh) : (bOn && poseFresh);
+    if (active) messages.push(boneMsg(name, q));
+  }
 
   // Blendshapes — ARKit 52 passthrough (perfect sync), always.
   if (shapes) {
@@ -655,6 +675,7 @@ document.addEventListener("click", () => {
   if (!menu.hidden) { menu.hidden = true; btnGear.setAttribute("aria-expanded", "false"); }
 });
 optBlind.addEventListener("change", () => stage.classList.toggle("blind", optBlind.checked));
+optMirror.addEventListener("change", () => boneCache.clear());   // names flip L/R — drop stale entries
 
 // Room key is masked (type=password) by default; the eye reveals it.
 roomEye.addEventListener("click", () => {
