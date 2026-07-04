@@ -142,14 +142,17 @@ function standardBlends(b) {
 const $ = (id) => document.getElementById(id);
 const stage = $("stage"), video = $("cam"), overlay = $("overlay"), returnEl = $("return");
 const joinForm = $("join-form"), roomInput = $("room"), joinBtn = $("join"), statusEl = $("status");
-const btnCam = $("btn-cam"), btnRecenter = $("btn-recenter");
+const btnCam = $("btn-cam"), btnMic = $("btn-mic"), btnRecenter = $("btn-recenter");
 const btnGear = $("btn-gear"), btnLeave = $("btn-leave"), menu = $("menu");
 const chipRoom = $("chip-room"), chipTrack = $("chip-track"), chipRate = $("chip-rate"), chipHint = $("chip-hint");
 const optTrack = $("opt-track"), optMirror = $("opt-mirror"), optBlind = $("opt-blind"), optPerfect = $("opt-perfect");
 
 let holo = null, Kalidokit = null, trackersLoading = null;
 let room = null, remoteAudioEls = [];
-let camOn = false, joined = false, leaving = false;
+let camOn = false, joined = false, leaving = false, micOn = false, micBusy = false;
+// Tracker health: surface failures instead of dying silently, and retry on CPU once if the
+// GPU delegate keeps throwing (some browsers init GPU fine but fail per-frame).
+let detectFails = 0, lastGoodDetect = 0, lastErrMsg = "", cpuFallbackTried = false, reinitBusy = false, stalled = false;
 let lastVideoTime = -1, refQuatInv = null, wantRecenter = true;
 let pktCount = 0, pktWindowStart = 0, faceSeen = false;
 let sentKeys = new Set(), sentBones = new Set();
@@ -224,6 +227,7 @@ async function cameraOn() {
   overlay.height = video.videoHeight;
   camOn = true;
   lastVideoTime = -1; wantRecenter = true; faceSeen = false;
+  detectFails = 0; lastGoodDetect = performance.now(); stalled = false;
   stage.classList.add("cam");
   btnCam.classList.remove("is-off");
   btnRecenter.disabled = false;
@@ -295,7 +299,7 @@ async function join() {
     stage.classList.add("live");
     chipRoom.hidden = false; chipRoom.textContent = maskRoom(roomCode);
     chipRate.hidden = false; chipRate.textContent = "0 fps";
-    btnLeave.hidden = false;
+    btnLeave.hidden = false; btnMic.disabled = false;
     setStatus("In the app, set Face Source to VMC.");
   } catch (e) {
     joined = false;
@@ -319,6 +323,7 @@ async function leave(message) {
   stage.classList.remove("live");
   chipRoom.hidden = true; chipRate.hidden = true; chipHint.hidden = true;
   btnLeave.hidden = true;
+  micOn = false; btnMic.disabled = true; btnMic.classList.add("is-off");
   setStatus(message || "");
 }
 
@@ -492,12 +497,41 @@ function publish(bytes) {
   room.localParticipant.publishData(bytes, { reliable: false, topic: "vmc" }).catch(() => {});
 }
 
+// One-shot rebuild of the landmarker on CPU when the GPU delegate keeps failing per frame.
+async function fallbackToCpu() {
+  if (cpuFallbackTried || reinitBusy) return;
+  cpuFallbackTried = true; reinitBusy = true;
+  try {
+    const fileset = await FilesetResolver.forVisionTasks(WASM_BASE);
+    holo = await HolisticLandmarker.createFromOptions(fileset, {
+      baseOptions: { modelAssetPath: HOLISTIC_MODEL, delegate: "CPU" },
+      runningMode: "VIDEO", outputFaceBlendshapes: true,
+    });
+    detectFails = 0;
+    setStatus("Tracker restarted on CPU.");
+  } catch (e) { console.error("[vrl] CPU fallback failed:", e); }
+  reinitBusy = false;
+}
+
 function loop() {
   if (!camOn) return;
   if (optTrack.checked && holo && video.readyState >= 2 && video.currentTime !== lastVideoTime) {
     lastVideoTime = video.currentTime;
     let result = null;
-    try { result = holo.detectForVideo(video, performance.now()); } catch { /* skip frame */ }
+    try { result = holo.detectForVideo(video, performance.now()); } catch (e) {
+      detectFails++;
+      lastErrMsg = String(e?.message || e);
+      if (detectFails === 1 || detectFails % 120 === 0) console.error("[vrl] tracker frame failed:", e);
+      if (detectFails >= 20) fallbackToCpu();
+    }
+    // Watchdog: nothing usable for 6 s while the camera runs → say so instead of a silent "no face".
+    const now = performance.now();
+    if (result) { detectFails = 0; lastGoodDetect = now; if (stalled) { stalled = false; setStatus(""); } }
+    else if (!stalled && now - lastGoodDetect > 6000) {
+      stalled = true;
+      chipTrack.textContent = "tracker stalled"; chipTrack.classList.add("warn");
+      setStatus(`Tracker not responding${lastErrMsg ? " — " + lastErrMsg : ""}. Try toggling the camera.`, true);
+    }
     if (result) {
       drawOverlay(result);
       if (!joined) {   // lobby: still show the tracking state on the preview
@@ -530,6 +564,20 @@ optTrack.addEventListener("change", () => {
   } else if (camOn) {
     chipTrack.textContent = "no face"; faceSeen = false;
   }
+});
+btnMic.addEventListener("click", async () => {
+  if (!joined || !room || micBusy) return;
+  micBusy = true;
+  const want = !micOn;
+  try {
+    await room.localParticipant.setMicrophoneEnabled(want);   // grant allows microphone ONLY, never camera
+    micOn = want;
+    btnMic.classList.toggle("is-off", !micOn);
+    setStatus(micOn ? "Mic live — the operator can hear you." : "");
+  } catch (e) {
+    setStatus(String(e.message || e), true);
+  }
+  micBusy = false;
 });
 btnRecenter.addEventListener("click", () => { wantRecenter = true; setStatus("Head pose recentered."); });
 btnGear.addEventListener("click", (e) => {
