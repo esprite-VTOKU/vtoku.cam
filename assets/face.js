@@ -140,8 +140,8 @@ let detectFails = 0, lastGoodDetect = 0, lastErrMsg = "", cpuFallbackTried = fal
 let lastVideoTime = -1, refQuatInv = null, wantRecenter = true;
 let pktCount = 0, pktWindowStart = 0, faceSeen = false;
 let sentKeys = new Set(), sentBones = new Set();
-const partSeen = { pose: false, Left: false, Right: false };   // for rest-on-dropout
 let hintTimer = 0;
+let lastTrackTime = 0, faceRelaxed = false;   // debounce face-neutralize on brief tracking blips
 
 roomInput.value = localStorage.getItem("vrlRoom") || "";
 // Pre-join messages land in the dialog; once it hides, they surface as an overlay chip.
@@ -230,7 +230,21 @@ function cameraOff() {
   btnCam.classList.add("is-off");
   btnRecenter.disabled = true;
   chipTrack.hidden = true; chipRate.hidden = true;
-  relaxAvatar();   // camera muted mid-call → relax the avatar, stay in the room
+  neutralizeFace();   // camera muted mid-call → face neutral; body idles app-side. Stay in the room.
+}
+
+// Shape the stage to the return feed so a portrait (9:16) program isn't cropped into the
+// default 16:9 box. Skipped in OBS watch mode (fixed full-viewport, contain handles it).
+function fitReturnAspect() {
+  if (document.body.classList.contains("watch")) return;
+  const w = returnEl.videoWidth, h = returnEl.videoHeight;
+  if (!w || !h) return;
+  stage.style.aspectRatio = `${w} / ${h}`;
+  stage.classList.toggle("portrait-feed", h > w);
+}
+function clearReturnAspect() {
+  stage.style.aspectRatio = "";
+  stage.classList.remove("portrait-feed");
 }
 
 // ── room join/leave ─────────────────────────────────────────────────────────────────────────
@@ -238,6 +252,8 @@ function attachTrack(track) {
   if (track.kind === "video") {
     track.attach(returnEl);
     stage.classList.add("return");
+    returnEl.addEventListener("resize", fitReturnAspect);   // intrinsic size arrives async
+    fitReturnAspect();
   } else if (track.kind === "audio") {
     const el = track.attach();          // hear the operator (return feed audio)
     remoteAudioEls.push(el);
@@ -246,6 +262,8 @@ function attachTrack(track) {
 }
 function detachAll() {
   stage.classList.remove("return");
+  returnEl.removeEventListener("resize", fitReturnAspect);
+  clearReturnAspect();
   for (const el of remoteAudioEls) el.remove();
   remoteAudioEls = [];
 }
@@ -256,7 +274,7 @@ async function connectRoom(roomCode) {
   room = new Room();
   room.on(RoomEvent.TrackSubscribed, (track) => attachTrack(track));
   room.on(RoomEvent.TrackUnsubscribed, (track) => {
-    if (track.kind === "video") stage.classList.remove("return");
+    if (track.kind === "video") { stage.classList.remove("return"); clearReturnAspect(); }
     track.detach();
   });
   room.on(RoomEvent.Disconnected, () => {
@@ -299,7 +317,7 @@ async function leave(message) {
   leaving = true;
   if (room) {
     try {
-      if (room.state === "connected") { relaxAvatar(); await new Promise((r) => setTimeout(r, 120)); }
+      if (room.state === "connected") { neutralizeFace(); await new Promise((r) => setTimeout(r, 120)); }
       await room.disconnect();
     } catch {}
     room = null;
@@ -392,17 +410,17 @@ function drawOverlay(result) {
   ctx.shadowBlur = 0;
 }
 
-// Zero driven blends and/or rest driven bones (by prefix) so parts relax instead of freezing.
-function relaxParts(blends, prefixes) {
-  if (!room || room.state !== "connected") return;
-  const msgs = [];
-  if (blends) for (const k of sentKeys) msgs.push(blendMsg(k, 0));
-  for (const p of prefixes) for (const b of sentBones) if (b.startsWith(p)) msgs.push(boneMsg(b, [0, 0, 0, 1]));
-  if (!msgs.length) return;
+// Zero the expression blends we've driven, once, so the face returns to neutral. NEVER touches
+// bones: identity bone rotations = the rig's bind pose (a T/A-pose), so sending them on a dropout
+// is exactly what made the avatar snap to a T-pose. The app relaxes the BODY on its own — when our
+// bone packets stop arriving it falls back to the local idle/dance after ~0.5s (VMCReceiver.bodyLive),
+// holding the last real pose in between instead of flashing the bind pose.
+function neutralizeFace() {
+  if (!room || room.state !== "connected" || !sentKeys.size) return;
+  const msgs = [...sentKeys].map((k) => blendMsg(k, 0));
   msgs.push(oscMessage("/VMC/Ext/Blend/Apply", []));
   for (const b of packBundles(msgs)) publish(b);
 }
-const relaxAvatar = () => relaxParts(true, [""]);   // "" prefix matches every driven bone
 
 // Kalidokit gives XYZ Euler rigs (three.js convention); convert to a mirrored/unmirrored
 // Unity-space VMC bone message. `amp` tames or boosts a chain if it overshoots on device.
@@ -416,12 +434,6 @@ function pushBone(messages, mirror, name, e, amp = 1) {
   sentBones.add(n);
   messages.push(boneMsg(n, q));
 }
-// Send rest (identity) for the already-driven bones matching a prefix — so a hand or arm that
-// drops out of frame relaxes instead of freezing in its last pose.
-function restBones(messages, prefix) {
-  for (const b of sentBones) if (b.startsWith(prefix)) messages.push(boneMsg(b, [0, 0, 0, 1]));
-}
-
 function sendFrame(result) {
   if (!joined || !room || room.state !== "connected") return;
   const fOn = faceOn(), bOn = bodyOn();
@@ -429,9 +441,14 @@ function sendFrame(result) {
   const hasFace = fOn && !!result.faceLandmarks?.[0];
   const hasPose = bOn && !!result.poseLandmarks?.[0];
   if (!hasFace && !hasPose) {
-    if (faceSeen) { faceSeen = false; chipTrack.textContent = "no face"; chipTrack.classList.add("warn"); relaxAvatar(); }
+    if (faceSeen) { faceSeen = false; chipTrack.textContent = "no face"; chipTrack.classList.add("warn"); }
+    // Only neutralize after a SUSTAINED loss (~0.5s). A one-frame blip (motion blur, quick turn)
+    // holds the last expression + pose instead of flashing neutral — that flicker was interrupting
+    // both the face and the body. The body relaxes on its own app-side (we just stop sending bones).
+    if (!faceRelaxed && performance.now() - lastTrackTime > 500) { neutralizeFace(); faceRelaxed = true; }
     return;
   }
+  faceRelaxed = false; lastTrackTime = performance.now();
   if (!faceSeen) { faceSeen = true; chipTrack.textContent = "tracking"; chipTrack.classList.remove("warn"); }
 
   const mirror = optMirror.checked;
@@ -453,7 +470,6 @@ function sendFrame(result) {
   // Upper body + hands.
   if (bOn) try {
     if (result.poseWorldLandmarks?.[0] && result.poseLandmarks?.[0]) {
-      partSeen.pose = true;
       const rig = Kalidokit.Pose.solve(result.poseWorldLandmarks[0], result.poseLandmarks[0],
                                        { runtime: "mediapipe", video });
       if (rig) {
@@ -466,26 +482,13 @@ function sendFrame(result) {
         if (!result.leftHandLandmarks?.[0]) pushBone(messages, mirror, "LeftHand", rig.LeftHand);
         if (!result.rightHandLandmarks?.[0]) pushBone(messages, mirror, "RightHand", rig.RightHand);
       }
-    } else if (partSeen.pose) {
-      partSeen.pose = false;
-      restBones(messages, "Spine");
-      restBones(messages, "LeftUpperArm"); restBones(messages, "LeftLowerArm");
-      restBones(messages, "RightUpperArm"); restBones(messages, "RightLowerArm");
     }
+    // On a pose/hand dropout we simply STOP sending those bones (no identity/rest — that snapped
+    // the rig to its bind pose). The app holds the last real pose, then eases to idle if the gap
+    // outlasts its body-liveness window.
     for (const side of ["Left", "Right"]) {
       const lms = result[`${side.toLowerCase()}HandLandmarks`]?.[0];
-      if (!lms) {
-        // Hand left the frame → relax its wrist + fingers once instead of freezing mid-gesture.
-        // (`sentBones` names are post-mirror, so the prefix check uses the mirrored side too.)
-        const s = mirror ? mirrorName(side) : side;
-        if (partSeen[side]) {
-          partSeen[side] = false;
-          restBones(messages, `${s}Hand`);
-          for (const finger of ["Thumb", "Index", "Middle", "Ring", "Little"]) restBones(messages, s + finger);
-        }
-        continue;
-      }
-      partSeen[side] = true;
+      if (!lms) continue;
       const hand = Kalidokit.Hand.solve(lms, side);
       if (!hand) continue;
       for (const [key, e] of Object.entries(hand)) {
@@ -593,11 +596,10 @@ function toggleBar(btn) {
   return on;
 }
 btnFace.addEventListener("click", () => {
-  if (!toggleBar(btnFace)) relaxParts(true, ["Head"]);          // blends zeroed + head to rest
+  if (!toggleBar(btnFace)) neutralizeFace();   // face off → expression neutral (no bone identity)
+  // body off → just stop sending body bones; the app eases to idle via its liveness window.
 });
-btnBody.addEventListener("click", () => {
-  if (!toggleBar(btnBody)) relaxParts(false, ["Spine", "Left", "Right"]);   // arms/hands/fingers to rest
-});
+btnBody.addEventListener("click", () => toggleBar(btnBody));
 btnMic.addEventListener("click", async () => {
   if (!joined || !room || micBusy) return;
   micBusy = true;
