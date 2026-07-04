@@ -164,6 +164,18 @@ const maskRoom = (r) => {
   return cut > 0 ? r.slice(0, cut + 1) + "…" : r.slice(0, 4) + "…";
 };
 
+// The OBS browser-source URL is valid as soon as there's a key (the source retries until the room
+// goes live), so surface the field pre-join — not only after connecting.
+function refreshObs() {
+  const key = roomInput.value.trim();
+  if (key.length >= 8) {
+    obsUrl.value = `${location.origin}${location.pathname}#watch=${encodeURIComponent(key)}`;
+    obsBox.hidden = false;
+  } else {
+    obsBox.hidden = true;
+  }
+}
+
 async function mintToken(roomCode) {
   const res = await fetch(TOKEN_URL, {
     method: "POST",
@@ -302,8 +314,7 @@ async function join() {
     chipRoom.hidden = false; chipRoom.textContent = maskRoom(roomCode);
     chipRate.hidden = false; chipRate.textContent = "0 fps";
     btnLeave.hidden = false; btnMic.disabled = false;
-    obsUrl.value = `${location.origin}${location.pathname}#watch=${encodeURIComponent(roomCode)}`;
-    obsBox.hidden = false;
+    refreshObs();
     setStatus("In the app, set Face Source to VMC.");
   } catch (e) {
     joined = false;
@@ -326,7 +337,7 @@ async function leave(message) {
   detachAll();
   stage.classList.remove("live");
   chipRoom.hidden = true; chipRate.hidden = true; chipHint.hidden = true;
-  btnLeave.hidden = true; obsBox.hidden = true;
+  btnLeave.hidden = true;   // OBS field stays as long as a key is present (refreshObs)
   micOn = false; btnMic.disabled = true; btnMic.classList.add("is-off");
   setStatus(message || "");
 }
@@ -641,6 +652,8 @@ obsCopy.addEventListener("click", async () => {
   setTimeout(() => { obsCopy.textContent = "Copy"; }, 1500);
 });
 obsI.addEventListener("click", () => { obsHint.hidden = !obsHint.hidden; });
+roomInput.addEventListener("input", refreshObs);
+refreshObs();   // show it now if a key is already prefilled (returning user)
 
 window.addEventListener("pagehide", () => { if (room) room.disconnect(); });
 
