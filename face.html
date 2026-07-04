@@ -15,32 +15,69 @@
 <link rel="apple-touch-icon" href="assets/app-icon.png">
 <link rel="stylesheet" href="assets/style.css?v=3">
 <style>
-  .face-stage { position: relative; border-radius: var(--radius); overflow: hidden; background: #14121f;
-    box-shadow: var(--shadow-glass); aspect-ratio: 16 / 9; }
-  .face-stage video, .face-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  body.live .face-stage video, body.live .face-stage canvas { transform: scaleX(-1); }  /* selfie view */
-  .face-stage .placeholder { position: absolute; inset: 0; display: grid; place-items: center;
-    color: rgba(255,255,255,.55); font-size: .95rem; text-align: center; padding: 24px; }
-  body.live .face-stage .placeholder { display: none; }
-  .face-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
-  .face-controls input[type="text"] { flex: 1 1 220px; min-width: 0; padding: 12px 14px; font-family: var(--mono);
-    font-size: .95rem; color: var(--text); background: var(--glass-strong); border: 1px solid var(--glass-border);
-    border-radius: var(--radius-sm); box-shadow: inset 0 1px 0 var(--glass-edge); }
-  .face-controls .btn { padding: 12px 22px; border-radius: var(--radius-sm); font-weight: 600; border: 1px solid transparent; cursor: pointer; font-size: .95rem; }
-  .face-controls .btn[disabled] { opacity: .45; cursor: default; transform: none; }
-  .face-opts { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px; color: var(--text-dim); font-size: .93rem; }
-  .face-opts label { display: flex; align-items: center; gap: 7px; cursor: pointer; }
-  .face-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
-  .face-chips span { font-family: var(--mono); font-size: .78rem; padding: 4px 10px; border-radius: 999px;
-    background: var(--glass-strong); border: 1px solid var(--glass-border); color: var(--text-faint); }
-  .face-chips span.on { color: var(--accent-deep); border-color: var(--accent-soft); background: var(--accent-soft); }
-  #status { margin-top: 12px; font-size: .93rem; color: var(--text-dim); min-height: 1.4em; }
+  /* Video-call layout: stage + side panel, control bar docked on the stage.
+     Deliberately utilitarian (solid surfaces, 6-12px radii) — the app area is a tool,
+     not a brochure. Round buttons appear only in the call bar, the video-chat idiom. */
+  .call { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
+  @media (max-width: 900px) { .call { grid-template-columns: 1fr; } }
+
+  .stage { position: relative; border-radius: 12px; overflow: hidden; background: #17151d;
+    border: 1px solid var(--hairline); aspect-ratio: 16 / 9; }
+  .stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .stage.cam video, .stage.cam canvas { transform: scaleX(-1); }  /* self view is always mirrored */
+
+  .stage-empty { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255,255,255,.5); }
+  .stage-empty .inner { text-align: center; font-size: .95rem; }
+  .stage-empty svg { display: block; margin: 0 auto 10px; width: 34px; height: 34px; stroke: rgba(255,255,255,.4); }
+  .stage.cam .stage-empty { display: none; }
+
+  .ov-chips { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .ov-chips span { font-family: var(--mono); font-size: .74rem; color: #fff; background: rgba(0,0,0,.55);
+    padding: 4px 8px; border-radius: 6px; }
+  .ov-chips span.warn { background: rgba(160,80,20,.75); }
+
+  .bar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 12px; justify-content: center;
+    padding: 12px 0 14px; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.45)); }
+  .bar button { width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
+    background: rgba(255,255,255,.16); display: grid; place-items: center; transition: background .12s ease; }
+  .bar button:hover { background: rgba(255,255,255,.28); }
+  .bar button svg { width: 21px; height: 21px; stroke: #fff; fill: none; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round; }
+  .bar button[aria-pressed="true"] { background: var(--accent); }
+  .bar button.danger { background: #D64545; }
+  .bar button.danger:hover { background: #E25353; }
+  .bar button[disabled] { opacity: .4; cursor: default; }
+  .bar button .off { display: none; }
+  .bar button.is-off .on { display: none; }
+  .bar button.is-off .off { display: block; }
+
+  .panel { background: #fff; border: 1px solid var(--hairline); border-radius: 12px; padding: 20px; }
+  .panel h2 { font-size: 1.05rem; margin: 0 0 6px; }
+  .panel p { font-size: .92rem; color: var(--text-dim); margin: 0 0 14px; }
+  .panel input[type="text"] { width: 100%; box-sizing: border-box; padding: 11px 12px; font-family: var(--mono);
+    font-size: .92rem; color: var(--text); background: #fff; border: 1px solid rgba(60,40,120,.25);
+    border-radius: 8px; }
+  .panel input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .joinbtn { width: 100%; margin-top: 10px; padding: 11px 0; border: none; border-radius: 8px; cursor: pointer;
+    background: var(--accent-bright); color: #fff; font-size: .95rem; font-weight: 600; }
+  .joinbtn:hover { background: var(--accent); }
+  .joinbtn[disabled] { opacity: .5; cursor: default; }
+  .mono { font-family: var(--mono); }
+  .opts { border-top: 1px solid var(--hairline); margin-top: 16px; padding-top: 14px; display: grid; gap: 9px; }
+  .opts label { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--text-dim); cursor: pointer; }
+  #status { margin: 12px 0 0; font-size: .88rem; color: var(--text-dim); min-height: 1.3em; }
   #status.err { color: var(--warn); }
+
   .face-steps { counter-reset: step; list-style: none; padding: 0; margin: 0; }
-  .face-steps li { counter-increment: step; position: relative; padding-left: 40px; margin: 14px 0; color: var(--text-dim); }
-  .face-steps li::before { content: counter(step); position: absolute; left: 0; top: -1px; width: 26px; height: 26px;
-    display: grid; place-items: center; border-radius: 999px; background: var(--accent-soft); color: var(--accent-deep);
-    font-weight: 700; font-size: .85rem; }
+  .face-steps li { counter-increment: step; position: relative; padding-left: 38px; margin: 12px 0; color: var(--text-dim); }
+  .face-steps li::before { content: counter(step); position: absolute; left: 0; top: -1px; width: 24px; height: 24px;
+    display: grid; place-items: center; border-radius: 6px; background: var(--accent-soft); color: var(--accent-deep);
+    font-weight: 700; font-size: .82rem; }
+  .face-help { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 26px; }
+  @media (max-width: 900px) { .face-help { grid-template-columns: 1fr; } }
+  .face-help section { background: #fff; border: 1px solid var(--hairline); border-radius: 12px; padding: 20px; }
+  .face-help h3 { margin: 0 0 10px; font-size: 1rem; }
+  .face-help p { font-size: .92rem; color: var(--text-dim); margin: 0; }
 </style>
 </head>
 <body>
@@ -55,54 +92,81 @@
   </div>
 </nav>
 
-<div class="container reading">
-  <div class="page-head" style="text-align:center;">
+<div class="container" style="max-width:1060px;">
+  <div class="page-head">
     <p class="eyebrow">VRL Link</p>
-    <h1>VRL Face</h1>
-    <p class="updated">Drive your avatar's face from any webcam. No install. Your camera never leaves this browser tab: tracking runs locally, and only the animation data is sent.</p>
+    <h1 style="font-size:1.9rem;">VRL Face</h1>
+    <p class="updated" style="max-width:640px;">Webcam face tracking for your avatar. Tracking runs in this tab; only blendshape and head rotation values are sent to your room.</p>
   </div>
 
   <main style="padding-bottom:8px;">
-    <div class="face-stage">
-      <video id="cam" playsinline muted></video>
-      <canvas id="overlay"></canvas>
-      <div class="placeholder">Camera preview appears here.<br>Enter your room secret and press Start.</div>
+    <div class="call">
+      <div class="stage" id="stage">
+        <video id="cam" playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="ov-chips">
+          <span id="chip-room" hidden></span>
+          <span id="chip-track" hidden></span>
+          <span id="chip-rate" hidden></span>
+        </div>
+        <div class="stage-empty">
+          <div class="inner">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h9A1.5 1.5 0 0 1 15 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 3 16.5zM15 10l5-3v10l-5-3" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            Camera is off
+          </div>
+        </div>
+        <div class="bar">
+          <button id="btn-cam" class="is-off" aria-label="Turn camera on or off" title="Camera">
+            <svg class="on" viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h9A1.5 1.5 0 0 1 15 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 3 16.5zM15 10l5-3v10l-5-3"/></svg>
+            <svg class="off" viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h9A1.5 1.5 0 0 1 15 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 3 16.5zM15 10l5-3v10l-5-3"/><path d="M2 2l20 20"/></svg>
+          </button>
+          <button id="btn-mirror" aria-pressed="true" aria-label="Mirror left and right" title="Mirror">
+            <svg viewBox="0 0 24 24"><path d="M12 3v18M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>
+          </button>
+          <button id="btn-recenter" disabled aria-label="Recenter head pose" title="Recenter">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+          </button>
+          <button id="btn-leave" class="danger" hidden aria-label="Leave the room" title="Leave">
+            <svg viewBox="0 0 24 24"><path d="M4 14c4.5-4 11.5-4 16 0M7 12.5 5.5 16M17 12.5l1.5 3.5"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <div id="join-form">
+          <h2>Join a room</h2>
+          <p>Paste the room secret from VTOKU Cam (Settings, VRL Link, Copy).</p>
+          <input id="room" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+                 placeholder="cyberfox-k7m2xq8r">
+          <button id="join" class="joinbtn">Join</button>
+        </div>
+        <div id="session-info" hidden>
+          <h2>Connected</h2>
+          <p>Room <span id="session-room" class="mono"></span></p>
+          <p>Your face is driving the avatar. Hang up with the red button to stop sending.</p>
+        </div>
+        <div class="opts">
+          <label><input id="opt-head" type="checkbox" checked> Send head rotation</label>
+          <label><input id="opt-perfect" type="checkbox"> Perfect sync (all 52 ARKit blendshapes)</label>
+        </div>
+        <p id="status"></p>
+      </aside>
     </div>
 
-    <div class="face-controls">
-      <input id="room" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
-             placeholder="Room secret, e.g. cyberfox-k7m2xq8r">
-      <button id="connect" class="btn btn-primary">Start</button>
-      <button id="stop" class="btn btn-ghost" disabled>Stop</button>
-      <button id="recenter" class="btn btn-ghost" disabled>Recenter</button>
-    </div>
-
-    <div class="face-opts">
-      <label><input id="opt-mirror" type="checkbox" checked> Mirror</label>
-      <label><input id="opt-head" type="checkbox" checked> Head rotation</label>
-      <label><input id="opt-perfect" type="checkbox"> Perfect sync (ARKit blendshapes)</label>
-    </div>
-
-    <div class="face-chips">
-      <span id="chip-cam">camera off</span>
-      <span id="chip-track">no face</span>
-      <span id="chip-room">room off</span>
-      <span id="chip-rate">0 fps</span>
-    </div>
-    <p id="status"></p>
-
-    <div class="note" style="margin-top:28px;">
-      <h3 style="margin-top:0;">Set up in the app</h3>
-      <ol class="face-steps">
-        <li>In VTOKU Cam open Settings, then VRL Link. Generate a room secret and turn on <strong>Connect</strong>.</li>
-        <li>Copy the secret to this page. The room only accepts senders while the app is connected.</li>
-        <li>In the Face panel set <strong>Source</strong> to <strong>VMC</strong>. Your avatar now follows this webcam.</li>
-      </ol>
-      <p style="margin-bottom:0;"><strong>Perfect sync</strong> sends all 52 ARKit blendshapes for avatars rigged for them. Leave it off for standard VRM models. <strong>Recenter</strong> captures your current head pose as neutral.</p>
-    </div>
-
-    <div class="note" style="margin-top:16px;">
-      <p style="margin:0;"><strong>Privacy.</strong> Face tracking runs on your device with MediaPipe. Video and images are never uploaded. The page sends only VMC blendshape and head rotation values, end to end inside your private room. Works in current Chrome, Edge, and Safari on a device with a camera.</p>
+    <div class="face-help">
+      <section>
+        <h3>Set up in the app</h3>
+        <ol class="face-steps">
+          <li>In VTOKU Cam open Settings, then VRL Link. Generate a room secret and turn on <strong>Connect</strong>.</li>
+          <li>Copy the secret here and press Join. Joining only works while the app is connected.</li>
+          <li>In the Face panel set <strong>Source</strong> to <strong>VMC</strong>. Your avatar now follows this webcam.</li>
+        </ol>
+      </section>
+      <section>
+        <h3>Privacy and options</h3>
+        <p>Face tracking runs on your device with MediaPipe. Video and images are never uploaded; the page sends only VMC blendshape and head rotation values inside your private room.
+        <br><br><strong>Perfect sync</strong> is for avatars rigged with ARKit blendshapes; leave it off for standard VRM models. <strong>Recenter</strong> captures your current head pose as neutral. Works in current Chrome, Edge, and Safari.</p>
+      </section>
     </div>
   </main>
 </div>
@@ -147,7 +211,7 @@
   </div>
 </footer>
 
-<script type="module" src="assets/face.js"></script>
+<script type="module" src="assets/face.js?v=2"></script>
 
 </body>
 </html>

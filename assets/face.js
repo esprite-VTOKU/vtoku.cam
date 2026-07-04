@@ -5,6 +5,9 @@
 // bytes on the VRL Link room's LiveKit data channel (topic "vmc", lossy) — the exact same
 // wire format the app's VMCReceiver already parses from Warudo / the VRL Bridge.
 //
+// UI is a small video-call state machine: camera on/off (lobby preview) and joined/left.
+// Camera can run without a room (preview + tracking overlay); joining starts sending.
+//
 // Token: POST https://vrl-token.fly.dev/face-token { room } → { token, url }. The mint is
 // data-publish only (no tracks in or out) and requires the room to be live in the app.
 
@@ -140,12 +143,15 @@ function standardBlends(b) {
 
 // ── UI ──────────────────────────────────────────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
-const roomInput = $("room"), connectBtn = $("connect"), stopBtn = $("stop"), recenterBtn = $("recenter");
-const video = $("cam"), overlay = $("overlay"), statusEl = $("status");
-const chipCam = $("chip-cam"), chipTrack = $("chip-track"), chipRoom = $("chip-room"), chipRate = $("chip-rate");
-const optMirror = $("opt-mirror"), optPerfect = $("opt-perfect"), optHead = $("opt-head");
+const stage = $("stage"), video = $("cam"), overlay = $("overlay"), statusEl = $("status");
+const roomInput = $("room"), joinBtn = $("join");
+const joinForm = $("join-form"), sessionInfo = $("session-info"), sessionRoom = $("session-room");
+const btnCam = $("btn-cam"), btnMirror = $("btn-mirror"), btnRecenter = $("btn-recenter"), btnLeave = $("btn-leave");
+const chipRoom = $("chip-room"), chipTrack = $("chip-track"), chipRate = $("chip-rate");
+const optHead = $("opt-head"), optPerfect = $("opt-perfect");
 
-let landmarker = null, room = null, running = false, stopping = false;
+let landmarker = null, room = null;
+let camOn = false, joined = false, leaving = false;
 let lastVideoTime = -1, refQuatInv = null, wantRecenter = true;
 let pktCount = 0, pktWindowStart = 0, faceSeen = false, sentKeys = new Set();
 
@@ -154,9 +160,12 @@ const setStatus = (msg, isErr) => {
   statusEl.textContent = msg;
   statusEl.classList.toggle("err", !!isErr);
 };
-const chip = (el, label, on) => {
-  el.textContent = label;
-  el.classList.toggle("on", !!on);
+const mirrored = () => btnMirror.getAttribute("aria-pressed") === "true";
+// Show only the memorable prefix of the secret on the overlay — the full code stays private
+// even if the tab is on stream.
+const maskRoom = (r) => {
+  const cut = r.search(/[-_ .:]/);
+  return cut > 0 ? r.slice(0, cut + 1) + "…" : r.slice(0, 4) + "…";
 };
 
 async function mintToken(roomCode) {
@@ -188,7 +197,10 @@ async function ensureLandmarker() {
   }
 }
 
-async function startCamera() {
+// ── camera on/off (independent of the room, like any call app) ─────────────────────────────
+async function cameraOn() {
+  await ensureLandmarker();
+  setStatus("Starting camera…");
   const stream = await navigator.mediaDevices.getUserMedia({
     video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
     audio: false,
@@ -197,80 +209,131 @@ async function startCamera() {
   await video.play();
   overlay.width = video.videoWidth;
   overlay.height = video.videoHeight;
-  chip(chipCam, "camera on", true);
+  camOn = true;
+  lastVideoTime = -1; wantRecenter = true; faceSeen = false;
+  stage.classList.add("cam");
+  btnCam.classList.remove("is-off");
+  btnRecenter.disabled = false;
+  chipTrack.hidden = false; chipTrack.textContent = "no face";
+  setStatus(joined ? "Tracking." : "Camera preview only — join a room to send.");
+  loop();
 }
 
-function stopCamera() {
+function cameraOff() {
+  camOn = false;
   const s = video.srcObject;
   if (s) for (const t of s.getTracks()) t.stop();
   video.srcObject = null;
-  chip(chipCam, "camera off", false);
+  overlay.getContext("2d").clearRect(0, 0, overlay.width, overlay.height);
+  stage.classList.remove("cam");
+  btnCam.classList.add("is-off");
+  btnRecenter.disabled = true;
+  chipTrack.hidden = true; chipRate.hidden = true;
+  if (joined) zeroBlends();   // camera muted mid-call → relax the avatar, stay in the room
 }
 
+// ── room join/leave ─────────────────────────────────────────────────────────────────────────
 async function connectRoom(roomCode) {
   setStatus("Checking room…");
   const { token, url } = await mintToken(roomCode);
   room = new Room();
   room.on(RoomEvent.Disconnected, () => {
-    chip(chipRoom, "room off", false);
-    if (running && !stopping) reconnectLoop(roomCode);
+    if (joined && !leaving) reconnectLoop(roomCode);
   });
-  room.on(RoomEvent.Reconnecting, () => chip(chipRoom, "reconnecting…", false));
-  room.on(RoomEvent.Reconnected, () => chip(chipRoom, "room on", true));
+  room.on(RoomEvent.Reconnecting, () => setStatus("Connection blip — recovering…"));
+  room.on(RoomEvent.Reconnected, () => setStatus("Tracking."));
   setStatus("Connecting…");
   await room.connect(url, token);
-  chip(chipRoom, "room on", true);
+}
+
+async function join() {
+  const roomCode = roomInput.value.trim();
+  if (roomCode.length < 8) { setStatus("Enter the room secret from the app (Settings → VRL Link → Copy).", true); return; }
+  localStorage.setItem("vrlRoom", roomCode);
+  joinBtn.disabled = true;
+  try {
+    if (!camOn) await cameraOn();
+    await connectRoom(roomCode);
+    joined = true; leaving = false;
+    sentKeys = new Set(); pktCount = 0; pktWindowStart = performance.now();
+    joinForm.hidden = true; sessionInfo.hidden = false;
+    sessionRoom.textContent = maskRoom(roomCode);
+    chipRoom.hidden = false; chipRoom.textContent = maskRoom(roomCode);
+    chipRate.hidden = false; chipRate.textContent = "0 fps";
+    btnLeave.hidden = false;
+    setStatus("Tracking. In the app set Face → Source to VMC.");
+  } catch (e) {
+    setStatus(String(e.message || e), true);
+    if (room) { try { await room.disconnect(); } catch {} room = null; }
+    joinBtn.disabled = false;
+  }
+}
+
+async function leave(message) {
+  leaving = true; joined = false;
+  if (room) {
+    try {
+      if (room.state === "connected") { zeroBlends(); await new Promise((r) => setTimeout(r, 120)); }
+      await room.disconnect();
+    } catch {}
+    room = null;
+  }
+  joinForm.hidden = false; sessionInfo.hidden = true;
+  chipRoom.hidden = true; chipRate.hidden = true;
+  btnLeave.hidden = true;
+  joinBtn.disabled = false;
+  setStatus(message || "Left the room. Camera preview stays local.");
 }
 
 // The LiveKit SDK retries transient blips itself; this covers full drops (e.g. token expiry) by
-// re-minting. Stops when the user hits Stop or the room genuinely ends (app disconnected → 404).
+// re-minting. Stops when the user leaves or the room genuinely ends (app disconnected → 404).
 async function reconnectLoop(roomCode) {
-  for (let attempt = 1; running && !stopping; attempt++) {
+  for (let attempt = 1; joined && !leaving; attempt++) {
     setStatus(`Connection lost — reconnecting (try ${attempt})…`, true);
     await new Promise((r) => setTimeout(r, Math.min(15000, 1500 * attempt)));
-    if (!running || stopping) return;
+    if (!joined || leaving) return;
     try {
       await connectRoom(roomCode);
-      setStatus("Reconnected. Tracking…");
+      setStatus("Reconnected. Tracking.");
       return;
     } catch (e) {
       if (String(e.message || e).includes("room not active")) {
-        setStatus("Room ended — VRL Link disconnected in the app.", true);
-        await stopAll();
+        await leave("Room ended — VRL Link disconnected in the app.");
         return;
       }
     }
   }
 }
 
+// ── per-frame: draw, map, send ──────────────────────────────────────────────────────────────
 function drawOverlay(result) {
   const ctx = overlay.getContext("2d");
   ctx.clearRect(0, 0, overlay.width, overlay.height);
   const lm = result?.faceLandmarks?.[0];
   if (!lm) return;
-  ctx.fillStyle = "rgba(124, 92, 255, 0.85)";
+  ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
   for (const p of lm) {
     ctx.fillRect(p.x * overlay.width - 1, p.y * overlay.height - 1, 2, 2);
   }
 }
 
+function zeroBlends() {
+  if (!room || room.state !== "connected" || !sentKeys.size) return;
+  const zeros = [...sentKeys].map((k) => blendMsg(k, 0));
+  zeros.push(oscMessage("/VMC/Ext/Blend/Apply", []));
+  for (const b of packBundles(zeros)) publish(b);
+}
+
 function sendFrame(result) {
-  if (!room || room.state !== "connected") return;
+  if (!joined || !room || room.state !== "connected") return;
   const shapes = result?.faceBlendshapes?.[0]?.categories;
   if (!shapes) {
-    // Face lost: zero out everything we were driving so the avatar relaxes instead of freezing.
-    if (faceSeen) {
-      faceSeen = false;
-      chip(chipTrack, "no face", false);
-      const zeros = [...sentKeys].map((k) => blendMsg(k, 0));
-      zeros.push(oscMessage("/VMC/Ext/Blend/Apply", []));
-      for (const b of packBundles(zeros)) publish(b);
-    }
+    if (faceSeen) { faceSeen = false; chipTrack.textContent = "no face"; chipTrack.classList.add("warn"); zeroBlends(); }
     return;
   }
-  if (!faceSeen) { faceSeen = true; chip(chipTrack, "tracking", true); }
+  if (!faceSeen) { faceSeen = true; chipTrack.textContent = "tracking"; chipTrack.classList.remove("warn"); }
 
-  const mirror = optMirror.checked;
+  const mirror = mirrored();
   const b = {};
   for (const c of shapes) b[c.categoryName] = c.score;
 
@@ -307,11 +370,11 @@ function sendFrame(result) {
 
   for (const bundle of packBundles(messages)) publish(bundle);
 
-  // packets/s chip (1 s window)
+  // frames-sent/s chip (1 s window)
   const now = performance.now();
   pktCount++;
   if (now - pktWindowStart > 1000) {
-    chip(chipRate, `${pktCount} fps`, pktCount > 0);
+    chipRate.textContent = `${pktCount} fps`;
     pktCount = 0; pktWindowStart = now;
   }
 }
@@ -321,65 +384,38 @@ function publish(bytes) {
 }
 
 function loop() {
-  if (!running) return;
+  if (!camOn) return;
   if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
     lastVideoTime = video.currentTime;
     let result = null;
     try { result = landmarker.detectForVideo(video, performance.now()); } catch { /* skip frame */ }
-    if (result) { drawOverlay(result); sendFrame(result); }
+    if (result) {
+      drawOverlay(result);
+      if (!joined) {   // lobby: still show the tracking state on the preview
+        const has = !!result.faceLandmarks?.[0];
+        if (has !== faceSeen) {
+          faceSeen = has;
+          chipTrack.textContent = has ? "tracking" : "no face";
+          chipTrack.classList.toggle("warn", !has);
+        }
+      }
+      sendFrame(result);
+    }
   }
   if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(() => loop());
   else requestAnimationFrame(loop);
 }
 
-async function startAll() {
-  const roomCode = roomInput.value.trim();
-  if (roomCode.length < 8) { setStatus("Enter the room secret from the app (Settings → VRL Link → Copy).", true); return; }
-  localStorage.setItem("vrlRoom", roomCode);
-  connectBtn.disabled = true;
-  try {
-    await ensureLandmarker();
-    await startCamera();
-    await connectRoom(roomCode);
-    running = true; stopping = false;
-    wantRecenter = true; sentKeys = new Set(); faceSeen = false;
-    lastVideoTime = -1; pktCount = 0; pktWindowStart = performance.now();
-    stopBtn.disabled = false; recenterBtn.disabled = false;
-    document.body.classList.add("live");
-    setStatus("Tracking. In the app set Face → Source to VMC.");
-    loop();
-  } catch (e) {
-    setStatus(String(e.message || e), true);
-    connectBtn.disabled = false;
-    stopCamera();
-    if (room) { try { await room.disconnect(); } catch {} room = null; }
-  }
-}
-
-async function stopAll() {
-  stopping = true; running = false;
-  stopBtn.disabled = true; recenterBtn.disabled = true;
-  if (room) {
-    // Relax the avatar before leaving.
-    try {
-      const zeros = [...sentKeys].map((k) => blendMsg(k, 0));
-      if (zeros.length && room.state === "connected") for (const b of packBundles(zeros)) publish(b);
-      await new Promise((r) => setTimeout(r, 120));
-      await room.disconnect();
-    } catch {}
-    room = null;
-  }
-  stopCamera();
-  const ctx = overlay.getContext("2d");
-  ctx.clearRect(0, 0, overlay.width, overlay.height);
-  chip(chipRoom, "room off", false); chip(chipTrack, "no face", false); chip(chipRate, "0 fps", false);
-  document.body.classList.remove("live");
-  connectBtn.disabled = false;
-  if (!statusEl.classList.contains("err")) setStatus("Stopped.");
-}
-
-connectBtn.addEventListener("click", startAll);
-stopBtn.addEventListener("click", () => { setStatus("Stopped."); stopAll(); });
-recenterBtn.addEventListener("click", () => { wantRecenter = true; setStatus("Neutral pose recentered."); });
-roomInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !connectBtn.disabled) startAll(); });
+// ── wiring ──────────────────────────────────────────────────────────────────────────────────
+btnCam.addEventListener("click", async () => {
+  if (camOn) { cameraOff(); setStatus(joined ? "Camera off — still in the room." : "Camera off."); return; }
+  try { await cameraOn(); } catch (e) { setStatus(String(e.message || e), true); }
+});
+btnMirror.addEventListener("click", () => {
+  btnMirror.setAttribute("aria-pressed", mirrored() ? "false" : "true");
+});
+btnRecenter.addEventListener("click", () => { wantRecenter = true; setStatus("Neutral head pose recentered."); });
+btnLeave.addEventListener("click", () => leave());
+joinBtn.addEventListener("click", join);
+roomInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !joinBtn.disabled) join(); });
 window.addEventListener("pagehide", () => { if (room) room.disconnect(); });
