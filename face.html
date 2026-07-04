@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VRL Face · VTOKU Cam</title>
-<meta name="description" content="Drive your VTuber's face from any webcam. Free browser face tracking that sends VMC data straight into your VRL Link session. No install, and your camera never leaves the browser.">
+<meta name="description" content="Drive your VTuber from any webcam. Free browser face, upper-body, and hand tracking that sends VMC data straight into your VRL Link session. No install, and your camera never leaves the browser.">
 <link rel="canonical" href="https://vtoku.cam/face.html">
 <meta property="og:title" content="VRL Face · VTOKU Cam">
-<meta property="og:description" content="Browser face tracking for VRL Link. Enter your room secret and drive your avatar's face from any webcam.">
+<meta property="og:description" content="Browser face and hand tracking for VRL Link. Enter your room secret and drive your avatar from any webcam.">
 <meta property="og:url" content="https://vtoku.cam/face.html">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
@@ -15,34 +15,58 @@
 <link rel="apple-touch-icon" href="assets/app-icon.png">
 <link rel="stylesheet" href="assets/style.css?v=3">
 <style>
-  /* Video-call layout: stage + side panel, control bar docked on the stage.
-     Deliberately utilitarian (solid surfaces, 6-12px radii) — the app area is a tool,
-     not a brochure. Round buttons appear only in the call bar, the video-chat idiom. */
-  .call { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
-  @media (max-width: 900px) { .call { grid-template-columns: 1fr; } }
-
+  /* Video-call layout: one full-width stage, join dialog centered over it, control bar docked.
+     Deliberately utilitarian (solid surfaces, 6-12px radii) — the app area is a tool, not a
+     brochure. Round buttons only in the call bar, the video-chat idiom. Icons: Lucide (ISC). */
   .stage { position: relative; border-radius: 12px; overflow: hidden; background: #17151d;
-    border: 1px solid var(--hairline); aspect-ratio: 16 / 9; }
+    border: 1px solid var(--hairline); aspect-ratio: 16 / 9; margin-top: 18px; }
   .stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .stage.cam video, .stage.cam canvas { transform: scaleX(-1); }  /* self view is always mirrored */
 
-  .stage-empty { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255,255,255,.5); }
-  .stage-empty .inner { text-align: center; font-size: .95rem; }
-  .stage-empty svg { display: block; margin: 0 auto 10px; width: 34px; height: 34px; stroke: rgba(255,255,255,.4); }
-  .stage.cam .stage-empty { display: none; }
+  /* return program feed fills the stage once the phone publishes it */
+  #return { display: none; }
+  .stage.return #return { display: block; }
+
+  /* self view: full stage until the return feed arrives, then a corner PiP */
+  .self { position: absolute; inset: 0; }
+  .stage.cam .self video, .stage.cam .self canvas { transform: scaleX(-1); }  /* selfie mirror */
+  .stage.return .self { inset: auto 12px 76px auto; width: 26%; min-width: 180px; aspect-ratio: 16 / 9;
+    border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,.22); }
+  .stage.blind .self video { visibility: hidden; }   /* hide my video: tracking dots stay */
+
+  .stage-empty { position: absolute; inset: 0; display: grid; place-items: center; }
+  .stage-empty svg { width: 36px; height: 36px; fill: rgba(255,255,255,.35); }
+  .stage.cam .stage-empty, .stage.return .stage-empty { display: none; }
 
   .ov-chips { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
   .ov-chips span { font-family: var(--mono); font-size: .74rem; color: #fff; background: rgba(0,0,0,.55);
     padding: 4px 8px; border-radius: 6px; }
   .ov-chips span.warn { background: rgba(160,80,20,.75); }
 
+  /* centered join dialog */
+  .joincard { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+  .joincard form { pointer-events: auto; width: min(340px, calc(100% - 48px)); background: rgba(23,21,29,.92);
+    border: 1px solid rgba(255,255,255,.14); border-radius: 12px; padding: 22px; text-align: center; }
+  .joincard h1 { font-size: 1.15rem; color: #fff; margin: 0 0 4px; }
+  .joincard p { font-size: .84rem; color: rgba(255,255,255,.55); margin: 0 0 14px; }
+  .joincard input { width: 100%; box-sizing: border-box; padding: 11px 12px; font-family: var(--mono);
+    font-size: .95rem; text-align: center; color: #fff; background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.2); border-radius: 8px; }
+  .joincard input::placeholder { color: rgba(255,255,255,.35); }
+  .joincard input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .joincard button { width: 100%; margin-top: 10px; padding: 11px 0; border: none; border-radius: 8px;
+    cursor: pointer; background: var(--accent-bright); color: #fff; font-size: .95rem; font-weight: 600; }
+  .joincard button:hover { background: var(--accent); }
+  .joincard button[disabled] { opacity: .5; cursor: default; }
+  .joincard #status { margin: 10px 0 0; font-size: .82rem; color: rgba(255,255,255,.6); min-height: 1.2em; }
+  .joincard #status.err { color: #FFB38A; }
+  .stage.live .joincard { display: none; }
+
   .bar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 12px; justify-content: center;
     padding: 12px 0 14px; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.45)); }
   .bar button { width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
     background: rgba(255,255,255,.16); display: grid; place-items: center; transition: background .12s ease; }
   .bar button:hover { background: rgba(255,255,255,.28); }
-  .bar button svg { width: 21px; height: 21px; stroke: #fff; fill: none; stroke-width: 1.8;
-    stroke-linecap: round; stroke-linejoin: round; }
+  .bar button svg { width: 22px; height: 22px; fill: #fff; }   /* Iconsax bold (filled) */
   .bar button[aria-pressed="true"] { background: var(--accent); }
   .bar button.danger { background: #D64545; }
   .bar button.danger:hover { background: #E25353; }
@@ -51,33 +75,11 @@
   .bar button.is-off .on { display: none; }
   .bar button.is-off .off { display: block; }
 
-  .panel { background: #fff; border: 1px solid var(--hairline); border-radius: 12px; padding: 20px; }
-  .panel h2 { font-size: 1.05rem; margin: 0 0 6px; }
-  .panel p { font-size: .92rem; color: var(--text-dim); margin: 0 0 14px; }
-  .panel input[type="text"] { width: 100%; box-sizing: border-box; padding: 11px 12px; font-family: var(--mono);
-    font-size: .92rem; color: var(--text); background: #fff; border: 1px solid rgba(60,40,120,.25);
-    border-radius: 8px; }
-  .panel input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .joinbtn { width: 100%; margin-top: 10px; padding: 11px 0; border: none; border-radius: 8px; cursor: pointer;
-    background: var(--accent-bright); color: #fff; font-size: .95rem; font-weight: 600; }
-  .joinbtn:hover { background: var(--accent); }
-  .joinbtn[disabled] { opacity: .5; cursor: default; }
-  .mono { font-family: var(--mono); }
-  .opts { border-top: 1px solid var(--hairline); margin-top: 16px; padding-top: 14px; display: grid; gap: 9px; }
-  .opts label { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--text-dim); cursor: pointer; }
-  #status { margin: 12px 0 0; font-size: .88rem; color: var(--text-dim); min-height: 1.3em; }
-  #status.err { color: var(--warn); }
+  .menu { position: absolute; right: 12px; bottom: 72px; background: rgba(20,18,26,.96); border: 1px solid rgba(255,255,255,.14);
+    border-radius: 10px; padding: 12px 14px; display: grid; gap: 10px; }
+  .menu label { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: #fff; cursor: pointer; white-space: nowrap; }
 
-  .face-steps { counter-reset: step; list-style: none; padding: 0; margin: 0; }
-  .face-steps li { counter-increment: step; position: relative; padding-left: 38px; margin: 12px 0; color: var(--text-dim); }
-  .face-steps li::before { content: counter(step); position: absolute; left: 0; top: -1px; width: 24px; height: 24px;
-    display: grid; place-items: center; border-radius: 6px; background: var(--accent-soft); color: var(--accent-deep);
-    font-weight: 700; font-size: .82rem; }
-  .face-help { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 26px; }
-  @media (max-width: 900px) { .face-help { grid-template-columns: 1fr; } }
-  .face-help section { background: #fff; border: 1px solid var(--hairline); border-radius: 12px; padding: 20px; }
-  .face-help h3 { margin: 0 0 10px; font-size: 1rem; }
-  .face-help p { font-size: .92rem; color: var(--text-dim); margin: 0; }
+  .face-foot { font-size: .85rem; color: var(--text-faint); margin: 14px 0 40px; text-align: center; }
 </style>
 </head>
 <body>
@@ -93,81 +95,63 @@
 </nav>
 
 <div class="container" style="max-width:1060px;">
-  <div class="page-head">
-    <p class="eyebrow">VRL Link</p>
-    <h1 style="font-size:1.9rem;">VRL Face</h1>
-    <p class="updated" style="max-width:640px;">Webcam face tracking for your avatar. Tracking runs in this tab; only blendshape and head rotation values are sent to your room.</p>
-  </div>
-
-  <main style="padding-bottom:8px;">
-    <div class="call">
-      <div class="stage" id="stage">
+  <main>
+    <div class="stage" id="stage">
+      <video id="return" playsinline autoplay></video>
+      <div class="self">
         <video id="cam" playsinline muted></video>
         <canvas id="overlay"></canvas>
-        <div class="ov-chips">
-          <span id="chip-room" hidden></span>
-          <span id="chip-track" hidden></span>
-          <span id="chip-rate" hidden></span>
-        </div>
-        <div class="stage-empty">
-          <div class="inner">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h9A1.5 1.5 0 0 1 15 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 3 16.5zM15 10l5-3v10l-5-3" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            Camera is off
-          </div>
-        </div>
-        <div class="bar">
-          <button id="btn-cam" class="is-off" aria-label="Turn camera on or off" title="Camera">
-            <svg class="on" viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h9A1.5 1.5 0 0 1 15 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 3 16.5zM15 10l5-3v10l-5-3"/></svg>
-            <svg class="off" viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h9A1.5 1.5 0 0 1 15 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 3 16.5zM15 10l5-3v10l-5-3"/><path d="M2 2l20 20"/></svg>
-          </button>
-          <button id="btn-mirror" aria-pressed="true" aria-label="Mirror left and right" title="Mirror">
-            <svg viewBox="0 0 24 24"><path d="M12 3v18M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>
-          </button>
-          <button id="btn-recenter" disabled aria-label="Recenter head pose" title="Recenter">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
-          </button>
-          <button id="btn-leave" class="danger" hidden aria-label="Leave the room" title="Leave">
-            <svg viewBox="0 0 24 24"><path d="M4 14c4.5-4 11.5-4 16 0M7 12.5 5.5 16M17 12.5l1.5 3.5"/></svg>
-          </button>
-        </div>
+      </div>
+      <div class="stage-empty">
+        <svg viewBox="0 0 24 24"><path d="M17.74 7.57c.01.07.01.15 0 .22 0-.07-.01-.14-.01-.21l.01-.01Z"/><path d="M17.279 6.56 3.829 20.01c-1.4-.89-1.95-2.48-1.95-4.01V8c0-3.42 1.33-4.75 4.75-4.75h6c2.89 0 4.28.95 4.65 3.31Z"/><path d="M21.4 2.229c-.3-.3-.79-.3-1.09 0L1.85 20.689c-.3.3-.3.79 0 1.09.15.14.35.22.54.22.2 0 .39-.08.54-.23L21.4 3.309c.3-.3.3-.78 0-1.08ZM22.38 8.38v7.24c0 1.43-.7 2-1.1 2.21-.19.1-.49.21-.86.21-.43 0-.96-.14-1.58-.58l-1.48-1.04c-.07 2.21-.77 3.47-2.36 4-.64.23-1.43.33-2.38.33h-6c-.24 0-.47-.01-.71-.04L15 11.63l5.65-5.65c.26.02.47.1.63.19.4.21 1.1.78 1.1 2.21Z"/></svg>
+      </div>
+      <div class="ov-chips">
+        <span id="chip-room" hidden></span>
+        <span id="chip-track" hidden></span>
+        <span id="chip-rate" hidden></span>
+        <span id="chip-hint" hidden></span>
       </div>
 
-      <aside class="panel">
-        <div id="join-form">
-          <h2>Join a room</h2>
-          <p>Paste the room secret from VTOKU Cam (Settings, VRL Link, Copy).</p>
+      <div class="joincard">
+        <form id="join-form">
+          <h1>VRL Face</h1>
+          <p>Webcam tracking for your VTOKU Cam avatar</p>
           <input id="room" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
-                 placeholder="cyberfox-k7m2xq8r">
-          <button id="join" class="joinbtn">Join</button>
-        </div>
-        <div id="session-info" hidden>
-          <h2>Connected</h2>
-          <p>Room <span id="session-room" class="mono"></span></p>
-          <p>Your face is driving the avatar. Hang up with the red button to stop sending.</p>
-        </div>
-        <div class="opts">
-          <label><input id="opt-head" type="checkbox" checked> Send head rotation</label>
-          <label><input id="opt-perfect" type="checkbox"> Perfect sync (all 52 ARKit blendshapes)</label>
-        </div>
-        <p id="status"></p>
-      </aside>
+                 placeholder="Room secret" aria-label="Room secret">
+          <button id="join" type="submit">Join</button>
+          <p id="status"></p>
+        </form>
+      </div>
+
+      <div class="menu" id="menu" hidden>
+        <label><input id="opt-mirror" type="checkbox" checked> Mirror</label>
+        <label><input id="opt-blind" type="checkbox"> Hide my video</label>
+        <label><input id="opt-body" type="checkbox"> Upper body + hands</label>
+        <label><input id="opt-perfect" type="checkbox"> Perfect sync</label>
+      </div>
+
+      <div class="bar">
+        <button id="btn-cam" class="is-off" type="button" aria-label="Turn camera on or off" title="Camera">
+          <svg class="on" viewBox="0 0 24 24"><path d="M21.15 6.17c-.41-.22-1.27-.45-2.44.37l-1.47 1.04c-.11-3.11-1.46-4.33-4.74-4.33h-6C3.08 3.25 1.75 4.58 1.75 8v8c0 2.3 1.25 4.75 4.75 4.75h6c3.28 0 4.63-1.22 4.74-4.33l1.47 1.04c.62.44 1.16.58 1.59.58.37 0 .66-.11.85-.21.41-.21 1.1-.78 1.1-2.21V8.38c0-1.43-.69-2-1.1-2.21ZM11 11.38c-1.03 0-1.88-.84-1.88-1.88S9.97 7.62 11 7.62c1.03 0 1.88.84 1.88 1.88s-.85 1.88-1.88 1.88Z"/></svg>
+          <svg class="off" viewBox="0 0 24 24"><path d="M17.74 7.57c.01.07.01.15 0 .22 0-.07-.01-.14-.01-.21l.01-.01Z"/><path d="M17.279 6.56 3.829 20.01c-1.4-.89-1.95-2.48-1.95-4.01V8c0-3.42 1.33-4.75 4.75-4.75h6c2.89 0 4.28.95 4.65 3.31Z"/><path d="M21.4 2.229c-.3-.3-.79-.3-1.09 0L1.85 20.689c-.3.3-.3.79 0 1.09.15.14.35.22.54.22.2 0 .39-.08.54-.23L21.4 3.309c.3-.3.3-.78 0-1.08ZM22.38 8.38v7.24c0 1.43-.7 2-1.1 2.21-.19.1-.49.21-.86.21-.43 0-.96-.14-1.58-.58l-1.48-1.04c-.07 2.21-.77 3.47-2.36 4-.64.23-1.43.33-2.38.33h-6c-.24 0-.47-.01-.71-.04L15 11.63l5.65-5.65c.26.02.47.1.63.19.4.21 1.1.78 1.1 2.21Z"/></svg>
+        </button>
+        <button id="btn-track" type="button" aria-pressed="true" aria-label="Tracking on or off" title="Tracking">
+          <svg viewBox="0 0 24 24"><path d="M2.77 10C2.34 10 2 9.66 2 9.23V6.92A4.93 4.93 0 0 1 6.92 2h2.31c.43 0 .77.34.77.77s-.34.77-.77.77H6.92c-1.87 0-3.38 1.52-3.38 3.38v2.31c0 .43-.35.77-.77.77ZM21.23 10a.77.77 0 0 1-.77-.77V6.92c0-1.87-1.52-3.38-3.38-3.38h-2.31a.77.77 0 0 1 0-1.54h2.31A4.93 4.93 0 0 1 22 6.92v2.31c0 .43-.34.77-.77.77ZM17.082 22h-1.39a.77.77 0 0 1 0-1.54h1.39c1.87 0 3.38-1.52 3.38-3.38V15.7a.77.77 0 0 1 1.54 0v1.38a4.93 4.93 0 0 1-4.92 4.92ZM9.23 22H6.92A4.93 4.93 0 0 1 2 17.08v-2.31c0-.43.34-.77.77-.77s.77.34.77.77v2.31c0 1.87 1.52 3.38 3.38 3.38h2.31a.77.77 0 0 1 0 1.54ZM18.46 11.23H5.54a.77.77 0 0 0 0 1.54H18.46a.77.77 0 0 0 0-1.54ZM6.898 13.94v.33c0 1.66 1.34 3 3 3h4.2c1.66 0 3-1.34 3-3v-.33c0-.12-.09-.21-.21-.21h-9.78c-.12 0-.21.09-.21.21ZM6.898 10.06v-.33c0-1.66 1.34-3 3-3h4.2c1.66 0 3 1.34 3 3v.33c0 .12-.09.21-.21.21h-9.78c-.12 0-.21-.09-.21-.21Z"/></svg>
+        </button>
+        <button id="btn-recenter" type="button" disabled aria-label="Recenter head pose" title="Recenter">
+          <svg viewBox="0 0 24 24"><path d="M22 11.25h-2.04c-.36-3.81-3.4-6.86-7.21-7.21V2c0-.41-.34-.75-.75-.75s-.75.34-.75.75v2.04c-3.81.36-6.86 3.4-7.21 7.21H2c-.41 0-.75.34-.75.75s.34.75.75.75h2.04c.36 3.81 3.4 6.86 7.21 7.21V22c0 .41.34.75.75.75s.75-.34.75-.75v-2.04c3.81-.36 6.86-3.4 7.21-7.21H22c.41 0 .75-.34.75-.75s-.34-.75-.75-.75Zm-10 3.87c-1.72 0-3.12-1.4-3.12-3.12 0-1.72 1.4-3.12 3.12-3.12 1.72 0 3.12 1.4 3.12 3.12 0 1.72-1.4 3.12-3.12 3.12Z"/></svg>
+        </button>
+        <button id="btn-gear" type="button" aria-expanded="false" aria-label="Options" title="Options">
+          <svg viewBox="0 0 24 24"><path d="M20.1 9.221c-1.81 0-2.55-1.28-1.65-2.85.52-.91.21-2.07-.7-2.59l-1.73-.99c-.79-.47-1.81-.19-2.28.6l-.11.19c-.9 1.57-2.38 1.57-3.29 0l-.11-.19a1.641 1.641 0 0 0-2.26-.6l-1.73.99c-.91.52-1.22 1.69-.7 2.6.91 1.56.17 2.84-1.64 2.84-1.04 0-1.9.85-1.9 1.9v1.76c0 1.04.85 1.9 1.9 1.9 1.81 0 2.55 1.28 1.64 2.85-.52.91-.21 2.07.7 2.59l1.73.99c.79.47 1.81.19 2.28-.6l.11-.19c.9-1.57 2.38-1.57 3.29 0l.11.19c.47.79 1.49 1.07 2.28.6l1.73-.99c.91-.52 1.22-1.69.7-2.59-.91-1.57-.17-2.85 1.64-2.85 1.04 0 1.9-.85 1.9-1.9v-1.76a1.92 1.92 0 0 0-1.91-1.9Zm-8.1 6.03c-1.79 0-3.25-1.46-3.25-3.25s1.46-3.25 3.25-3.25 3.25 1.46 3.25 3.25-1.46 3.25-3.25 3.25Z"/></svg>
+        </button>
+        <button id="btn-leave" class="danger" type="button" hidden aria-label="Leave the room" title="Leave">
+          <svg viewBox="0 0 24 24"><path d="M22 18.33c0 .36-.08.73-.25 1.09-.17.36-.39.7-.68 1.02-.49.54-1.03.93-1.64 1.18-.6.25-1.26.38-1.96.38-1.02 0-2.11-.24-3.26-.73a17.63 17.63 0 01-3.45-1.98c-.58-.43-1.15-.87-1.7-1.35l3.26-3.26c.01 0 .01 0 .02.01.52.44.95.74 1.29.92.05.02.11.05.18.08.08.03.16.04.25.04.17 0 .3-.06.41-.17l.76-.75c.25-.25.49-.44.72-.56.23-.14.46-.21.71-.21.19 0 .39.04.61.13.22.09.45.22.7.39l3.32 2.35c.26.18.44.39.55.64.1.25.16.5.16.78zM10.76 13.24 7.5 16.5c-.01 0-.01 0-.02-.01a29.544 29.544 0 0 1-2.8-3.27c-.81-1.12-1.46-2.25-1.94-3.36-.01-.02-.01-.03-.02-.05C2.24 8.67 2 7.58 2 6.54c0-.68.12-1.33.36-1.93.2-.51.5-.99.91-1.42.07-.08.15-.17.24-.25.16-.16.32-.3.49-.41h.01C4.51 2.17 5.04 2 5.6 2c.28 0 .56.06.81.18.24.11.45.27.62.5.02.02.03.04.05.06L9.4 6.01c.18.25.31.48.4.7.09.21.14.42.14.61 0 .24-.07.48-.21.71-.13.23-.32.47-.56.71l-.76.79c-.11.11-.16.24-.16.4 0 .08.01.15.03.23.03.08.06.14.08.2.18.33.49.76.93 1.28.45.52.93 1.05 1.45 1.58l.02.02z"/><path d="M21.77 2.229c-.3-.3-.79-.3-1.09 0L2.23 20.689c-.3.3-.3.79 0 1.09a.758.758 0 0 0 1.08-.01l18.46-18.46c.31-.3.31-.78 0-1.08z"/></svg>
+        </button>
+      </div>
     </div>
 
-    <div class="face-help">
-      <section>
-        <h3>Set up in the app</h3>
-        <ol class="face-steps">
-          <li>In VTOKU Cam open Settings, then VRL Link. Generate a room secret and turn on <strong>Connect</strong>.</li>
-          <li>Copy the secret here and press Join. Joining only works while the app is connected.</li>
-          <li>In the Face panel set <strong>Source</strong> to <strong>VMC</strong>. Your avatar now follows this webcam.</li>
-        </ol>
-      </section>
-      <section>
-        <h3>Privacy and options</h3>
-        <p>Face tracking runs on your device with MediaPipe. Video and images are never uploaded; the page sends only VMC blendshape and head rotation values inside your private room.
-        <br><br><strong>Perfect sync</strong> is for avatars rigged with ARKit blendshapes; leave it off for standard VRM models. <strong>Recenter</strong> captures your current head pose as neutral. Works in current Chrome, Edge, and Safari.</p>
-      </section>
-    </div>
+    <p class="face-foot">Tracking runs in this tab. Your video is never uploaded — this page can only send
+      motion data. More in the <a href="docs/vrl-link.html">VRL Link guide</a>.</p>
   </main>
 </div>
 
@@ -211,7 +195,7 @@
   </div>
 </footer>
 
-<script type="module" src="assets/face.js?v=2"></script>
+<script type="module" src="assets/face.js?v=4"></script>
 
 </body>
 </html>
