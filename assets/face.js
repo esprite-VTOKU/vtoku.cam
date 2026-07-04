@@ -1,27 +1,23 @@
-// VRL Face — browser motion capture for VTOKU Cam.
+// VRL Link web sender — browser motion capture for VTOKU Cam.
 //
-// Tracks face (and optionally upper body + hands) locally with MediaPipe, converts the result
-// into standard VMC OSC bundles, and publishes the bytes on the VRL Link room's LiveKit data
-// channel (topic "vmc", lossy) — the exact wire format the app's VMCReceiver already parses.
-// The room grant is data-only for publishing (canPublish=false), so this page PHYSICALLY cannot
-// send the webcam video; it subscribes to the phone's return "program" feed and shows it as the
-// main stage view (the self preview becomes a corner PiP).
+// Tracks face + upper body + hands locally (MediaPipe Holistic + Kalidokit solvers), converts
+// the result into standard VMC OSC bundles, and publishes the bytes on the VRL Link room's
+// LiveKit data channel (topic "vmc", lossy) — the exact wire format the app's VMCReceiver
+// already parses. The room grant is data-only for publishing (canPublish=false), so this page
+// PHYSICALLY cannot send the webcam video; it subscribes to the phone's return "program" feed
+// and shows it as the main stage view (the self preview becomes a corner PiP).
 //
-// Two tracking modes:
-//   face (default) — FaceLandmarker: 52 ARKit blendshapes + head pose from the face matrix.
-//   body (gear menu) — HolisticLandmarker + Kalidokit solvers: same blendshapes, plus
-//     spine/arms/wrists/fingers as VMC bone rotations. Hips are never sent, so the avatar
-//     stays planted on its stage (same rule as the app's own body capture).
+// Hips are never sent, so the avatar stays planted on its stage (same rule as the app's own
+// body capture). One "Tracking" switch pauses everything; blends and bones relax on pause.
 //
 // Token: POST https://vrl-token.fly.dev/face-token { room } → { token, url }.
 
-import { FilesetResolver, FaceLandmarker, HolisticLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
+import { FilesetResolver, HolisticLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
 import { Room, RoomEvent } from "https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.esm.min.mjs";
 
 const qs = new URLSearchParams(location.search);
 const TOKEN_URL = qs.get("token") || "https://vrl-token.fly.dev/face-token";
 const WASM_BASE = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
-const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
 const HOLISTIC_MODEL = "https://storage.googleapis.com/mediapipe-models/holistic_landmarker/holistic_landmarker/float16/1/holistic_landmarker.task";
 const KALIDOKIT_URL = "https://cdn.jsdelivr.net/npm/kalidokit@1.1.5/dist/kalidokit.es.js";
 const MAX_PACKET = 1200;   // stay under one MTU per lossy data packet — VMCReceiver parses each independently
@@ -90,27 +86,6 @@ const boneMsg = (name, q) => oscMessage("/VMC/Ext/Bone/Pos", [
 ]);
 
 // ── quaternion helpers (arrays [x,y,z,w]) ──────────────────────────────────────────────────
-function quatFromMatrix(m) {   // m: column-major 4x4 (MediaPipe facialTransformationMatrix)
-  const m00 = m[0], m01 = m[4], m02 = m[8];
-  const m10 = m[1], m11 = m[5], m12 = m[9];
-  const m20 = m[2], m21 = m[6], m22 = m[10];
-  const tr = m00 + m11 + m22;
-  let x, y, z, w;
-  if (tr > 0) {
-    const s = Math.sqrt(tr + 1) * 2;
-    w = s / 4; x = (m21 - m12) / s; y = (m02 - m20) / s; z = (m10 - m01) / s;
-  } else if (m00 > m11 && m00 > m22) {
-    const s = Math.sqrt(1 + m00 - m11 - m22) * 2;
-    w = (m21 - m12) / s; x = s / 4; y = (m01 + m10) / s; z = (m02 + m20) / s;
-  } else if (m11 > m22) {
-    const s = Math.sqrt(1 + m11 - m00 - m22) * 2;
-    w = (m02 - m20) / s; x = (m01 + m10) / s; y = s / 4; z = (m12 + m21) / s;
-  } else {
-    const s = Math.sqrt(1 + m22 - m00 - m11) * 2;
-    w = (m10 - m01) / s; x = (m02 + m20) / s; y = (m12 + m21) / s; z = s / 4;
-  }
-  return [x, y, z, w];
-}
 // three.js-style XYZ-order Euler (radians) → quaternion.
 function quatFromEuler(x, y, z) {
   const c1 = Math.cos(x / 2), s1 = Math.sin(x / 2);
@@ -167,17 +142,18 @@ function standardBlends(b) {
 const $ = (id) => document.getElementById(id);
 const stage = $("stage"), video = $("cam"), overlay = $("overlay"), returnEl = $("return");
 const joinForm = $("join-form"), roomInput = $("room"), joinBtn = $("join"), statusEl = $("status");
-const btnCam = $("btn-cam"), btnTrack = $("btn-track"), btnRecenter = $("btn-recenter");
+const btnCam = $("btn-cam"), btnRecenter = $("btn-recenter");
 const btnGear = $("btn-gear"), btnLeave = $("btn-leave"), menu = $("menu");
 const chipRoom = $("chip-room"), chipTrack = $("chip-track"), chipRate = $("chip-rate"), chipHint = $("chip-hint");
-const optMirror = $("opt-mirror"), optBlind = $("opt-blind"), optBody = $("opt-body"), optPerfect = $("opt-perfect");
+const optTrack = $("opt-track"), optMirror = $("opt-mirror"), optBlind = $("opt-blind"), optPerfect = $("opt-perfect");
 
-let faceLm = null, holoLm = null, Kalidokit = null, fileset = null;
+let holo = null, Kalidokit = null, trackersLoading = null;
 let room = null, remoteAudioEls = [];
-let camOn = false, joined = false, leaving = false, bodyReady = false, bodyLoading = false;
+let camOn = false, joined = false, leaving = false;
 let lastVideoTime = -1, refQuatInv = null, wantRecenter = true;
 let pktCount = 0, pktWindowStart = 0, faceSeen = false;
 let sentKeys = new Set(), sentBones = new Set();
+const partSeen = { pose: false, Left: false, Right: false };   // for rest-on-dropout
 let hintTimer = 0;
 
 roomInput.value = localStorage.getItem("vrlRoom") || "";
@@ -212,49 +188,31 @@ async function mintToken(roomCode) {
   return body;   // { token, url }
 }
 
-// ── trackers ────────────────────────────────────────────────────────────────────────────────
-async function ensureFileset() {
-  if (!fileset) fileset = await FilesetResolver.forVisionTasks(WASM_BASE);
-  return fileset;
-}
-async function makeLandmarker(cls, modelPath, extra) {
-  const fs = await ensureFileset();
-  const opts = (delegate) => ({
-    baseOptions: { modelAssetPath: modelPath, delegate },
-    runningMode: "VIDEO",
-    ...extra,
-  });
-  try { return await cls.createFromOptions(fs, opts("GPU")); }
-  catch { return await cls.createFromOptions(fs, opts("CPU")); }
-}
-async function ensureFace() {
-  if (faceLm) return;
-  setStatus("Loading face tracker…");
-  faceLm = await makeLandmarker(FaceLandmarker, FACE_MODEL, {
-    numFaces: 1, outputFaceBlendshapes: true, outputFacialTransformationMatrixes: true,
-  });
-  setStatus("");
-}
-async function ensureBody() {
-  if (bodyReady || bodyLoading) return;
-  bodyLoading = true;
-  setStatus("Loading body tracker…");
-  try {
-    const mod = await import(KALIDOKIT_URL);
-    Kalidokit = mod.default ?? mod;
-    holoLm = await makeLandmarker(HolisticLandmarker, HOLISTIC_MODEL, { outputFaceBlendshapes: true });
-    bodyReady = true;
-    setStatus("");
-  } catch (e) {
-    optBody.checked = false;
-    setStatus("Body tracking failed to load — using face only.", true);
+// ── tracker (holistic model + kalidokit solvers, loaded once) ───────────────────────────────
+function ensureTrackers() {
+  if (!trackersLoading) {
+    trackersLoading = (async () => {
+      setStatus("Loading tracker…");
+      const mod = await import(KALIDOKIT_URL);
+      Kalidokit = mod.default ?? mod;
+      const fileset = await FilesetResolver.forVisionTasks(WASM_BASE);
+      const opts = (delegate) => ({
+        baseOptions: { modelAssetPath: HOLISTIC_MODEL, delegate },
+        runningMode: "VIDEO",
+        outputFaceBlendshapes: true,
+      });
+      try { holo = await HolisticLandmarker.createFromOptions(fileset, opts("GPU")); }
+      catch { holo = await HolisticLandmarker.createFromOptions(fileset, opts("CPU")); }
+      setStatus("");
+    })();
+    trackersLoading.catch(() => { trackersLoading = null; });   // allow retry after a failed load
   }
-  bodyLoading = false;
+  return trackersLoading;
 }
 
 // ── camera on/off (independent of the room, like any call app) ─────────────────────────────
 async function cameraOn() {
-  await ensureFace();
+  await ensureTrackers();
   setStatus("Starting camera…");
   const stream = await navigator.mediaDevices.getUserMedia({
     video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
@@ -325,7 +283,7 @@ async function connectRoom(roomCode) {
 
 async function join() {
   const roomCode = roomInput.value.trim();
-  if (roomCode.length < 8) { setStatus("Paste the room secret from the app.", true); return; }
+  if (roomCode.length < 8) { setStatus("Paste the room key from the app.", true); return; }
   localStorage.setItem("vrlRoom", roomCode);
   joinBtn.disabled = true;
   try {
@@ -412,16 +370,23 @@ function relaxAvatar() {
 
 // Kalidokit gives XYZ Euler rigs (three.js convention); convert to a mirrored/unmirrored
 // Unity-space VMC bone message. `amp` tames or boosts a chain if it overshoots on device.
+// Non-finite eulers are dropped — Kalidokit emits NaN on degenerate landmarks, and one NaN
+// quaternion freezes the bone on the receiving end.
 function pushBone(messages, mirror, name, e, amp = 1) {
-  if (!e) return;
-  let q = toUnity(quatFromEuler((e.x || 0) * amp, (e.y || 0) * amp, (e.z || 0) * amp));
+  if (!e || !Number.isFinite(e.x) || !Number.isFinite(e.y) || !Number.isFinite(e.z)) return;
+  let q = toUnity(quatFromEuler(e.x * amp, e.y * amp, e.z * amp));
   let n = name;
   if (mirror) { n = mirrorName(name); q = mirrorQ(q); }
   sentBones.add(n);
   messages.push(boneMsg(n, q));
 }
+// Send rest (identity) for the already-driven bones matching a prefix — so a hand or arm that
+// drops out of frame relaxes instead of freezing in its last pose.
+function restBones(messages, prefix) {
+  for (const b of sentBones) if (b.startsWith(prefix)) messages.push(boneMsg(b, [0, 0, 0, 1]));
+}
 
-function sendFrame(result, bodyMode) {
+function sendFrame(result) {
   if (!joined || !room || room.state !== "connected") return;
   const shapes = result.faceBlendshapes?.[0]?.categories;
   const hasFace = !!result.faceLandmarks?.[0];
@@ -434,54 +399,63 @@ function sendFrame(result, bodyMode) {
   const mirror = optMirror.checked;
   const messages = [];
 
-  // Head. Face mode: from the face transformation matrix. Body mode: Kalidokit's face solve.
-  let headQ = null;
-  if (!bodyMode) {
-    const m = result.facialTransformationMatrixes?.[0]?.data;
-    if (m) headQ = toUnity(quatFromMatrix(m));
-  } else if (Kalidokit?.Face) {
-    try {
-      const f = Kalidokit.Face.solve(result.faceLandmarks[0], { runtime: "mediapipe", video });
-      if (f?.head) headQ = toUnity(quatFromEuler(f.head.x, f.head.y, f.head.z));
-    } catch { /* face solve can fail on partial landmarks */ }
-  }
-  if (headQ) {
-    if (wantRecenter) { refQuatInv = qConj(headQ); wantRecenter = false; }
-    if (refQuatInv) headQ = qMul(refQuatInv, headQ);
-    if (mirror) headQ = mirrorQ(headQ);
-    sentBones.add("Head");
-    messages.push(boneMsg("Head", headQ));
-  }
+  // Head (Kalidokit face solve over the holistic landmarks).
+  try {
+    const f = Kalidokit.Face.solve(result.faceLandmarks[0], { runtime: "mediapipe", video });
+    if (f?.head) {
+      let headQ = toUnity(quatFromEuler(f.head.x, f.head.y, f.head.z));
+      if (wantRecenter) { refQuatInv = qConj(headQ); wantRecenter = false; }
+      if (refQuatInv) headQ = qMul(refQuatInv, headQ);
+      if (mirror) headQ = mirrorQ(headQ);
+      sentBones.add("Head");
+      messages.push(boneMsg("Head", headQ));
+    }
+  } catch { /* face solve can fail on partial landmarks */ }
 
-  // Upper body + hands (Kalidokit solvers over the holistic result).
-  if (bodyMode && Kalidokit) {
-    try {
-      if (result.poseWorldLandmarks?.[0] && result.poseLandmarks?.[0]) {
-        const rig = Kalidokit.Pose.solve(result.poseWorldLandmarks[0], result.poseLandmarks[0],
-                                         { runtime: "mediapipe", video });
-        if (rig) {
-          pushBone(messages, mirror, "Spine", rig.Spine, 0.6);
-          pushBone(messages, mirror, "LeftUpperArm", rig.LeftUpperArm);
-          pushBone(messages, mirror, "LeftLowerArm", rig.LeftLowerArm);
-          pushBone(messages, mirror, "RightUpperArm", rig.RightUpperArm);
-          pushBone(messages, mirror, "RightLowerArm", rig.RightLowerArm);
-          // Wrist fallback from pose; overwritten below when the hand solver has real data.
-          if (!result.leftHandLandmarks?.[0]) pushBone(messages, mirror, "LeftHand", rig.LeftHand);
-          if (!result.rightHandLandmarks?.[0]) pushBone(messages, mirror, "RightHand", rig.RightHand);
-        }
+  // Upper body + hands.
+  try {
+    if (result.poseWorldLandmarks?.[0] && result.poseLandmarks?.[0]) {
+      partSeen.pose = true;
+      const rig = Kalidokit.Pose.solve(result.poseWorldLandmarks[0], result.poseLandmarks[0],
+                                       { runtime: "mediapipe", video });
+      if (rig) {
+        pushBone(messages, mirror, "Spine", rig.Spine, 0.6);
+        pushBone(messages, mirror, "LeftUpperArm", rig.LeftUpperArm);
+        pushBone(messages, mirror, "LeftLowerArm", rig.LeftLowerArm);
+        pushBone(messages, mirror, "RightUpperArm", rig.RightUpperArm);
+        pushBone(messages, mirror, "RightLowerArm", rig.RightLowerArm);
+        // Wrist fallback from pose; overwritten below when the hand solver has real data.
+        if (!result.leftHandLandmarks?.[0]) pushBone(messages, mirror, "LeftHand", rig.LeftHand);
+        if (!result.rightHandLandmarks?.[0]) pushBone(messages, mirror, "RightHand", rig.RightHand);
       }
-      for (const side of ["Left", "Right"]) {
-        const lms = result[`${side.toLowerCase()}HandLandmarks`]?.[0];
-        if (!lms) continue;
-        const hand = Kalidokit.Hand.solve(lms, side);
-        if (!hand) continue;
-        for (const [key, e] of Object.entries(hand)) {
-          const bone = key === `${side}Wrist` ? `${side}Hand` : key;   // VMC/Unity wrist name
-          pushBone(messages, mirror, bone, e);
+    } else if (partSeen.pose) {
+      partSeen.pose = false;
+      restBones(messages, "Spine");
+      restBones(messages, "LeftUpperArm"); restBones(messages, "LeftLowerArm");
+      restBones(messages, "RightUpperArm"); restBones(messages, "RightLowerArm");
+    }
+    for (const side of ["Left", "Right"]) {
+      const lms = result[`${side.toLowerCase()}HandLandmarks`]?.[0];
+      if (!lms) {
+        // Hand left the frame → relax its wrist + fingers once instead of freezing mid-gesture.
+        // (`sentBones` names are post-mirror, so the prefix check uses the mirrored side too.)
+        const s = mirror ? mirrorName(side) : side;
+        if (partSeen[side]) {
+          partSeen[side] = false;
+          restBones(messages, `${s}Hand`);
+          for (const finger of ["Thumb", "Index", "Middle", "Ring", "Little"]) restBones(messages, s + finger);
         }
+        continue;
       }
-    } catch { /* solver hiccup — skip body this frame, face still sends */ }
-  }
+      partSeen[side] = true;
+      const hand = Kalidokit.Hand.solve(lms, side);
+      if (!hand) continue;
+      for (const [key, e] of Object.entries(hand)) {
+        const bone = key === `${side}Wrist` ? `${side}Hand` : key;   // VMC/Unity wrist name
+        pushBone(messages, mirror, bone, e);
+      }
+    }
+  } catch { /* solver hiccup — skip body this frame, face still sends */ }
 
   // Blendshapes.
   if (shapes) {
@@ -518,16 +492,12 @@ function publish(bytes) {
   room.localParticipant.publishData(bytes, { reliable: false, topic: "vmc" }).catch(() => {});
 }
 
-const trackOn = () => btnTrack.getAttribute("aria-pressed") === "true";
-
 function loop() {
   if (!camOn) return;
-  if (trackOn() && video.readyState >= 2 && video.currentTime !== lastVideoTime) {
+  if (optTrack.checked && holo && video.readyState >= 2 && video.currentTime !== lastVideoTime) {
     lastVideoTime = video.currentTime;
-    const bodyMode = optBody.checked && bodyReady;
-    const lm = bodyMode ? holoLm : faceLm;
     let result = null;
-    try { result = lm.detectForVideo(video, performance.now()); } catch { /* skip frame */ }
+    try { result = holo.detectForVideo(video, performance.now()); } catch { /* skip frame */ }
     if (result) {
       drawOverlay(result);
       if (!joined) {   // lobby: still show the tracking state on the preview
@@ -538,7 +508,7 @@ function loop() {
           chipTrack.classList.toggle("warn", !has);
         }
       }
-      sendFrame(result, bodyMode);
+      sendFrame(result);
     }
   }
   if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(() => loop());
@@ -552,12 +522,10 @@ btnCam.addEventListener("click", async () => {
   if (camOn) { cameraOff(); setStatus(joined ? "Camera off — still in the room." : ""); return; }
   try { await cameraOn(); } catch (e) { setStatus(String(e.message || e), true); }
 });
-btnTrack.addEventListener("click", () => {
-  const on = !trackOn();
-  btnTrack.setAttribute("aria-pressed", on ? "true" : "false");
-  if (!on) {
+optTrack.addEventListener("change", () => {
+  if (!optTrack.checked) {
     overlay.getContext("2d").clearRect(0, 0, overlay.width, overlay.height);
-    chipTrack.textContent = "paused";
+    if (camOn) chipTrack.textContent = "paused";
     relaxAvatar();
   } else if (camOn) {
     chipTrack.textContent = "no face"; faceSeen = false;
@@ -574,8 +542,4 @@ document.addEventListener("click", () => {
   if (!menu.hidden) { menu.hidden = true; btnGear.setAttribute("aria-expanded", "false"); }
 });
 optBlind.addEventListener("change", () => stage.classList.toggle("blind", optBlind.checked));
-optBody.addEventListener("change", async () => {
-  if (optBody.checked) await ensureBody();
-  else relaxAvatar();   // arms/fingers back to rest when body tracking turns off
-});
 window.addEventListener("pagehide", () => { if (room) room.disconnect(); });

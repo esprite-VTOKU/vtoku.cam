@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VRL Face · VTOKU Cam</title>
+<title>VRL Link · VTOKU Cam</title>
 <meta name="description" content="Drive your VTuber from any webcam. Free browser face, upper-body, and hand tracking that sends VMC data straight into your VRL Link session. No install, and your camera never leaves the browser.">
 <link rel="canonical" href="https://vtoku.cam/face.html">
-<meta property="og:title" content="VRL Face · VTOKU Cam">
-<meta property="og:description" content="Browser face and hand tracking for VRL Link. Enter your room secret and drive your avatar from any webcam.">
+<meta property="og:title" content="VRL Link · VTOKU Cam">
+<meta property="og:description" content="Browser face and hand tracking for VRL Link. Enter your room key and drive your avatar from any webcam.">
 <meta property="og:url" content="https://vtoku.cam/face.html">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
@@ -17,7 +17,7 @@
 <style>
   /* Video-call layout: one full-width stage, join dialog centered over it, control bar docked.
      Deliberately utilitarian (solid surfaces, 6-12px radii) — the app area is a tool, not a
-     brochure. Round buttons only in the call bar, the video-chat idiom. Icons: Lucide (ISC). */
+     brochure. Round buttons only in the call bar, the video-chat idiom. Icons: Iconsax bold. */
   .stage { position: relative; border-radius: 12px; overflow: hidden; background: #17151d;
     border: 1px solid var(--hairline); aspect-ratio: 16 / 9; margin-top: 18px; }
   .stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -75,9 +75,20 @@
   .bar button.is-off .on { display: none; }
   .bar button.is-off .off { display: block; }
 
-  .menu { position: absolute; right: 12px; bottom: 72px; background: rgba(20,18,26,.96); border: 1px solid rgba(255,255,255,.14);
-    border-radius: 10px; padding: 12px 14px; display: grid; gap: 10px; }
-  .menu label { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: #fff; cursor: pointer; white-space: nowrap; }
+  .menu { position: absolute; right: 12px; bottom: 72px; min-width: 232px; background: rgba(26,24,33,.97);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px; padding: 4px 14px; box-shadow: 0 16px 40px rgba(0,0,0,.45); }
+  .menu label { display: flex; align-items: center; justify-content: space-between; gap: 28px;
+    padding: 11px 0; font-size: .9rem; color: rgba(255,255,255,.92); cursor: pointer; white-space: nowrap; }
+  .menu label + label { border-top: 1px solid rgba(255,255,255,.08); }
+  .menu input { position: absolute; opacity: 0; pointer-events: none; }
+  .menu .sw { flex: none; width: 36px; height: 21px; border-radius: 999px; background: rgba(255,255,255,.22); /* unslop-ignore: switch track, the toggle idiom */
+    position: relative; transition: background .15s ease; }
+  .menu .sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 17px; height: 17px;
+    border-radius: 50%; background: #fff; transition: transform .15s ease; }
+  .menu input:checked + .sw { background: var(--accent-bright); }
+  .menu input:checked + .sw::after { transform: translateX(15px); }
+  .menu input:focus-visible + .sw { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
 
   .face-foot { font-size: .85rem; color: var(--text-faint); margin: 14px 0 40px; text-align: center; }
 </style>
@@ -114,29 +125,27 @@
 
       <div class="joincard">
         <form id="join-form">
-          <h1>VRL Face</h1>
-          <p>Webcam tracking for your VTOKU Cam avatar</p>
+          <h1>VRL Link</h1>
+          <p>Enter Room Key</p>
           <input id="room" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
-                 placeholder="Room secret" aria-label="Room secret">
+                 placeholder="Room key" aria-label="Room key">
           <button id="join" type="submit">Join</button>
           <p id="status"></p>
         </form>
       </div>
 
       <div class="menu" id="menu" hidden>
-        <label><input id="opt-mirror" type="checkbox" checked> Mirror</label>
-        <label><input id="opt-blind" type="checkbox"> Hide my video</label>
-        <label><input id="opt-body" type="checkbox"> Upper body + hands</label>
-        <label><input id="opt-perfect" type="checkbox"> Perfect sync</label>
+        <label><span>Tracking</span><input id="opt-track" type="checkbox" checked><span class="sw"></span></label>
+        <label><span>Mirror</span><input id="opt-mirror" type="checkbox" checked><span class="sw"></span></label>
+        <label><span>Hide my video</span><input id="opt-blind" type="checkbox"><span class="sw"></span></label>
+        <label><span>Upper body + hands</span><input id="opt-body" type="checkbox"><span class="sw"></span></label>
+        <label><span>Perfect sync</span><input id="opt-perfect" type="checkbox"><span class="sw"></span></label>
       </div>
 
       <div class="bar">
         <button id="btn-cam" class="is-off" type="button" aria-label="Turn camera on or off" title="Camera">
           <svg class="on" viewBox="0 0 24 24"><path d="M21.15 6.17c-.41-.22-1.27-.45-2.44.37l-1.47 1.04c-.11-3.11-1.46-4.33-4.74-4.33h-6C3.08 3.25 1.75 4.58 1.75 8v8c0 2.3 1.25 4.75 4.75 4.75h6c3.28 0 4.63-1.22 4.74-4.33l1.47 1.04c.62.44 1.16.58 1.59.58.37 0 .66-.11.85-.21.41-.21 1.1-.78 1.1-2.21V8.38c0-1.43-.69-2-1.1-2.21ZM11 11.38c-1.03 0-1.88-.84-1.88-1.88S9.97 7.62 11 7.62c1.03 0 1.88.84 1.88 1.88s-.85 1.88-1.88 1.88Z"/></svg>
           <svg class="off" viewBox="0 0 24 24"><path d="M17.74 7.57c.01.07.01.15 0 .22 0-.07-.01-.14-.01-.21l.01-.01Z"/><path d="M17.279 6.56 3.829 20.01c-1.4-.89-1.95-2.48-1.95-4.01V8c0-3.42 1.33-4.75 4.75-4.75h6c2.89 0 4.28.95 4.65 3.31Z"/><path d="M21.4 2.229c-.3-.3-.79-.3-1.09 0L1.85 20.689c-.3.3-.3.79 0 1.09.15.14.35.22.54.22.2 0 .39-.08.54-.23L21.4 3.309c.3-.3.3-.78 0-1.08ZM22.38 8.38v7.24c0 1.43-.7 2-1.1 2.21-.19.1-.49.21-.86.21-.43 0-.96-.14-1.58-.58l-1.48-1.04c-.07 2.21-.77 3.47-2.36 4-.64.23-1.43.33-2.38.33h-6c-.24 0-.47-.01-.71-.04L15 11.63l5.65-5.65c.26.02.47.1.63.19.4.21 1.1.78 1.1 2.21Z"/></svg>
-        </button>
-        <button id="btn-track" type="button" aria-pressed="true" aria-label="Tracking on or off" title="Tracking">
-          <svg viewBox="0 0 24 24"><path d="M2.77 10C2.34 10 2 9.66 2 9.23V6.92A4.93 4.93 0 0 1 6.92 2h2.31c.43 0 .77.34.77.77s-.34.77-.77.77H6.92c-1.87 0-3.38 1.52-3.38 3.38v2.31c0 .43-.35.77-.77.77ZM21.23 10a.77.77 0 0 1-.77-.77V6.92c0-1.87-1.52-3.38-3.38-3.38h-2.31a.77.77 0 0 1 0-1.54h2.31A4.93 4.93 0 0 1 22 6.92v2.31c0 .43-.34.77-.77.77ZM17.082 22h-1.39a.77.77 0 0 1 0-1.54h1.39c1.87 0 3.38-1.52 3.38-3.38V15.7a.77.77 0 0 1 1.54 0v1.38a4.93 4.93 0 0 1-4.92 4.92ZM9.23 22H6.92A4.93 4.93 0 0 1 2 17.08v-2.31c0-.43.34-.77.77-.77s.77.34.77.77v2.31c0 1.87 1.52 3.38 3.38 3.38h2.31a.77.77 0 0 1 0 1.54ZM18.46 11.23H5.54a.77.77 0 0 0 0 1.54H18.46a.77.77 0 0 0 0-1.54ZM6.898 13.94v.33c0 1.66 1.34 3 3 3h4.2c1.66 0 3-1.34 3-3v-.33c0-.12-.09-.21-.21-.21h-9.78c-.12 0-.21.09-.21.21ZM6.898 10.06v-.33c0-1.66 1.34-3 3-3h4.2c1.66 0 3 1.34 3 3v.33c0 .12-.09.21-.21.21h-9.78c-.12 0-.21-.09-.21-.21Z"/></svg>
         </button>
         <button id="btn-recenter" type="button" disabled aria-label="Recenter head pose" title="Recenter">
           <svg viewBox="0 0 24 24"><path d="M22 11.25h-2.04c-.36-3.81-3.4-6.86-7.21-7.21V2c0-.41-.34-.75-.75-.75s-.75.34-.75.75v2.04c-3.81.36-6.86 3.4-7.21 7.21H2c-.41 0-.75.34-.75.75s.34.75.75.75h2.04c.36 3.81 3.4 6.86 7.21 7.21V22c0 .41.34.75.75.75s.75-.34.75-.75v-2.04c3.81-.36 6.86-3.4 7.21-7.21H22c.41 0 .75-.34.75-.75s-.34-.75-.75-.75Zm-10 3.87c-1.72 0-3.12-1.4-3.12-3.12 0-1.72 1.4-3.12 3.12-3.12 1.72 0 3.12 1.4 3.12 3.12 0 1.72-1.4 3.12-3.12 3.12Z"/></svg>
@@ -150,8 +159,8 @@
       </div>
     </div>
 
-    <p class="face-foot">Tracking runs in this tab. Your video is never uploaded — this page can only send
-      motion data. More in the <a href="docs/vrl-link.html">VRL Link guide</a>.</p>
+    <p class="face-foot">Your video is never broadcast — only tracking data leaves this tab.
+      More in the <a href="docs/vrl-link.html">VRL Link guide</a>.</p>
   </main>
 </div>
 
