@@ -91,6 +91,19 @@
   .menu input:focus-visible + .sw { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
 
   .face-foot { font-size: .85rem; color: var(--text-faint); margin: 14px 0 40px; text-align: center; }
+
+  .menu .act { display: block; width: 100%; text-align: left; padding: 11px 0; background: none; border: none;
+    border-top: 1px solid rgba(255,255,255,.08); color: rgba(255,255,255,.92); font-size: .9rem; cursor: pointer; }
+  .menu .act:hover { color: #fff; }
+
+  /* OBS browser-source view (#watch=<roomkey>): nothing but the return program, full viewport */
+  body.watch { background: #000; }
+  body.watch .nav, body.watch .footer, body.watch .face-foot { display: none; }
+  body.watch .stage { position: fixed; inset: 0; margin: 0; border: none; border-radius: 0; aspect-ratio: auto; background: #000; }
+  body.watch .bar, body.watch .joincard, body.watch .ov-chips, body.watch .self, body.watch .stage-empty, body.watch .menu { display: none; }
+  body.watch #return { object-fit: contain; }
+  body.watch .stage:not(.return)::after { content: "waiting for program…"; position: absolute; inset: 0;
+    display: grid; place-items: center; color: rgba(255,255,255,.35); font-size: .9rem; }
 </style>
 </head>
 <body>
@@ -135,11 +148,9 @@
       </div>
 
       <div class="menu" id="menu" hidden>
-        <label><span>Tracking</span><input id="opt-track" type="checkbox" checked><span class="sw"></span></label>
         <label><span>Mirror</span><input id="opt-mirror" type="checkbox" checked><span class="sw"></span></label>
         <label><span>Hide my video</span><input id="opt-blind" type="checkbox"><span class="sw"></span></label>
-        <label><span>Upper body + hands</span><input id="opt-body" type="checkbox"><span class="sw"></span></label>
-        <label><span>Perfect sync</span><input id="opt-perfect" type="checkbox"><span class="sw"></span></label>
+        <button id="menu-obs" type="button" class="act">Copy OBS view link</button>
       </div>
 
       <div class="bar">
@@ -150,6 +161,12 @@
         <button id="btn-mic" class="is-off" type="button" disabled aria-label="Turn microphone on or off" title="Microphone">
           <svg class="on" viewBox="0 0 24 24"><path d="M19.12 9.12c-.39 0-.7.31-.7.7v1.58c0 3.54-2.88 6.42-6.42 6.42s-6.42-2.88-6.42-6.42V9.81c0-.39-.31-.7-.7-.7-.39 0-.7.31-.7.7v1.58c0 4.07 3.13 7.42 7.12 7.78v2.13c0 .39.31.7.7.7.39 0 .7-.31.7-.7v-2.13c3.98-.35 7.12-3.71 7.12-7.78V9.81a.707.707 0 0 0-.7-.69Z"/><path d="M11.998 2c-2.44 0-4.42 1.98-4.42 4.42v5.12c0 2.44 1.98 4.42 4.42 4.42s4.42-1.98 4.42-4.42V6.42c0-2.44-1.98-4.42-4.42-4.42Zm1.31 6.95c-.07.26-.3.43-.56.43-.05 0-.1-.01-.15-.02-.39-.11-.8-.11-1.19 0-.32.09-.63-.1-.71-.41-.09-.31.1-.63.41-.71.59-.16 1.21-.16 1.8 0 .3.08.48.4.4.71Zm.53-1.94a.58.58 0 0 1-.55.38c-.07 0-.13-.01-.2-.03-.7-.26-1.48-.26-2.18 0a.59.59 0 0 1-.75-.35c-.11-.3.05-.64.35-.74a4.36 4.36 0 0 1 2.98 0c.3.11.46.44.35.74Z"/></svg>
           <svg class="off" viewBox="0 0 24 24"><path d="M17.619 5.72 7.009 16.33c-.73-.99-1.13-2.2-1.13-3.51V8.11c0-1.84.82-3.49 2.12-4.61v4.14c0 .39.32.71.7.71.39 0 .71-.32.71-.71V2.57c.46-.23.95-.39 1.46-.48v3.66c0 .4.32.71.71.71.39 0 .71-.31.71-.71V2c2.39.11 4.45 1.61 5.33 3.72ZM18.12 8.879v3.94c0 3.37-2.75 6.12-6.12 6.12-.18 0-.36-.01-.54-.03-.08 0-.16-.01-.23-.02-.13-.02-.26-.04-.38-.06-.05 0-.09-.02-.15-.03-.14-.03-.28-.07-.41-.11a5.83 5.83 0 0 1-.63-.22c-.13-.05-.25-.1-.37-.17-.03-.01-.05-.03-.08-.04-.1-.05-.2-.1-.3-.17l9.21-9.21Z"/><path d="M21.75 11v2c0 5.38-4.37 9.75-9.75 9.75-2.12 0-4.15-.68-5.82-1.93l1.08-1.08A8.15 8.15 0 0 0 12 21.25c4.55 0 8.25-3.7 8.25-8.25v-2c0-.41.34-.75.75-.75s.75.34.75.75ZM21.769 2.229c-.3-.3-.79-.3-1.09 0l-18.45 18.46c-.3.3-.3.79 0 1.09a.758.758 0 0 0 1.08-.01l18.46-18.46c.31-.3.31-.78 0-1.08Z"/></svg>
+        </button>
+        <button id="btn-face" type="button" aria-pressed="true" aria-label="Face tracking on or off" title="Face tracking">
+          <svg viewBox="0 0 24 24"><path d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81v8.37C2 19.83 4.17 22 7.81 22h8.37c3.64 0 5.81-2.17 5.81-5.81V7.81C22 4.17 19.83 2 16.19 2ZM8.5 6.38c1.03 0 1.88.84 1.88 1.88s-.84 1.88-1.88 1.88-1.88-.86-1.88-1.89c0-1.03.85-1.87 1.88-1.87Zm3.5 12.7c-2.69 0-4.88-2.19-4.88-4.88 0-.7.57-1.28 1.27-1.28h7.2c.7 0 1.27.57 1.27 1.28.02 2.69-2.17 4.88-4.86 4.88Zm3.5-8.96c-1.03 0-1.88-.84-1.88-1.88s.84-1.88 1.88-1.88 1.88.84 1.88 1.88-.85 1.88-1.88 1.88Z"/></svg>
+        </button>
+        <button id="btn-body" type="button" aria-pressed="true" aria-label="Body and hand tracking on or off" title="Body tracking">
+          <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM12 14.5c-5.01 0-9.09 3.36-9.09 7.5 0 .28.22.5.5.5h17.18c.28 0 .5-.22.5-.5 0-4.14-4.08-7.5-9.09-7.5Z"/></svg>
         </button>
         <button id="btn-recenter" type="button" disabled aria-label="Recenter head pose" title="Recenter">
           <svg viewBox="0 0 24 24"><path d="M22 11.25h-2.04c-.36-3.81-3.4-6.86-7.21-7.21V2c0-.41-.34-.75-.75-.75s-.75.34-.75.75v2.04c-3.81.36-6.86 3.4-7.21 7.21H2c-.41 0-.75.34-.75.75s.34.75.75.75h2.04c.36 3.81 3.4 6.86 7.21 7.21V22c0 .41.34.75.75.75s.75-.34.75-.75v-2.04c3.81-.36 6.86-3.4 7.21-7.21H22c.41 0 .75-.34.75-.75s-.34-.75-.75-.75Zm-10 3.87c-1.72 0-3.12-1.4-3.12-3.12 0-1.72 1.4-3.12 3.12-3.12 1.72 0 3.12 1.4 3.12 3.12 0 1.72-1.4 3.12-3.12 3.12Z"/></svg>
@@ -208,7 +225,7 @@
   </div>
 </footer>
 
-<script type="module" src="assets/face.js?v=6"></script>
+<script type="module" src="assets/face.js?v=7"></script>
 
 </body>
 </html>

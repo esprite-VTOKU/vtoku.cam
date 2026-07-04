@@ -114,38 +114,21 @@ const toUnity = (q) => [-q[0], -q[1], q[2], q[3]];
 const mirrorQ = (q) => [q[0], -q[1], -q[2], q[3]];   // mirror across the vertical axis
 
 // ── blendshape mapping ──────────────────────────────────────────────────────────────────────
-// MediaPipe emits the ARKit 52 by name (eyeBlinkLeft, jawOpen, …). Two send modes:
-//  standard — derive the VRM0 presets every avatar answers to (A/I/U/O, Blink_L/R, Look*)
-//  perfect sync — pass the ARKit names straight through (rigs with perfect-sync morphs)
+// MediaPipe emits the ARKit 52 by name (eyeBlinkLeft, jawOpen, …) — perfect-sync passthrough,
+// always on (product decision 2026-07-04; rigs are expected to carry the ARKit morphs).
 const MIRROR_SWAP = /Left|Right/;
 const mirrorName = (n) => n.replace(MIRROR_SWAP, (m) => (m === "Left" ? "Right" : "Left"));
-
-function standardBlends(b) {
-  const g = (k) => b[k] || 0;
-  const lookH = (g("eyeLookOutRight") + g("eyeLookInLeft")) / 2 - (g("eyeLookOutLeft") + g("eyeLookInRight")) / 2;
-  const lookV = (g("eyeLookUpLeft") + g("eyeLookUpRight")) / 2 - (g("eyeLookDownLeft") + g("eyeLookDownRight")) / 2;
-  return {
-    A: Math.min(1, g("jawOpen") * 1.2),
-    I: Math.min(1, (g("mouthStretchLeft") + g("mouthStretchRight")) / 2),
-    U: Math.min(1, g("mouthPucker")),
-    O: Math.min(1, g("mouthFunnel")),
-    Blink_L: g("eyeBlinkLeft"),
-    Blink_R: g("eyeBlinkRight"),
-    LookRight: Math.max(0, Math.min(1, lookH)),
-    LookLeft: Math.max(0, Math.min(1, -lookH)),
-    LookUp: Math.max(0, Math.min(1, lookV)),
-    LookDown: Math.max(0, Math.min(1, -lookV)),
-  };
-}
 
 // ── UI ──────────────────────────────────────────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
 const stage = $("stage"), video = $("cam"), overlay = $("overlay"), returnEl = $("return");
 const joinForm = $("join-form"), roomInput = $("room"), joinBtn = $("join"), statusEl = $("status");
-const btnCam = $("btn-cam"), btnMic = $("btn-mic"), btnRecenter = $("btn-recenter");
+const btnCam = $("btn-cam"), btnMic = $("btn-mic"), btnFace = $("btn-face"), btnBody = $("btn-body"), btnRecenter = $("btn-recenter");
 const btnGear = $("btn-gear"), btnLeave = $("btn-leave"), menu = $("menu");
 const chipRoom = $("chip-room"), chipTrack = $("chip-track"), chipRate = $("chip-rate"), chipHint = $("chip-hint");
-const optTrack = $("opt-track"), optMirror = $("opt-mirror"), optBlind = $("opt-blind"), optPerfect = $("opt-perfect");
+const optMirror = $("opt-mirror"), optBlind = $("opt-blind");
+const faceOn = () => btnFace.getAttribute("aria-pressed") === "true";
+const bodyOn = () => btnBody.getAttribute("aria-pressed") === "true";
 
 let holo = null, Kalidokit = null, trackersLoading = null;
 let room = null, remoteAudioEls = [];
@@ -357,21 +340,25 @@ function drawOverlay(result) {
   const ctx = overlay.getContext("2d");
   ctx.clearRect(0, 0, overlay.width, overlay.height);
   ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
-  if (result.faceLandmarks?.[0]) drawDots(ctx, result.faceLandmarks[0], 2);
-  if (result.poseLandmarks?.[0]) { ctx.fillStyle = "rgba(160, 210, 255, 0.8)"; drawDots(ctx, result.poseLandmarks[0], 5); }
-  if (result.leftHandLandmarks?.[0]) drawDots(ctx, result.leftHandLandmarks[0], 4);
-  if (result.rightHandLandmarks?.[0]) drawDots(ctx, result.rightHandLandmarks[0], 4);
+  if (faceOn() && result.faceLandmarks?.[0]) drawDots(ctx, result.faceLandmarks[0], 2);
+  if (bodyOn()) {
+    if (result.poseLandmarks?.[0]) { ctx.fillStyle = "rgba(160, 210, 255, 0.8)"; drawDots(ctx, result.poseLandmarks[0], 5); }
+    if (result.leftHandLandmarks?.[0]) drawDots(ctx, result.leftHandLandmarks[0], 4);
+    if (result.rightHandLandmarks?.[0]) drawDots(ctx, result.rightHandLandmarks[0], 4);
+  }
 }
 
-// Zero every blend and rest every bone we've driven, so the avatar relaxes instead of freezing.
-function relaxAvatar() {
+// Zero driven blends and/or rest driven bones (by prefix) so parts relax instead of freezing.
+function relaxParts(blends, prefixes) {
   if (!room || room.state !== "connected") return;
-  const msgs = [...sentKeys].map((k) => blendMsg(k, 0));
-  for (const b of sentBones) msgs.push(boneMsg(b, [0, 0, 0, 1]));
+  const msgs = [];
+  if (blends) for (const k of sentKeys) msgs.push(blendMsg(k, 0));
+  for (const p of prefixes) for (const b of sentBones) if (b.startsWith(p)) msgs.push(boneMsg(b, [0, 0, 0, 1]));
   if (!msgs.length) return;
   msgs.push(oscMessage("/VMC/Ext/Blend/Apply", []));
   for (const b of packBundles(msgs)) publish(b);
 }
+const relaxAvatar = () => relaxParts(true, [""]);   // "" prefix matches every driven bone
 
 // Kalidokit gives XYZ Euler rigs (three.js convention); convert to a mirrored/unmirrored
 // Unity-space VMC bone message. `amp` tames or boosts a chain if it overshoots on device.
@@ -393,9 +380,11 @@ function restBones(messages, prefix) {
 
 function sendFrame(result) {
   if (!joined || !room || room.state !== "connected") return;
-  const shapes = result.faceBlendshapes?.[0]?.categories;
-  const hasFace = !!result.faceLandmarks?.[0];
-  if (!hasFace) {
+  const fOn = faceOn(), bOn = bodyOn();
+  const shapes = fOn ? result.faceBlendshapes?.[0]?.categories : null;
+  const hasFace = fOn && !!result.faceLandmarks?.[0];
+  const hasPose = bOn && !!result.poseLandmarks?.[0];
+  if (!hasFace && !hasPose) {
     if (faceSeen) { faceSeen = false; chipTrack.textContent = "no face"; chipTrack.classList.add("warn"); relaxAvatar(); }
     return;
   }
@@ -405,7 +394,7 @@ function sendFrame(result) {
   const messages = [];
 
   // Head (Kalidokit face solve over the holistic landmarks).
-  try {
+  if (hasFace) try {
     const f = Kalidokit.Face.solve(result.faceLandmarks[0], { runtime: "mediapipe", video });
     if (f?.head) {
       let headQ = toUnity(quatFromEuler(f.head.x, f.head.y, f.head.z));
@@ -418,7 +407,7 @@ function sendFrame(result) {
   } catch { /* face solve can fail on partial landmarks */ }
 
   // Upper body + hands.
-  try {
+  if (bOn) try {
     if (result.poseWorldLandmarks?.[0] && result.poseLandmarks?.[0]) {
       partSeen.pose = true;
       const rig = Kalidokit.Pose.solve(result.poseWorldLandmarks[0], result.poseLandmarks[0],
@@ -462,22 +451,13 @@ function sendFrame(result) {
     }
   } catch { /* solver hiccup — skip body this frame, face still sends */ }
 
-  // Blendshapes.
+  // Blendshapes — ARKit 52 passthrough (perfect sync), always.
   if (shapes) {
-    const b = {};
-    for (const c of shapes) b[c.categoryName] = c.score;
-    const emit = (name, v) => {
-      const n = mirror ? mirrorName(name) : name;
+    for (const c of shapes) {
+      if (c.categoryName === "_neutral") continue;
+      const n = mirror ? mirrorName(c.categoryName) : c.categoryName;
       sentKeys.add(n);
-      messages.push(blendMsg(n, v));
-    };
-    if (optPerfect.checked) {
-      for (const c of shapes) {
-        if (c.categoryName === "_neutral") continue;
-        emit(c.categoryName, c.score);
-      }
-    } else {
-      for (const [name, v] of Object.entries(standardBlends(b))) emit(name, v);
+      messages.push(blendMsg(n, c.score));
     }
   }
   messages.push(oscMessage("/VMC/Ext/Blend/Apply", []));
@@ -515,7 +495,7 @@ async function fallbackToCpu() {
 
 function loop() {
   if (!camOn) return;
-  if (optTrack.checked && holo && video.readyState >= 2 && video.currentTime !== lastVideoTime) {
+  if ((faceOn() || bodyOn()) && holo && video.readyState >= 2 && video.currentTime !== lastVideoTime) {
     lastVideoTime = video.currentTime;
     let result = null;
     try { result = holo.detectForVideo(video, performance.now()); } catch (e) {
@@ -556,14 +536,23 @@ btnCam.addEventListener("click", async () => {
   if (camOn) { cameraOff(); setStatus(joined ? "Camera off — still in the room." : ""); return; }
   try { await cameraOn(); } catch (e) { setStatus(String(e.message || e), true); }
 });
-optTrack.addEventListener("change", () => {
-  if (!optTrack.checked) {
+// Face / body bar toggles: turning one off relaxes just its parts; both off pauses detection.
+function toggleBar(btn) {
+  const on = btn.getAttribute("aria-pressed") !== "true";
+  btn.setAttribute("aria-pressed", on ? "true" : "false");
+  if (!faceOn() && !bodyOn()) {
     overlay.getContext("2d").clearRect(0, 0, overlay.width, overlay.height);
     if (camOn) chipTrack.textContent = "paused";
-    relaxAvatar();
   } else if (camOn) {
     chipTrack.textContent = "no face"; faceSeen = false;
   }
+  return on;
+}
+btnFace.addEventListener("click", () => {
+  if (!toggleBar(btnFace)) relaxParts(true, ["Head"]);          // blends zeroed + head to rest
+});
+btnBody.addEventListener("click", () => {
+  if (!toggleBar(btnBody)) relaxParts(false, ["Spine", "Left", "Right"]);   // arms/hands/fingers to rest
 });
 btnMic.addEventListener("click", async () => {
   if (!joined || !room || micBusy) return;
@@ -590,4 +579,44 @@ document.addEventListener("click", () => {
   if (!menu.hidden) { menu.hidden = true; btnGear.setAttribute("aria-expanded", "false"); }
 });
 optBlind.addEventListener("change", () => stage.classList.toggle("blind", optBlind.checked));
+$("menu-obs").addEventListener("click", async () => {
+  const key = roomInput.value.trim();
+  if (key.length < 8) { setStatus("Enter the room key first.", true); return; }
+  const link = `${location.origin}${location.pathname}#watch=${encodeURIComponent(key)}`;
+  try { await navigator.clipboard.writeText(link); setStatus("OBS view link copied."); }
+  catch { setStatus(link, true); }   // clipboard blocked → show the link to copy by hand
+  menu.hidden = true; btnGear.setAttribute("aria-expanded", "false");
+});
 window.addEventListener("pagehide", () => { if (room) room.disconnect(); });
+
+// ── OBS browser-source view (#watch=<roomkey>) ─────────────────────────────────────────────
+// Subscribe-only: no camera, no tracking, no publishing of any kind (the watch token can't).
+// Retries forever — OBS scenes load long before the phone connects, and must survive drops.
+async function startWatch(key) {
+  document.body.classList.add("watch");
+  for (;;) {
+    try {
+      const res = await fetch(TOKEN_URL, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ room: key, mode: "watch" }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || res.status);
+      const r = new Room();
+      room = r;
+      r.on(RoomEvent.TrackSubscribed, (track) => attachTrack(track));
+      r.on(RoomEvent.TrackUnsubscribed, (track) => {
+        if (track.kind === "video") stage.classList.remove("return");
+        track.detach();
+      });
+      await r.connect(body.url, body.token);
+      await new Promise((resolve) => r.once(RoomEvent.Disconnected, resolve));   // hold until drop
+      detachAll();
+      room = null;
+    } catch { /* room offline — retry quietly */ }
+    await new Promise((r2) => setTimeout(r2, 5000));
+  }
+}
+const watchKey = new URLSearchParams(location.hash.slice(1)).get("watch");
+if (watchKey && watchKey.length >= 8) startWatch(watchKey);
