@@ -31,7 +31,8 @@
   .stage.cam .self video, .stage.cam .self canvas { transform: scaleX(-1); }  /* selfie mirror */
   .stage.return .self { inset: auto 12px 76px auto; width: 26%; min-width: 180px; aspect-ratio: 16 / 9;
     border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,.22); }
-  .stage.blind .self video { visibility: hidden; }   /* hide my video: tracking dots stay */
+  .stage.blind .self { background: #000; }            /* hide my video: black behind the mesh */
+  .stage.blind .self video { visibility: hidden; }    /* the glowing tracking mesh stays visible */
 
   .stage-empty { position: absolute; inset: 0; display: grid; place-items: center; }
   .stage-empty svg { width: 36px; height: 36px; fill: rgba(255,255,255,.35); }
@@ -53,6 +54,13 @@
     border: 1px solid rgba(255,255,255,.2); border-radius: 8px; }
   .joincard input::placeholder { color: rgba(255,255,255,.35); }
   .joincard input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .keywrap { position: relative; }
+  .keywrap input { padding-right: 42px; }
+  #room-eye { position: absolute; right: 4px; top: 0; bottom: 0; width: 36px; margin: 0; padding: 0;
+    background: none; border: none; display: grid; place-items: center; cursor: pointer; }
+  #room-eye svg { width: 19px; height: 19px; fill: rgba(255,255,255,.5); }
+  #room-eye:hover svg { fill: rgba(255,255,255,.85); }
+  #room-eye.off svg { fill: rgba(255,255,255,.3); }
   .joincard button { width: 100%; margin-top: 10px; padding: 11px 0; border: none; border-radius: 8px;
     cursor: pointer; background: var(--accent-bright); color: #fff; font-size: .95rem; font-weight: 600; }
   .joincard button:hover { background: var(--accent); }
@@ -91,11 +99,23 @@
   .menu input:checked + .sw::after { transform: translateX(15px); }
   .menu input:focus-visible + .sw { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
 
-  .face-foot { font-size: .85rem; color: var(--text-faint); margin: 14px 0 40px; text-align: center; }
+  .face-foot { font-size: .85rem; color: var(--text-faint); margin: 8px 0 40px; text-align: center; }
 
-  .menu .act { display: block; width: 100%; text-align: left; padding: 11px 0; background: none; border: none;
-    border-top: 1px solid rgba(255,255,255,.08); color: rgba(255,255,255,.92); font-size: .9rem; cursor: pointer; }
-  .menu .act:hover { color: #fff; }
+  /* OBS browser-source URL field, below the stage */
+  .obs { margin-top: 16px; }
+  .obs-head { display: flex; align-items: center; gap: 7px; font-size: .82rem; font-weight: 600;
+    color: var(--text-dim); margin-bottom: 7px; }
+  .obs-i { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--hairline); background: none;
+    color: var(--text-dim); font-size: .72rem; font-style: italic; font-family: Georgia, serif; cursor: pointer;
+    display: grid; place-items: center; padding: 0; line-height: 1; }
+  .obs-i:hover { color: var(--text); border-color: var(--text-faint); }
+  .obs-field { display: flex; gap: 8px; }
+  .obs-field input { flex: 1; min-width: 0; padding: 10px 12px; font-family: var(--mono); font-size: .82rem;
+    color: var(--text-dim); background: var(--glass-strong); border: 1px solid var(--hairline); border-radius: 8px; }
+  .obs-field button { flex: none; padding: 0 16px; border: none; border-radius: 8px; cursor: pointer;
+    background: var(--accent-bright); color: #fff; font-size: .88rem; font-weight: 600; }
+  .obs-field button:hover { background: var(--accent); }
+  .obs-hint { margin: 9px 0 0; font-size: .82rem; color: var(--text-faint); line-height: 1.5; }
 
   /* OBS browser-source view (#watch=<roomkey>): nothing but the return program, full viewport */
   body.watch { background: #000; }
@@ -141,17 +161,21 @@
         <form id="join-form">
           <h1>VRL Link</h1>
           <p>Enter Room Key</p>
-          <input id="room" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
-                 placeholder="Room key" aria-label="Room key">
+          <div class="keywrap">
+            <input id="room" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"
+                   placeholder="Room key" aria-label="Room key">
+            <button id="room-eye" type="button" aria-label="Show or hide the room key" title="Show key">
+              <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5Zm0 11.25A3.75 3.75 0 1 1 12 8.25a3.75 3.75 0 0 1 0 7.5Z"/><circle cx="12" cy="12" r="2"/></svg>
+            </button>
+          </div>
           <button id="join" type="submit">Join</button>
           <p id="status"></p>
         </form>
       </div>
 
       <div class="menu" id="menu" hidden>
-        <label><span>Mirror</span><input id="opt-mirror" type="checkbox" checked><span class="sw"></span></label>
+        <label><span>Mirror</span><input id="opt-mirror" type="checkbox"><span class="sw"></span></label>
         <label><span>Hide my video</span><input id="opt-blind" type="checkbox"><span class="sw"></span></label>
-        <button id="menu-obs" type="button" class="act">Copy OBS view link</button>
       </div>
 
       <div class="bar">
@@ -167,10 +191,10 @@
           <svg viewBox="0 0 24 24"><path d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81v8.37C2 19.83 4.17 22 7.81 22h8.37c3.64 0 5.81-2.17 5.81-5.81V7.81C22 4.17 19.83 2 16.19 2ZM8.5 6.38c1.03 0 1.88.84 1.88 1.88s-.84 1.88-1.88 1.88-1.88-.86-1.88-1.89c0-1.03.85-1.87 1.88-1.87Zm3.5 12.7c-2.69 0-4.88-2.19-4.88-4.88 0-.7.57-1.28 1.27-1.28h7.2c.7 0 1.27.57 1.27 1.28.02 2.69-2.17 4.88-4.86 4.88Zm3.5-8.96c-1.03 0-1.88-.84-1.88-1.88s.84-1.88 1.88-1.88 1.88.84 1.88 1.88-.85 1.88-1.88 1.88Z"/></svg>
         </button>
         <button id="btn-body" type="button" aria-pressed="true" aria-label="Body and hand tracking on or off" title="Body tracking">
-          <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM12 14.5c-5.01 0-9.09 3.36-9.09 7.5 0 .28.22.5.5.5h17.18c.28 0 .5-.22.5-.5 0-4.14-4.08-7.5-9.09-7.5Z"/></svg>
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2.3"/><path d="M12 8.9c-.9 0-1.7-.1-2.5-.3L4.3 7.2a1 1 0 0 0-.6 1.92l5 1.55v1.35l-1.9 6.1a1.06 1.06 0 0 0 2.02.64L12 15.1l1.18 3.66a1.06 1.06 0 0 0 2.02-.64l-1.9-6.1v-1.35l5-1.55a1 1 0 0 0-.6-1.92l-5.2 1.4c-.8.2-1.6.3-2.5.3Z"/></svg>
         </button>
         <button id="btn-recenter" type="button" disabled aria-label="Recenter head pose" title="Recenter">
-          <svg viewBox="0 0 24 24"><path d="M22 11.25h-2.04c-.36-3.81-3.4-6.86-7.21-7.21V2c0-.41-.34-.75-.75-.75s-.75.34-.75.75v2.04c-3.81.36-6.86 3.4-7.21 7.21H2c-.41 0-.75.34-.75.75s.34.75.75.75h2.04c.36 3.81 3.4 6.86 7.21 7.21V22c0 .41.34.75.75.75s.75-.34.75-.75v-2.04c3.81-.36 6.86-3.4 7.21-7.21H22c.41 0 .75-.34.75-.75s-.34-.75-.75-.75Zm-10 3.87c-1.72 0-3.12-1.4-3.12-3.12 0-1.72 1.4-3.12 3.12-3.12 1.72 0 3.12 1.4 3.12 3.12 0 1.72-1.4 3.12-3.12 3.12Z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M7.25 22h4.5C15.5 22 17 20.5 17 16.75v-4.5C17 8.5 15.5 7 11.75 7h-4.5C3.5 7 2 8.5 2 12.25v4.5C2 20.5 3.5 22 7.25 22ZM21.25 10.5c-.41 0-.75-.34-.75-.75 0-2.96-2.06-5.44-4.83-6.09l.27.45c.21.36.1.82-.26 1.03-.36.21-.82.1-1.03-.26L13.6 3.13a.745.745 0 0 1-.01-.75c.14-.23.39-.38.66-.38C18.52 2 22 5.48 22 9.75c0 .41-.34.75-.75.75Z"/></svg>
         </button>
         <button id="btn-gear" type="button" aria-expanded="false" aria-label="Options" title="Options">
           <svg viewBox="0 0 24 24"><path d="M20.1 9.221c-1.81 0-2.55-1.28-1.65-2.85.52-.91.21-2.07-.7-2.59l-1.73-.99c-.79-.47-1.81-.19-2.28.6l-.11.19c-.9 1.57-2.38 1.57-3.29 0l-.11-.19a1.641 1.641 0 0 0-2.26-.6l-1.73.99c-.91.52-1.22 1.69-.7 2.6.91 1.56.17 2.84-1.64 2.84-1.04 0-1.9.85-1.9 1.9v1.76c0 1.04.85 1.9 1.9 1.9 1.81 0 2.55 1.28 1.64 2.85-.52.91-.21 2.07.7 2.59l1.73.99c.79.47 1.81.19 2.28-.6l.11-.19c.9-1.57 2.38-1.57 3.29 0l.11.19c.47.79 1.49 1.07 2.28.6l1.73-.99c.91-.52 1.22-1.69.7-2.59-.91-1.57-.17-2.85 1.64-2.85 1.04 0 1.9-.85 1.9-1.9v-1.76a1.92 1.92 0 0 0-1.91-1.9Zm-8.1 6.03c-1.79 0-3.25-1.46-3.25-3.25s1.46-3.25 3.25-3.25 3.25 1.46 3.25 3.25-1.46 3.25-3.25 3.25Z"/></svg>
@@ -179,6 +203,20 @@
           <svg viewBox="0 0 24 24"><path d="M22 18.33c0 .36-.08.73-.25 1.09-.17.36-.39.7-.68 1.02-.49.54-1.03.93-1.64 1.18-.6.25-1.26.38-1.96.38-1.02 0-2.11-.24-3.26-.73a17.63 17.63 0 01-3.45-1.98c-.58-.43-1.15-.87-1.7-1.35l3.26-3.26c.01 0 .01 0 .02.01.52.44.95.74 1.29.92.05.02.11.05.18.08.08.03.16.04.25.04.17 0 .3-.06.41-.17l.76-.75c.25-.25.49-.44.72-.56.23-.14.46-.21.71-.21.19 0 .39.04.61.13.22.09.45.22.7.39l3.32 2.35c.26.18.44.39.55.64.1.25.16.5.16.78zM10.76 13.24 7.5 16.5c-.01 0-.01 0-.02-.01a29.544 29.544 0 0 1-2.8-3.27c-.81-1.12-1.46-2.25-1.94-3.36-.01-.02-.01-.03-.02-.05C2.24 8.67 2 7.58 2 6.54c0-.68.12-1.33.36-1.93.2-.51.5-.99.91-1.42.07-.08.15-.17.24-.25.16-.16.32-.3.49-.41h.01C4.51 2.17 5.04 2 5.6 2c.28 0 .56.06.81.18.24.11.45.27.62.5.02.02.03.04.05.06L9.4 6.01c.18.25.31.48.4.7.09.21.14.42.14.61 0 .24-.07.48-.21.71-.13.23-.32.47-.56.71l-.76.79c-.11.11-.16.24-.16.4 0 .08.01.15.03.23.03.08.06.14.08.2.18.33.49.76.93 1.28.45.52.93 1.05 1.45 1.58l.02.02z"/><path d="M21.77 2.229c-.3-.3-.79-.3-1.09 0L2.23 20.689c-.3.3-.3.79 0 1.09a.758.758 0 0 0 1.08-.01l18.46-18.46c.31-.3.31-.78 0-1.08z"/></svg>
         </button>
       </div>
+    </div>
+
+    <div class="obs" id="obs" hidden>
+      <div class="obs-head">
+        <span>OBS browser source</span>
+        <button class="obs-i" id="obs-i" type="button" aria-label="How to add this to OBS">i</button>
+      </div>
+      <div class="obs-field">
+        <input id="obs-url" type="text" readonly aria-label="OBS browser source URL">
+        <button id="obs-copy" type="button">Copy</button>
+      </div>
+      <p class="obs-hint" id="obs-hint" hidden>In OBS: Sources → + → Browser. Paste this URL, set the size to
+        1920 × 1080, and it shows only the returned program video — no camera, no controls. It reconnects on
+        its own, so you can add it before the phone is live.</p>
     </div>
 
     <p class="face-foot">Your video is never broadcast — only tracking data leaves this tab.
@@ -226,7 +264,7 @@
   </div>
 </footer>
 
-<script type="module" src="assets/face.js?v=8"></script>
+<script type="module" src="assets/face.js?v=9"></script>
 
 </body>
 </html>

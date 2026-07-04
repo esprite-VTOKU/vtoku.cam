@@ -127,6 +127,7 @@ const btnCam = $("btn-cam"), btnMic = $("btn-mic"), btnFace = $("btn-face"), btn
 const btnGear = $("btn-gear"), btnLeave = $("btn-leave"), menu = $("menu");
 const chipRoom = $("chip-room"), chipTrack = $("chip-track"), chipRate = $("chip-rate"), chipHint = $("chip-hint");
 const optMirror = $("opt-mirror"), optBlind = $("opt-blind");
+const roomEye = $("room-eye"), obsBox = $("obs"), obsUrl = $("obs-url"), obsCopy = $("obs-copy"), obsI = $("obs-i"), obsHint = $("obs-hint");
 const faceOn = () => btnFace.getAttribute("aria-pressed") === "true";
 const bodyOn = () => btnBody.getAttribute("aria-pressed") === "true";
 
@@ -283,6 +284,8 @@ async function join() {
     chipRoom.hidden = false; chipRoom.textContent = maskRoom(roomCode);
     chipRate.hidden = false; chipRate.textContent = "0 fps";
     btnLeave.hidden = false; btnMic.disabled = false;
+    obsUrl.value = `${location.origin}${location.pathname}#watch=${encodeURIComponent(roomCode)}`;
+    obsBox.hidden = false;
     setStatus("In the app, set Face Source to VMC.");
   } catch (e) {
     joined = false;
@@ -305,7 +308,7 @@ async function leave(message) {
   detachAll();
   stage.classList.remove("live");
   chipRoom.hidden = true; chipRate.hidden = true; chipHint.hidden = true;
-  btnLeave.hidden = true;
+  btnLeave.hidden = true; obsBox.hidden = true;
   micOn = false; btnMic.disabled = true; btnMic.classList.add("is-off");
   setStatus(message || "");
 }
@@ -330,48 +333,63 @@ async function reconnectLoop(roomCode) {
   }
 }
 
-// ── per-frame: draw, solve, send ────────────────────────────────────────────────────────────
-function drawDots(ctx, points, size) {
-  for (const p of points) {
-    ctx.fillRect(p.x * overlay.width - size / 2, p.y * overlay.height - size / 2, size, size);
-  }
-}
-// Bone view: draw the skeleton connections MediaPipe ships (Connection = {start, end} indices),
-// skipping low-visibility endpoints so off-frame legs don't scribble.
-function drawSkeleton(ctx, lms, connections, color, joint) {
+// ── per-frame draw: cyberpunk glow mesh ─────────────────────────────────────────────────────
+// Neon wireframe over the (optionally hidden) camera. Additive compositing ('lighter') makes
+// overlapping strokes bloom; one batched stroke per group keeps the shadowBlur cost to a few
+// calls/frame. Face uses the contour connection set (crisp, ~130 lines) plus a sparse vertex
+// field for the "tracked mesh" look; pose + hands use their skeleton connection sets.
+function strokeConnections(ctx, lms, connections, color, width, blur, gate) {
+  if (!connections || !connections.length) return;   // static conn-set missing in this build
   const W = overlay.width, H = overlay.height;
-  ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineCap = "round";
+  ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineCap = "round";
+  ctx.shadowColor = color; ctx.shadowBlur = blur;
   ctx.beginPath();
   for (const c of connections) {
     const a = lms[c.start], b = lms[c.end];
-    if (!a || !b || (a.visibility ?? 1) < 0.5 || (b.visibility ?? 1) < 0.5) continue;
-    ctx.moveTo(a.x * W, a.y * H);
-    ctx.lineTo(b.x * W, b.y * H);
+    if (!a || !b || (a.visibility ?? 1) < gate || (b.visibility ?? 1) < gate) continue;
+    ctx.moveTo(a.x * W, a.y * H); ctx.lineTo(b.x * W, b.y * H);
   }
   ctx.stroke();
-  ctx.fillStyle = color;
-  for (const p of lms) {
-    if ((p.visibility ?? 1) < 0.5) continue;
-    ctx.beginPath();
-    ctx.arc(p.x * W, p.y * H, joint, 0, Math.PI * 2);
-    ctx.fill();
-  }
 }
+function fillPoints(ctx, lms, color, r, blur, gate) {
+  const W = overlay.width, H = overlay.height;
+  ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = blur;
+  ctx.beginPath();
+  for (const p of lms) {
+    if ((p.visibility ?? 1) < gate) continue;
+    ctx.moveTo(p.x * W + r, p.y * H);
+    ctx.arc(p.x * W, p.y * H, r, 0, Math.PI * 2);
+  }
+  ctx.fill();
+}
+const CYAN = "rgba(64, 224, 255, 0.85)";
+const MAGENTA = "rgba(255, 90, 200, 0.9)";
+const LIME = "rgba(150, 255, 130, 0.9)";
 function drawOverlay(result) {
   const ctx = overlay.getContext("2d");
   ctx.clearRect(0, 0, overlay.width, overlay.height);
-  ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
-  if (faceOn() && result.faceLandmarks?.[0]) drawDots(ctx, result.faceLandmarks[0], 2);
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  if (faceOn() && result.faceLandmarks?.[0]) {
+    const f = result.faceLandmarks[0];
+    strokeConnections(ctx, f, HolisticLandmarker.FACE_LANDMARKS_TESSELATION, "rgba(64, 224, 255, 0.16)", 0.5, 0, 0);
+    strokeConnections(ctx, f, HolisticLandmarker.FACE_LANDMARKS_CONTOURS, CYAN, 1.4, 8, 0);
+    fillPoints(ctx, f, "rgba(180, 245, 255, 0.9)", 1.1, 6, 0);
+  }
   if (bodyOn()) {
     if (result.poseLandmarks?.[0]) {
-      drawSkeleton(ctx, result.poseLandmarks[0], HolisticLandmarker.POSE_CONNECTIONS, "rgba(160, 210, 255, 0.9)", 3.5);
+      strokeConnections(ctx, result.poseLandmarks[0], HolisticLandmarker.POSE_CONNECTIONS, MAGENTA, 3, 12, 0.5);
+      fillPoints(ctx, result.poseLandmarks[0], MAGENTA, 3, 10, 0.5);
     }
     for (const side of ["leftHandLandmarks", "rightHandLandmarks"]) {
       if (result[side]?.[0]) {
-        drawSkeleton(ctx, result[side][0], HolisticLandmarker.HAND_CONNECTIONS, "rgba(140, 255, 190, 0.9)", 2.5);
+        strokeConnections(ctx, result[side][0], HolisticLandmarker.HAND_CONNECTIONS, LIME, 2, 9, 0);
+        fillPoints(ctx, result[side][0], LIME, 2, 7, 0);
       }
     }
   }
+  ctx.restore();
+  ctx.shadowBlur = 0;
 }
 
 // Zero driven blends and/or rest driven bones (by prefix) so parts relax instead of freezing.
@@ -605,15 +623,33 @@ document.addEventListener("click", () => {
   if (!menu.hidden) { menu.hidden = true; btnGear.setAttribute("aria-expanded", "false"); }
 });
 optBlind.addEventListener("change", () => stage.classList.toggle("blind", optBlind.checked));
-$("menu-obs").addEventListener("click", async () => {
-  const key = roomInput.value.trim();
-  if (key.length < 8) { setStatus("Enter the room key first.", true); return; }
-  const link = `${location.origin}${location.pathname}#watch=${encodeURIComponent(key)}`;
-  try { await navigator.clipboard.writeText(link); setStatus("OBS view link copied."); }
-  catch { setStatus(link, true); }   // clipboard blocked → show the link to copy by hand
-  menu.hidden = true; btnGear.setAttribute("aria-expanded", "false");
+
+// Room key is masked (type=password) by default; the eye reveals it.
+roomEye.addEventListener("click", () => {
+  const show = roomInput.type === "password";
+  roomInput.type = show ? "text" : "password";
+  roomEye.classList.toggle("off", !show);
+  roomEye.title = show ? "Hide key" : "Show key";
 });
+
+// OBS URL field: copy + collapsible how-to.
+obsCopy.addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(obsUrl.value); obsCopy.textContent = "Copied"; }
+  catch { obsUrl.select(); }
+  setTimeout(() => { obsCopy.textContent = "Copy"; }, 1500);
+});
+obsI.addEventListener("click", () => { obsHint.hidden = !obsHint.hidden; });
+
 window.addEventListener("pagehide", () => { if (room) room.disconnect(); });
+
+// ── one-tap join from the app's Share link (#join=<roomkey>) ────────────────────────────────
+// Prefill + auto-start. If the browser needs a user gesture for the camera, join() surfaces the
+// error and the (already-prefilled) dialog stays up so a tap finishes it.
+const joinKey = new URLSearchParams(location.hash.slice(1)).get("join");
+if (joinKey && joinKey.length >= 8) {
+  roomInput.value = joinKey;
+  join();
+}
 
 // ── OBS browser-source view (#watch=<roomkey>) ─────────────────────────────────────────────
 // Subscribe-only: no camera, no tracking, no publishing of any kind (the watch token can't).
