@@ -134,6 +134,21 @@
   body.watch #return { object-fit: contain; }
   body.watch .stage:not(.return)::after { content: "waiting for program…"; position: absolute; inset: 0;
     display: grid; place-items: center; color: rgba(255,255,255,.35); font-size: .9rem; }
+
+  /* ── phones: the 9-button call bar would overflow a ~390px screen, so let it wrap to two rows
+     and keep buttons at a 44px touch target. ── */
+  @media (max-width: 600px) {
+    /* taller portrait-ish stage so the wrapped bar doesn't crowd a short 16:9 view. A live return
+       feed still overrides this via the inline aspect-ratio JS sets. */
+    .stage { aspect-ratio: 3 / 4; }
+    .bar { flex-wrap: wrap; gap: 8px; padding: 10px 8px calc(10px + env(safe-area-inset-bottom)); }
+    .bar button { width: 44px; height: 44px; }
+    .bar button svg { width: 20px; height: 20px; }
+    .menu { bottom: 96px; min-width: 208px; }        /* clear the taller wrapped bar */
+    .joincard form { padding: 18px; }
+    .obs-i { width: 22px; height: 22px; }             /* bigger info tap target */
+    .stage.portrait-feed:not(.hide-return) { max-width: 100%; }
+  }
 </style>
 </head>
 <body>
