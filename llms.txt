@@ -14,6 +14,7 @@
 - Record your performance to video, send and receive NDI, output over HDMI, or go live over SRT/SRTLA.
 - Go live anywhere, bonding Wi-Fi and cellular with SRTLA so the stream holds up on the move.
 - Link a remote performer with VRL Link: receive their motion and voice to drive the avatar, and send your camera, video, and audio back.
+- Drive the avatar's face from any webcam with VRL Face, free browser face tracking at https://vtoku.cam/face.html (no install; tracking stays on device).
 - Works standalone (no PC) and scales into a Warudo or NDI studio setup.
 
 ## Key pages
@@ -23,6 +24,7 @@
 - Look and camera (occlusion, depth of field, Screen FX, HDMI): https://vtoku.cam/docs/look-camera.html
 - Bonded live streaming (SRT/SRTLA): https://vtoku.cam/docs/streaming.html
 - VRL Link (remote performer link): https://vtoku.cam/docs/vrl-link.html
+- VRL Face (browser face tracking into a VRL Link session): https://vtoku.cam/face.html
 - Support and FAQ: https://vtoku.cam/support.html
 - Join the beta: https://vtoku.cam/beta.html
 - Privacy Policy: https://vtoku.cam/privacy.html

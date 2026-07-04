@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VRL Face · VTOKU Cam</title>
+<meta name="description" content="Drive your VTuber's face from any webcam. Free browser face tracking that sends VMC data straight into your VRL Link session. No install, and your camera never leaves the browser.">
+<link rel="canonical" href="https://vtoku.cam/face.html">
+<meta property="og:title" content="VRL Face · VTOKU Cam">
+<meta property="og:description" content="Browser face tracking for VRL Link. Enter your room secret and drive your avatar's face from any webcam.">
+<meta property="og:url" content="https://vtoku.cam/face.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="assets/app-icon.png" sizes="any">
+<link rel="apple-touch-icon" href="assets/app-icon.png">
+<link rel="stylesheet" href="assets/style.css?v=3">
+<style>
+  .face-stage { position: relative; border-radius: var(--radius); overflow: hidden; background: #14121f;
+    box-shadow: var(--shadow-glass); aspect-ratio: 16 / 9; }
+  .face-stage video, .face-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  body.live .face-stage video, body.live .face-stage canvas { transform: scaleX(-1); }  /* selfie view */
+  .face-stage .placeholder { position: absolute; inset: 0; display: grid; place-items: center;
+    color: rgba(255,255,255,.55); font-size: .95rem; text-align: center; padding: 24px; }
+  body.live .face-stage .placeholder { display: none; }
+  .face-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+  .face-controls input[type="text"] { flex: 1 1 220px; min-width: 0; padding: 12px 14px; font-family: var(--mono);
+    font-size: .95rem; color: var(--text); background: var(--glass-strong); border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm); box-shadow: inset 0 1px 0 var(--glass-edge); }
+  .face-controls .btn { padding: 12px 22px; border-radius: var(--radius-sm); font-weight: 600; border: 1px solid transparent; cursor: pointer; font-size: .95rem; }
+  .face-controls .btn[disabled] { opacity: .45; cursor: default; transform: none; }
+  .face-opts { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px; color: var(--text-dim); font-size: .93rem; }
+  .face-opts label { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+  .face-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .face-chips span { font-family: var(--mono); font-size: .78rem; padding: 4px 10px; border-radius: 999px;
+    background: var(--glass-strong); border: 1px solid var(--glass-border); color: var(--text-faint); }
+  .face-chips span.on { color: var(--accent-deep); border-color: var(--accent-soft); background: var(--accent-soft); }
+  #status { margin-top: 12px; font-size: .93rem; color: var(--text-dim); min-height: 1.4em; }
+  #status.err { color: var(--warn); }
+  .face-steps { counter-reset: step; list-style: none; padding: 0; margin: 0; }
+  .face-steps li { counter-increment: step; position: relative; padding-left: 40px; margin: 14px 0; color: var(--text-dim); }
+  .face-steps li::before { content: counter(step); position: absolute; left: 0; top: -1px; width: 26px; height: 26px;
+    display: grid; place-items: center; border-radius: 999px; background: var(--accent-soft); color: var(--accent-deep);
+    font-weight: 700; font-size: .85rem; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html"><img class="brand-logo" src="assets/vtoku-logo.png" alt="VTOKU"></a>
+    <div class="nav-links">
+      <a href="docs/">Docs</a>
+      <a href="support.html">Support</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container reading">
+  <div class="page-head" style="text-align:center;">
+    <p class="eyebrow">VRL Link</p>
+    <h1>VRL Face</h1>
+    <p class="updated">Drive your avatar's face from any webcam. No install. Your camera never leaves this browser tab: tracking runs locally, and only the animation data is sent.</p>
+  </div>
+
+  <main style="padding-bottom:8px;">
+    <div class="face-stage">
+      <video id="cam" playsinline muted></video>
+      <canvas id="overlay"></canvas>
+      <div class="placeholder">Camera preview appears here.<br>Enter your room secret and press Start.</div>
+    </div>
+
+    <div class="face-controls">
+      <input id="room" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+             placeholder="Room secret, e.g. cyberfox-k7m2xq8r">
+      <button id="connect" class="btn btn-primary">Start</button>
+      <button id="stop" class="btn btn-ghost" disabled>Stop</button>
+      <button id="recenter" class="btn btn-ghost" disabled>Recenter</button>
+    </div>
+
+    <div class="face-opts">
+      <label><input id="opt-mirror" type="checkbox" checked> Mirror</label>
+      <label><input id="opt-head" type="checkbox" checked> Head rotation</label>
+      <label><input id="opt-perfect" type="checkbox"> Perfect sync (ARKit blendshapes)</label>
+    </div>
+
+    <div class="face-chips">
+      <span id="chip-cam">camera off</span>
+      <span id="chip-track">no face</span>
+      <span id="chip-room">room off</span>
+      <span id="chip-rate">0 fps</span>
+    </div>
+    <p id="status"></p>
+
+    <div class="note" style="margin-top:28px;">
+      <h3 style="margin-top:0;">Set up in the app</h3>
+      <ol class="face-steps">
+        <li>In VTOKU Cam open Settings, then VRL Link. Generate a room secret and turn on <strong>Connect</strong>.</li>
+        <li>Copy the secret to this page. The room only accepts senders while the app is connected.</li>
+        <li>In the Face panel set <strong>Source</strong> to <strong>VMC</strong>. Your avatar now follows this webcam.</li>
+      </ol>
+      <p style="margin-bottom:0;"><strong>Perfect sync</strong> sends all 52 ARKit blendshapes for avatars rigged for them. Leave it off for standard VRM models. <strong>Recenter</strong> captures your current head pose as neutral.</p>
+    </div>
+
+    <div class="note" style="margin-top:16px;">
+      <p style="margin:0;"><strong>Privacy.</strong> Face tracking runs on your device with MediaPipe. Video and images are never uploaded. The page sends only VMC blendshape and head rotation values, end to end inside your private room. Works in current Chrome, Edge, and Safari on a device with a camera.</p>
+    </div>
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="index.html"><img src="assets/app-icon.png" alt=""> VTOKU&nbsp;Cam</a>
+        <p class="muted" style="max-width:280px;margin-top:12px;">A VTOKU app.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="index.html#features">Features</a></li>
+          <li><a href="docs/">Documentation</a></li>
+          <li><a href="support.html">Support</a></li>
+          <li><a href="beta.html">Join the waitlist</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms &amp; EULA</a></li>
+          <li><a href="support.html#acknowledgements">Acknowledgements</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://vtoku.com">VTOKU.com</a></li>
+          <li><a href="https://vtoku.com/about-us/">About</a></li>
+          <li><a href="https://vtoku.com/contact-us/">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="legal">© 2026 VTOKU LLC. All rights reserved.</span>
+      <span class="legal">VRM, Warudo, NDI, and VMC are trademarks of their respective owners.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="assets/face.js"></script>
+
+</body>
+</html>
