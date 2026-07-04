@@ -124,6 +124,7 @@ const $ = (id) => document.getElementById(id);
 const stage = $("stage"), video = $("cam"), overlay = $("overlay"), returnEl = $("return");
 const joinForm = $("join-form"), roomInput = $("room"), joinBtn = $("join"), statusEl = $("status");
 const btnCam = $("btn-cam"), btnMic = $("btn-mic"), btnFace = $("btn-face"), btnBody = $("btn-body"), btnRecenter = $("btn-recenter");
+const btnSpeaker = $("btn-speaker"), btnReturn = $("btn-return");
 const btnGear = $("btn-gear"), btnLeave = $("btn-leave"), menu = $("menu");
 const chipRoom = $("chip-room"), chipTrack = $("chip-track"), chipRate = $("chip-rate"), chipHint = $("chip-hint");
 const optMirror = $("opt-mirror"), optBlind = $("opt-blind");
@@ -134,6 +135,7 @@ const bodyOn = () => btnBody.getAttribute("aria-pressed") === "true";
 let holo = null, Kalidokit = null, trackersLoading = null;
 let room = null, remoteAudioEls = [];
 let camOn = false, joined = false, leaving = false, micOn = false, micBusy = false;
+let returnAudioMuted = false;   // mute the operator's return audio (e.g. when OBS plays it instead)
 // Tracker health: surface failures instead of dying silently, and retry on CPU once if the
 // GPU delegate keeps throwing (some browsers init GPU fine but fail per-frame).
 let detectFails = 0, lastGoodDetect = 0, lastErrMsg = "", cpuFallbackTried = false, reinitBusy = false, stalled = false;
@@ -268,6 +270,7 @@ function attachTrack(track) {
     fitReturnAspect();
   } else if (track.kind === "audio") {
     const el = track.attach();          // hear the operator (return feed audio)
+    el.muted = returnAudioMuted;
     remoteAudioEls.push(el);
     document.body.appendChild(el);
   }
@@ -314,6 +317,7 @@ async function join() {
     chipRoom.hidden = false; chipRoom.textContent = maskRoom(roomCode);
     chipRate.hidden = false; chipRate.textContent = "0 fps";
     btnLeave.hidden = false; btnMic.disabled = false;
+    btnSpeaker.disabled = false; btnReturn.disabled = false;
     refreshObs();
     setStatus("In the app, set Face Source to VMC.");
   } catch (e) {
@@ -339,6 +343,7 @@ async function leave(message) {
   chipRoom.hidden = true; chipRate.hidden = true; chipHint.hidden = true;
   btnLeave.hidden = true;   // OBS field stays as long as a key is present (refreshObs)
   micOn = false; btnMic.disabled = true; btnMic.classList.add("is-off");
+  btnSpeaker.disabled = true; btnReturn.disabled = true;
   setStatus(message || "");
 }
 
@@ -624,6 +629,20 @@ btnMic.addEventListener("click", async () => {
     setStatus(String(e.message || e), true);
   }
   micBusy = false;
+});
+// Return audio (operator voice): mute/unmute playout. For when OBS plays the program audio instead.
+btnSpeaker.addEventListener("click", () => {
+  returnAudioMuted = !returnAudioMuted;
+  btnSpeaker.classList.toggle("is-off", returnAudioMuted);
+  for (const el of remoteAudioEls) el.muted = returnAudioMuted;
+});
+// Return video (program feed): show/hide on this page. For when OBS shows the program instead.
+btnReturn.addEventListener("click", () => {
+  const on = btnReturn.getAttribute("aria-pressed") !== "true";
+  btnReturn.setAttribute("aria-pressed", on ? "true" : "false");
+  stage.classList.toggle("hide-return", !on);
+  if (on && stage.classList.contains("return")) fitReturnAspect();
+  else clearReturnAspect();
 });
 btnRecenter.addEventListener("click", () => { wantRecenter = true; setStatus("Head pose recentered."); });
 btnGear.addEventListener("click", (e) => {

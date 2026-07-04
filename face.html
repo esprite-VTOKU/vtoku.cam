@@ -23,16 +23,17 @@
   .stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
   /* return program feed fills the stage once the phone publishes it. contain (not cover) so a
-     portrait 9:16 program is never cropped; the stage also adopts the feed's aspect via JS. */
+     portrait 9:16 program is never cropped; the stage also adopts the feed's aspect via JS.
+     `hide-return` (Return video toggled off, e.g. when OBS shows the program instead) drops it. */
   #return { display: none; }
-  .stage.return #return { display: block; object-fit: contain; }
+  .stage.return:not(.hide-return) #return { display: block; object-fit: contain; }
   /* a portrait feed makes the stage tall — cap its width so it isn't a full-width column */
-  .stage.portrait-feed { max-width: 440px; margin-left: auto; margin-right: auto; }
+  .stage.portrait-feed:not(.hide-return) { max-width: 440px; margin-left: auto; margin-right: auto; }
 
-  /* self view: full stage until the return feed arrives, then a corner PiP */
+  /* self view: full stage until the return feed arrives, then a corner PiP (unless return hidden) */
   .self { position: absolute; inset: 0; }
   .stage.cam .self video, .stage.cam .self canvas { transform: scaleX(-1); }  /* selfie mirror */
-  .stage.return .self { inset: auto 12px 76px auto; width: 26%; min-width: 180px; aspect-ratio: 16 / 9;
+  .stage.return:not(.hide-return) .self { inset: auto 12px 76px auto; width: 26%; min-width: 180px; aspect-ratio: 16 / 9;
     border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,.22); }
   .stage.blind .self { background: #000; }            /* hide my video: black behind the mesh */
   .stage.blind .self video { visibility: hidden; }    /* the glowing tracking mesh stays visible */
@@ -190,10 +191,17 @@
           <svg class="on" viewBox="0 0 24 24"><path d="M19.12 9.12c-.39 0-.7.31-.7.7v1.58c0 3.54-2.88 6.42-6.42 6.42s-6.42-2.88-6.42-6.42V9.81c0-.39-.31-.7-.7-.7-.39 0-.7.31-.7.7v1.58c0 4.07 3.13 7.42 7.12 7.78v2.13c0 .39.31.7.7.7.39 0 .7-.31.7-.7v-2.13c3.98-.35 7.12-3.71 7.12-7.78V9.81a.707.707 0 0 0-.7-.69Z"/><path d="M11.998 2c-2.44 0-4.42 1.98-4.42 4.42v5.12c0 2.44 1.98 4.42 4.42 4.42s4.42-1.98 4.42-4.42V6.42c0-2.44-1.98-4.42-4.42-4.42Zm1.31 6.95c-.07.26-.3.43-.56.43-.05 0-.1-.01-.15-.02-.39-.11-.8-.11-1.19 0-.32.09-.63-.1-.71-.41-.09-.31.1-.63.41-.71.59-.16 1.21-.16 1.8 0 .3.08.48.4.4.71Zm.53-1.94a.58.58 0 0 1-.55.38c-.07 0-.13-.01-.2-.03-.7-.26-1.48-.26-2.18 0a.59.59 0 0 1-.75-.35c-.11-.3.05-.64.35-.74a4.36 4.36 0 0 1 2.98 0c.3.11.46.44.35.74Z"/></svg>
           <svg class="off" viewBox="0 0 24 24"><path d="M17.619 5.72 7.009 16.33c-.73-.99-1.13-2.2-1.13-3.51V8.11c0-1.84.82-3.49 2.12-4.61v4.14c0 .39.32.71.7.71.39 0 .71-.32.71-.71V2.57c.46-.23.95-.39 1.46-.48v3.66c0 .4.32.71.71.71.39 0 .71-.31.71-.71V2c2.39.11 4.45 1.61 5.33 3.72ZM18.12 8.879v3.94c0 3.37-2.75 6.12-6.12 6.12-.18 0-.36-.01-.54-.03-.08 0-.16-.01-.23-.02-.13-.02-.26-.04-.38-.06-.05 0-.09-.02-.15-.03-.14-.03-.28-.07-.41-.11a5.83 5.83 0 0 1-.63-.22c-.13-.05-.25-.1-.37-.17-.03-.01-.05-.03-.08-.04-.1-.05-.2-.1-.3-.17l9.21-9.21Z"/><path d="M21.75 11v2c0 5.38-4.37 9.75-9.75 9.75-2.12 0-4.15-.68-5.82-1.93l1.08-1.08A8.15 8.15 0 0 0 12 21.25c4.55 0 8.25-3.7 8.25-8.25v-2c0-.41.34-.75.75-.75s.75.34.75.75ZM21.769 2.229c-.3-.3-.79-.3-1.09 0l-18.45 18.46c-.3.3-.3.79 0 1.09a.758.758 0 0 0 1.08-.01l18.46-18.46c.31-.3.31-.78 0-1.08Z"/></svg>
         </button>
+        <button id="btn-speaker" class="is-off" type="button" disabled aria-label="Return audio on or off" title="Return audio">
+          <svg class="on" viewBox="0 0 24 24"><path d="M18 16.75a.75.75 0 0 1-.6-1.2 5.94 5.94 0 0 0 0-7.1.75.75 0 0 1 1.2-.9c1.96 2.62 1.96 6.28 0 8.9-.15.2-.37.3-.6.3Z"/><path d="M19.828 19.25a.75.75 0 0 1-.6-1.2c2.67-3.56 2.67-8.54 0-12.1a.75.75 0 0 1 1.2-.9c3.07 4.09 3.07 9.81 0 13.9-.14.2-.37.3-.6.3ZM14.02 3.782c-1.12-.62-2.55-.46-4.01.45l-2.92 1.83c-.2.12-.43.19-.66.19H5c-2.42 0-3.75 1.33-3.75 3.75v4c0 2.42 1.33 3.75 3.75 3.75H6.43c.23 0 .46.07.66.19l2.92 1.83c.88.55 1.74.82 2.54.82a3 3 0 0 0 1.47-.37c1.11-.62 1.73-1.91 1.73-3.63v-9.18c0-1.72-.62-3.01-1.73-3.63Z"/></svg>
+          <svg class="off" viewBox="0 0 24 24"><path d="M18 16.75a.75.75 0 0 1-.6-1.2 5.926 5.926 0 0 0 .72-5.84.75.75 0 0 1 .4-.98c.38-.16.82.02.98.4 1.02 2.42.67 5.23-.9 7.33-.15.19-.37.29-.6.29Z"/><path d="M19.828 19.25a.75.75 0 0 1-.6-1.2c2.14-2.85 2.61-6.67 1.23-9.96a.75.75 0 0 1 .4-.98c.38-.16.82.02.98.4 1.59 3.78 1.05 8.16-1.41 11.44-.14.2-.37.3-.6.3ZM14.04 12.958c.63-.63 1.71-.18 1.71.71v2.93c0 1.72-.62 3.01-1.73 3.63a3 3 0 0 1-1.47.37c-.8 0-1.66-.27-2.54-.82l-.64-.4c-.54-.34-.63-1.1-.18-1.55l4.85-4.87ZM21.77 2.229c-.3-.3-.79-.3-1.09 0l-4.95 4.95c-.06-1.6-.66-2.8-1.72-3.39-1.12-.62-2.55-.46-4.01.45l-2.91 1.82c-.2.12-.43.19-.66.19H5c-2.42 0-3.75 1.33-3.75 3.75v4c0 2.42 1.33 3.75 3.75 3.75h.16l-2.94 2.94c-.3.3-.3.79 0 1.09.16.14.35.22.55.22.2 0 .39-.08.54-.23l18.46-18.46c.31-.3.31-.78 0-1.08Z"/></svg>
+        </button>
+        <button id="btn-return" type="button" disabled aria-pressed="true" aria-label="Return video on or off" title="Return video">
+          <svg viewBox="0 0 24 24"><path d="M17.56 2H6.41C3.98 2 2 3.98 2 6.41v6.7a4.41 4.41 0 0 0 4.41 4.41h3.84c.55 0 1 .45 1 1v.97c0 .55-.45 1-1 1H7.83a.755.755 0 0 0 0 1.51h8.35c.41 0 .75-.34.75-.75s-.34-.75-.75-.75h-2.42c-.55 0-1-.45-1-1v-.97c0-.55.45-1 1-1h3.81a4.41 4.41 0 0 0 4.41-4.41v-6.7C21.97 3.98 19.99 2 17.56 2Z"/></svg>
+        </button>
         <button id="btn-face" type="button" aria-pressed="true" aria-label="Face tracking on or off" title="Face tracking">
           <svg viewBox="0 0 24 24"><path d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81v8.37C2 19.83 4.17 22 7.81 22h8.37c3.64 0 5.81-2.17 5.81-5.81V7.81C22 4.17 19.83 2 16.19 2ZM8.5 6.38c1.03 0 1.88.84 1.88 1.88s-.84 1.88-1.88 1.88-1.88-.86-1.88-1.89c0-1.03.85-1.87 1.88-1.87Zm3.5 12.7c-2.69 0-4.88-2.19-4.88-4.88 0-.7.57-1.28 1.27-1.28h7.2c.7 0 1.27.57 1.27 1.28.02 2.69-2.17 4.88-4.86 4.88Zm3.5-8.96c-1.03 0-1.88-.84-1.88-1.88s.84-1.88 1.88-1.88 1.88.84 1.88 1.88-.85 1.88-1.88 1.88Z"/></svg>
         </button>
-        <button id="btn-body" type="button" aria-pressed="true" aria-label="Body and hand tracking on or off" title="Body tracking">
+        <button id="btn-body" type="button" aria-pressed="false" aria-label="Body and hand tracking on or off" title="Body tracking">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2.3"/><path d="M12 8.9c-.9 0-1.7-.1-2.5-.3L4.3 7.2a1 1 0 0 0-.6 1.92l5 1.55v1.35l-1.9 6.1a1.06 1.06 0 0 0 2.02.64L12 15.1l1.18 3.66a1.06 1.06 0 0 0 2.02-.64l-1.9-6.1v-1.35l5-1.55a1 1 0 0 0-.6-1.92l-5.2 1.4c-.8.2-1.6.3-2.5.3Z"/></svg>
         </button>
         <button id="btn-recenter" type="button" disabled aria-label="Recenter head pose" title="Recenter">
@@ -267,7 +275,7 @@
   </div>
 </footer>
 
-<script type="module" src="assets/face.js?v=11"></script>
+<script type="module" src="assets/face.js?v=12"></script>
 
 </body>
 </html>
