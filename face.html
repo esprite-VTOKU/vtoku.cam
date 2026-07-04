@@ -37,6 +37,11 @@
     border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,.22); }
   .stage.blind .self { background: #000; }            /* hide my video: black behind the mesh */
   .stage.blind .self video { visibility: hidden; }    /* the glowing tracking mesh stays visible */
+  /* VTOKU watermark on the blank (hidden-video) screen, behind the tracking mesh */
+  .watermark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 34%; max-width: 240px; height: auto; opacity: 0; pointer-events: none; }
+  .stage.blind .watermark { opacity: .12; }
+  .stage.blind .stage-empty { display: none; }        /* the watermark is the branded blank instead */
 
   .stage-empty { position: absolute; inset: 0; display: grid; place-items: center; }
   .stage-empty svg { width: 36px; height: 36px; fill: rgba(255,255,255,.35); }
@@ -149,6 +154,7 @@
       <video id="return" playsinline autoplay></video>
       <div class="self">
         <video id="cam" playsinline muted></video>
+        <img class="watermark" src="assets/vtoku-logo-white.png" alt="">
         <canvas id="overlay"></canvas>
       </div>
       <div class="stage-empty">
@@ -179,7 +185,7 @@
 
       <div class="menu" id="menu" hidden>
         <label><span>Mirror</span><input id="opt-mirror" type="checkbox"><span class="sw"></span></label>
-        <label><span>Hide my video</span><input id="opt-blind" type="checkbox"><span class="sw"></span></label>
+        <label><span>Hide my video</span><input id="opt-blind" type="checkbox" checked><span class="sw"></span></label>
       </div>
 
       <div class="bar">
@@ -275,7 +281,7 @@
   </div>
 </footer>
 
-<script type="module" src="assets/face.js?v=13"></script>
+<script type="module" src="assets/face.js?v=14"></script>
 
 </body>
 </html>

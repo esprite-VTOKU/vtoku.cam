@@ -675,6 +675,7 @@ document.addEventListener("click", () => {
   if (!menu.hidden) { menu.hidden = true; btnGear.setAttribute("aria-expanded", "false"); }
 });
 optBlind.addEventListener("change", () => stage.classList.toggle("blind", optBlind.checked));
+stage.classList.toggle("blind", optBlind.checked);   // apply the default (on) at load
 optMirror.addEventListener("change", () => boneCache.clear());   // names flip L/R — drop stale entries
 
 // Room key is masked (type=password) by default; the eye reveals it.
