@@ -336,15 +336,41 @@ function drawDots(ctx, points, size) {
     ctx.fillRect(p.x * overlay.width - size / 2, p.y * overlay.height - size / 2, size, size);
   }
 }
+// Bone view: draw the skeleton connections MediaPipe ships (Connection = {start, end} indices),
+// skipping low-visibility endpoints so off-frame legs don't scribble.
+function drawSkeleton(ctx, lms, connections, color, joint) {
+  const W = overlay.width, H = overlay.height;
+  ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineCap = "round";
+  ctx.beginPath();
+  for (const c of connections) {
+    const a = lms[c.start], b = lms[c.end];
+    if (!a || !b || (a.visibility ?? 1) < 0.5 || (b.visibility ?? 1) < 0.5) continue;
+    ctx.moveTo(a.x * W, a.y * H);
+    ctx.lineTo(b.x * W, b.y * H);
+  }
+  ctx.stroke();
+  ctx.fillStyle = color;
+  for (const p of lms) {
+    if ((p.visibility ?? 1) < 0.5) continue;
+    ctx.beginPath();
+    ctx.arc(p.x * W, p.y * H, joint, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
 function drawOverlay(result) {
   const ctx = overlay.getContext("2d");
   ctx.clearRect(0, 0, overlay.width, overlay.height);
   ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
   if (faceOn() && result.faceLandmarks?.[0]) drawDots(ctx, result.faceLandmarks[0], 2);
   if (bodyOn()) {
-    if (result.poseLandmarks?.[0]) { ctx.fillStyle = "rgba(160, 210, 255, 0.8)"; drawDots(ctx, result.poseLandmarks[0], 5); }
-    if (result.leftHandLandmarks?.[0]) drawDots(ctx, result.leftHandLandmarks[0], 4);
-    if (result.rightHandLandmarks?.[0]) drawDots(ctx, result.rightHandLandmarks[0], 4);
+    if (result.poseLandmarks?.[0]) {
+      drawSkeleton(ctx, result.poseLandmarks[0], HolisticLandmarker.POSE_CONNECTIONS, "rgba(160, 210, 255, 0.9)", 3.5);
+    }
+    for (const side of ["leftHandLandmarks", "rightHandLandmarks"]) {
+      if (result[side]?.[0]) {
+        drawSkeleton(ctx, result[side][0], HolisticLandmarker.HAND_CONNECTIONS, "rgba(140, 255, 190, 0.9)", 2.5);
+      }
+    }
   }
 }
 

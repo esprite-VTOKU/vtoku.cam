@@ -71,6 +71,7 @@
   .bar button.danger { background: #D64545; }
   .bar button.danger:hover { background: #E25353; }
   .bar button[disabled] { opacity: .4; cursor: default; }
+  .bar button[hidden] { display: none; }   /* our display:grid would otherwise beat the UA [hidden] rule */
   .bar button .off { display: none; }
   .bar button.is-off .on { display: none; }
   .bar button.is-off .off { display: block; }
@@ -225,7 +226,7 @@
   </div>
 </footer>
 
-<script type="module" src="assets/face.js?v=7"></script>
+<script type="module" src="assets/face.js?v=8"></script>
 
 </body>
 </html>
