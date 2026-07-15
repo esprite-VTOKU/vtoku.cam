@@ -295,22 +295,38 @@ function detachAll() {
   remoteAudioEls = [];
 }
 
+// Selective-subscribe gate: only the authenticated phone's named tracks, decided by the
+// server-stamped vrlRole. With autoSubscribe off, TrackPublished only fires for tracks published
+// AFTER we join — and /face-token requires the phone to already be live in the room, so its
+// program/voice tracks nearly always predate us. Sweep existing publications once connected, and
+// again if a participant's metadata arrives late (role unknown at publish time).
+// Returns the sweep so the caller can run it right after connect() resolves.
+function installPhoneGate(r) {
+  const roleOf = (participant) => {
+    try { return JSON.parse(participant?.metadata || "").vrlRole || null; } catch { return null; }
+  };
+  const gate = (publication, participant) => {
+    const allowed = roleOf(participant) === "phone"
+      && ["program", "perf-voice", "op-mic"].includes(publication.trackName);
+    if (allowed) publication.setSubscribed(true);
+  };
+  const sweep = (participant) => {
+    for (const pub of participant.trackPublications.values()) gate(pub, participant);
+  };
+  r.on(RoomEvent.TrackPublished, gate);
+  r.on(RoomEvent.ParticipantMetadataChanged, (_prev, participant) => sweep(participant));
+  r.on(RoomEvent.TrackSubscribed, (track, _publication, participant) => {
+    if (roleOf(participant) === "phone") attachTrack(track);
+    else track.detach();
+  });
+  return () => { for (const p of r.remoteParticipants.values()) sweep(p); };
+}
+
 async function connectRoom(roomCode) {
   setStatus("Checking room…");
   const { token, url } = await mintToken(roomCode);
   room = new Room();
-  const roleOf = (participant) => {
-    try { return JSON.parse(participant?.metadata || "").vrlRole || null; } catch { return null; }
-  };
-  room.on(RoomEvent.TrackPublished, (publication, participant) => {
-    const allowed = roleOf(participant) === "phone"
-      && ["program", "perf-voice", "op-mic"].includes(publication.trackName);
-    if (allowed) publication.setSubscribed(true);
-  });
-  room.on(RoomEvent.TrackSubscribed, (track, _publication, participant) => {
-    if (roleOf(participant) === "phone") attachTrack(track);
-    else track.detach();
-  });
+  const sweepExisting = installPhoneGate(room);
   room.on(RoomEvent.TrackUnsubscribed, (track) => {
     if (track.kind === "video") { stage.classList.remove("return"); clearReturnAspect(); }
     track.detach();
@@ -323,6 +339,7 @@ async function connectRoom(roomCode) {
   room.on(RoomEvent.Reconnected, () => setStatus(""));
   setStatus("Connecting…");
   await room.connect(url, token, { autoSubscribe: false });
+  sweepExisting();   // the phone published before we joined — the event alone never covers this
 }
 
 async function join() {
@@ -738,23 +755,13 @@ async function startWatch(key) {
       if (!res.ok) throw new Error(body.error || res.status);
       const r = new Room();
       room = r;
-      const roleOf = (participant) => {
-        try { return JSON.parse(participant?.metadata || "").vrlRole || null; } catch { return null; }
-      };
-      r.on(RoomEvent.TrackPublished, (publication, participant) => {
-        const allowed = roleOf(participant) === "phone"
-          && ["program", "perf-voice", "op-mic"].includes(publication.trackName);
-        if (allowed) publication.setSubscribed(true);
-      });
-      r.on(RoomEvent.TrackSubscribed, (track, _publication, participant) => {
-        if (roleOf(participant) === "phone") attachTrack(track);
-        else track.detach();
-      });
+      const sweepExisting = installPhoneGate(r);
       r.on(RoomEvent.TrackUnsubscribed, (track) => {
         if (track.kind === "video") stage.classList.remove("return");
         track.detach();
       });
       await r.connect(body.url, body.token, { autoSubscribe: false });
+      sweepExisting();   // watch always joins after the phone — its tracks already exist
       await new Promise((resolve) => r.once(RoomEvent.Disconnected, resolve));   // hold until drop
       detachAll();
       room = null;
