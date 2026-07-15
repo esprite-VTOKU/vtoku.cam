@@ -3,8 +3,9 @@
 // Tracks face + upper body + hands locally (MediaPipe Holistic + Kalidokit solvers), converts
 // the result into standard VMC OSC bundles, and publishes the bytes on the VRL Link room's
 // LiveKit data channel (topic "vmc", lossy) — the exact wire format the app's VMCReceiver
-// already parses. The room grant is data-only for publishing (canPublish=false), so this page
-// PHYSICALLY cannot send the webcam video; it subscribes to the phone's return "program" feed
+// already parses. The room grant permits VMC data plus a microphone track, while its server-side
+// media-source restriction prevents webcam-video publication. It selectively subscribes to the
+// authenticated phone's return "program" feed
 // and shows it as the main stage view (the self preview becomes a corner PiP).
 //
 // Hips are never sent, so the avatar stays planted on its stage (same rule as the app's own
@@ -13,14 +14,14 @@
 // Token: POST https://vrl-token.fly.dev/face-token { room } → { token, url }.
 
 import { FilesetResolver, HolisticLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
-import { Room, RoomEvent } from "https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.esm.min.mjs";
+import { Room, RoomEvent } from "https://cdn.jsdelivr.net/npm/livekit-client@2.20.1/dist/livekit-client.esm.min.mjs";
 
-const qs = new URLSearchParams(location.search);
-const TOKEN_URL = qs.get("token") || "https://vrl-token.fly.dev/face-token";
+const TOKEN_URL = "https://vrl-token.fly.dev/face-token";
 const WASM_BASE = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
 const HOLISTIC_MODEL = "https://storage.googleapis.com/mediapipe-models/holistic_landmarker/holistic_landmarker/float16/1/holistic_landmarker.task";
 const KALIDOKIT_URL = "https://cdn.jsdelivr.net/npm/kalidokit@1.1.5/dist/kalidokit.es.js";
 const MAX_PACKET = 1200;   // stay under one MTU per lossy data packet — VMCReceiver parses each independently
+const MIN_ROOM_LENGTH = 16;
 
 // ── tiny OSC 1.0 encoder (matches the app's VMCReceiver byte-for-byte) ─────────────────────
 function oscString(s) {
@@ -153,7 +154,10 @@ let lastTrackTime = 0, faceRelaxed = false;   // debounce face-neutralize on bri
 let lastFaceSolve = 0, lastPoseSolve = 0;     // per-part solve times → hold the cache through blips only
 const HOLD_MS = 500;                           // re-emit a cached part for this long after its last solve
 
-roomInput.value = localStorage.getItem("vrlRoom") || "";
+// Session-only by default: a room capability should not survive a browser restart or remain available
+// to unrelated future same-origin scripts. Remove the old persistent copy during migration.
+roomInput.value = sessionStorage.getItem("vrlRoom") || "";
+localStorage.removeItem("vrlRoom");
 // Pre-join messages land in the dialog; once it hides, they surface as an overlay chip.
 function setStatus(msg, isErr) {
   if (joined) {
@@ -178,7 +182,7 @@ const maskRoom = (r) => {
 // goes live), so surface the field pre-join — not only after connecting.
 function refreshObs() {
   const key = roomInput.value.trim();
-  if (key.length >= 8) {
+  if (key.length >= MIN_ROOM_LENGTH) {
     obsUrl.value = `${location.origin}${location.pathname}#watch=${encodeURIComponent(key)}`;
     obsBox.hidden = false;
   } else {
@@ -291,11 +295,38 @@ function detachAll() {
   remoteAudioEls = [];
 }
 
+// Selective-subscribe gate: only the authenticated phone's named tracks, decided by the
+// server-stamped vrlRole. With autoSubscribe off, TrackPublished only fires for tracks published
+// AFTER we join — and /face-token requires the phone to already be live in the room, so its
+// program/voice tracks nearly always predate us. Sweep existing publications once connected, and
+// again if a participant's metadata arrives late (role unknown at publish time).
+// Returns the sweep so the caller can run it right after connect() resolves.
+function installPhoneGate(r) {
+  const roleOf = (participant) => {
+    try { return JSON.parse(participant?.metadata || "").vrlRole || null; } catch { return null; }
+  };
+  const gate = (publication, participant) => {
+    const allowed = roleOf(participant) === "phone"
+      && ["program", "perf-voice", "op-mic"].includes(publication.trackName);
+    if (allowed) publication.setSubscribed(true);
+  };
+  const sweep = (participant) => {
+    for (const pub of participant.trackPublications.values()) gate(pub, participant);
+  };
+  r.on(RoomEvent.TrackPublished, gate);
+  r.on(RoomEvent.ParticipantMetadataChanged, (_prev, participant) => sweep(participant));
+  r.on(RoomEvent.TrackSubscribed, (track, _publication, participant) => {
+    if (roleOf(participant) === "phone") attachTrack(track);
+    else track.detach();
+  });
+  return () => { for (const p of r.remoteParticipants.values()) sweep(p); };
+}
+
 async function connectRoom(roomCode) {
   setStatus("Checking room…");
   const { token, url } = await mintToken(roomCode);
   room = new Room();
-  room.on(RoomEvent.TrackSubscribed, (track) => attachTrack(track));
+  const sweepExisting = installPhoneGate(room);
   room.on(RoomEvent.TrackUnsubscribed, (track) => {
     if (track.kind === "video") { stage.classList.remove("return"); clearReturnAspect(); }
     track.detach();
@@ -307,13 +338,14 @@ async function connectRoom(roomCode) {
   room.on(RoomEvent.Reconnecting, () => setStatus("Reconnecting…"));
   room.on(RoomEvent.Reconnected, () => setStatus(""));
   setStatus("Connecting…");
-  await room.connect(url, token);
+  await room.connect(url, token, { autoSubscribe: false });
+  sweepExisting();   // the phone published before we joined — the event alone never covers this
 }
 
 async function join() {
   const roomCode = roomInput.value.trim();
-  if (roomCode.length < 8) { setStatus("Paste the room key from the app.", true); return; }
-  localStorage.setItem("vrlRoom", roomCode);
+  if (roomCode.length < MIN_ROOM_LENGTH) { setStatus("Paste the room key from the app.", true); return; }
+  sessionStorage.setItem("vrlRoom", roomCode);
   joinBtn.disabled = true;
   try {
     if (!camOn) await cameraOn();
@@ -702,7 +734,7 @@ window.addEventListener("pagehide", () => { if (room) room.disconnect(); });
 // Prefill + auto-start. If the browser needs a user gesture for the camera, join() surfaces the
 // error and the (already-prefilled) dialog stays up so a tap finishes it.
 const joinKey = new URLSearchParams(location.hash.slice(1)).get("join");
-if (joinKey && joinKey.length >= 8) {
+if (joinKey && joinKey.length >= MIN_ROOM_LENGTH) {
   roomInput.value = joinKey;
   join();
 }
@@ -723,12 +755,13 @@ async function startWatch(key) {
       if (!res.ok) throw new Error(body.error || res.status);
       const r = new Room();
       room = r;
-      r.on(RoomEvent.TrackSubscribed, (track) => attachTrack(track));
+      const sweepExisting = installPhoneGate(r);
       r.on(RoomEvent.TrackUnsubscribed, (track) => {
         if (track.kind === "video") stage.classList.remove("return");
         track.detach();
       });
-      await r.connect(body.url, body.token);
+      await r.connect(body.url, body.token, { autoSubscribe: false });
+      sweepExisting();   // watch always joins after the phone — its tracks already exist
       await new Promise((resolve) => r.once(RoomEvent.Disconnected, resolve));   // hold until drop
       detachAll();
       room = null;
@@ -737,4 +770,4 @@ async function startWatch(key) {
   }
 }
 const watchKey = new URLSearchParams(location.hash.slice(1)).get("watch");
-if (watchKey && watchKey.length >= 8) startWatch(watchKey);
+if (watchKey && watchKey.length >= MIN_ROOM_LENGTH) startWatch(watchKey);
