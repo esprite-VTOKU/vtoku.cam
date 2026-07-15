@@ -17,6 +17,10 @@ virtual-production camera by VTOKU. Served as a static site on **GitHub Pages** 
 
 No build step — plain HTML + CSS. Edit a file, commit, push; GitHub Pages redeploys.
 
+`face.html` carries a restrictive CSP and no-referrer policy in markup. GitHub Pages does not support
+repository-defined response headers; if hosting moves behind a configurable CDN, also set
+`Permissions-Policy: camera=(self), microphone=(self)` and retain HTTPS/HSTS there.
+
 ## Warudo Workshop plugin
 
 The VTOKU Cam Workshop plugin for [Warudo](https://warudo.app) lives at
