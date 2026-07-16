@@ -85,8 +85,9 @@ To finish wiring it:
 4. Optional: set the Tally post-submit redirect/thank-you to your public TestFlight link so approved
    testers get the invite immediately.
 
-The "Pro" pricing on the landing reflects a one-time Pro unlock (NDI|HX + commercial-use license for
-companies or creators earning $100k/yr or more). The full definition lives in `terms.html`.
+The "Pro" pricing on the landing reflects a one-time Pro purchase that grants a commercial-use license
+(for companies, or creators earning $100k/yr or more). Pro is a license, not a feature unlock: every
+feature works in the free tier. The full definition lives in `terms.html`.
 
 ## TODO before launch
 

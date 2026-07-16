@@ -4,8 +4,10 @@
 > connects to Warudo and other VMC and NDI tools. Track the device in real space, perform a VRM
 > avatar in AR with face tracking, record
 > video, and go live anywhere with SRT and SRTLA bonded streaming. By VTOKU LLC (Honolulu, Hawai‘i).
-> iOS and iPadOS 26. Free to use; an optional one-time Pro unlock adds NDI|HX and a commercial-use
-> license. Currently in free TestFlight beta. Brand tagline: "Go VRL" (VR meets IRL).
+> iOS and iPadOS 26. Free to use with every app feature unlocked. Two optional subscriptions cover the
+> hosted VRL Link service: VRL Link at $15/month (personal use), and Pro at $150/year (adds a per-seat
+> commercial-use license for companies and creators earning $100k/yr or more). Currently in free
+> TestFlight beta. Brand tagline: "Go VRL" (VR meets IRL).
 
 ## What you can do
 - Use your phone as a moving virtual camera in Warudo (sends camera pose over the network).

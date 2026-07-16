@@ -63,6 +63,17 @@ introducing new colors or one-off styles.
 - Pre-launch, the primary CTA is **Join the beta** (`beta.html`), which embeds a Tally form
   feeding a Notion "Beta Waitlist" database. The form id placeholder `REPLACE_WITH_TALLY_FORM_ID`
   in `beta.html` still needs the real Tally form id (see README "Beta signups" + "TODO before launch").
-- "Pro" pricing copy describes a one-time Pro unlock (NDI|HX + commercial-use license); the
-  binding definition lives in `terms.html`.
+- **Monetization (locked 2026-07-16):** free app, every APP FEATURE unlocked, no feature gating.
+  Never write copy implying a purchase unlocks an app feature. Three paid things:
+  1. **VRL Link, $15/month** - auto-renewable sub for the hosted relay SERVICE (not an app
+     feature). Personal, non-commercial use.
+  2. **Pro, $150/year** - auto-renewable sub: VRL Link + a **commercial-use license**. Priced
+     below 12x$15 on purpose, so declaring commercial use is the CHEAPER path. **Per seat**: one
+     Pro covers one person, no Family Sharing. Honor system, no enforcement (Reaper model).
+     Commercial = any company/org, or a creator earning $100k/yr+.
+  3. **Paid animation packs** - one-time non-consumables (buy-to-own).
+  Both subs live in ONE App Store subscription group so users can't double-subscribe.
+  Output that costs us nothing stays free forever: NDI, SRT, HDMI, VDO.Ninja, recording, LiDAR.
+  NDI|HX was dropped (the NDI Advanced SDK license costs ~$5k) - never reintroduce it in copy.
+  Binding license definition lives in `terms.html`.
 - Contact / support inbox: `support@vtoku.com`.
