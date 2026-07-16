@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>隐私政策，VRL Cam</title>
+<meta name="description" content="VRL Cam 隐私政策。本应用不收集任何个人数据；处理在你的设备上进行，局域网串流仅停留在你的本地网络内，可选的 VRL Link 中继仅传输你主动发起的直播流。">
+<link rel="alternate" hreflang="en" href="privacy.html">
+<link rel="alternate" hreflang="zh-Hans" href="privacy.zh.html">
+<link rel="icon" href="assets/app-icon.png" sizes="any">
+<link rel="apple-touch-icon" href="assets/app-icon.png">
+<link rel="stylesheet" href="assets/style.css?v=3">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html"><img class="brand-logo" src="assets/vtoku-logo.png" alt="VTOKU"></a>
+    <div class="nav-links">
+      <a href="index.html#features">功能</a>
+      <a href="docs/" class="hide-sm">文档</a>
+      <a href="support.html">支持</a>
+      <a href="privacy.html">English</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container reading">
+  <div class="page-head">
+    <p class="eyebrow">法律</p>
+    <h1>隐私政策</h1>
+    <p class="updated">最后更新：2026 年 7 月 15 日 · 适用于 VRL Cam（com.vtoku.cam）</p>
+  </div>
+
+  <main class="prose" style="padding-bottom:24px;">
+    <div class="note">
+      <p><strong>简要说明：</strong>VRL Cam 不会为 VTOKU 自身用途收集、存储、出售或传输任何个人数据。没有账户，
+      没有分析统计，没有广告，也没有第三方追踪。本应用所做的几乎一切都发生在你的设备上或你自己的本地网络内。
+      唯一的例外是 <strong>VRL Link</strong>：这是一项由你主动开启的可选功能，它会通过我们的授权服务器和一项
+      第三方实时服务中继一路直播流；它仅传输你选择发送的内容，且仅在你运行该功能期间传输（见第&nbsp;6&nbsp;节）。</p>
+    </div>
+
+    <h2>1. 我们是谁</h2>
+    <p>VRL Cam（“本应用”）由 <strong>VTOKU LLC</strong>（“VTOKU”、“我们”）开发并发布，公司位于美国夏威夷檀香山。
+      本政策说明本应用如何处理信息。你可以通过 <a href="mailto:support@vtoku.com">support@vtoku.com</a> 与我们联系。</p>
+
+    <h2>2. 我们收集的数据</h2>
+    <p><strong>不为我们自身用途收集任何数据。</strong>本应用不含任何分析 SDK、广告 SDK、崩溃报告服务或追踪技术，
+      我们也不会建立关于你的任何画像。Apple 的“App 追踪透明度”不适用，因为本应用不会跨其他公司的应用或网站
+      追踪你，且本应用内置的隐私清单未声明任何追踪域名。</p>
+    <p>我们运营一台服务器，即 <strong>VRL Link 授权服务</strong>，它仅在<em>你</em>开启 VRL Link 时使用。它会接收
+      本应用生成的一个随机的、每次安装各不相同的标识符（不与你的姓名、Apple ID 或设备序列号关联），以及 Apple
+      对本应用为正版安装的签名证明，仅用于为该直播会话签发一个短期访问凭证并限制滥用频率。我们不会用它来识别你的
+      身份，也不会将其出售或为广告目的共享。完整说明见第&nbsp;6&nbsp;节。</p>
+
+    <h2>3. 你的内容与设备数据如何被使用（仅在设备上）</h2>
+    <p>为完成其功能，本应用会访问你设备上的以下内容。这些信息在本地实时处理，不会上传给我们。</p>
+
+    <table>
+      <thead><tr><th>权限</th><th>本应用为何请求</th><th>数据去向</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>相机</strong></td>
+          <td>ARKit 世界追踪使用相机来确定设备的位置和朝向，并将你的虚拟形象合成进实时画面。</td>
+          <td>在设备上处理。只有当<em>你</em>开启 NDI、某项串流（SRT / VRL Link / VDO.Ninja）或录制时，
+            相机画面才会离开设备（见下文）。</td>
+        </tr>
+        <tr>
+          <td><strong>麦克风</strong></td>
+          <td>当你选择录制时，将音频与你的视频一同录制。</td>
+          <td>在设备上保存进你的录制文件。不会传输给我们。</td>
+        </tr>
+        <tr>
+          <td><strong>添加到照片</strong></td>
+          <td>将你录制的视频保存到你的照片图库。</td>
+          <td>存储在你自己设备/iCloud 上的照片图库中，由你掌控。</td>
+        </tr>
+        <tr>
+          <td><strong>本地网络</strong></td>
+          <td>与你在网络中选择的其他应用和设备收发相机追踪、动作捕捉、音频和视频数据（VMC/OSC、FreeD、NDI、
+            iFacialMocap）。</td>
+          <td>仅停留在你的本地网络内，只发送到你所配置的目标（例如运行 Warudo 的电脑）。此类流量不经过我们的
+            服务器。</td>
+        </tr>
+        <tr>
+          <td><strong>互联网（串流）</strong></td>
+          <td>由你开启的可选对外串流：SRT 发送到你指定的服务器，或 VRL Link / VDO.Ninja 将你的相机和虚拟形象
+            通过互联网发送到浏览器或接收端。</td>
+          <td>SRT 仅发送到你输入的地址。VRL Link 和 VDO.Ninja 通过一项第三方实时中继（LiveKit）传输直播流；
+            VRL Link 还会先联系我们的授权服务器（见第&nbsp;2&nbsp;节和第&nbsp;6&nbsp;节）。在你启用之前，不会串流任何内容。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. 虚拟形象与录制内容归你所有</h2>
+    <p>你导入的 VRM 虚拟形象文件、你接收的动作数据，以及你录制的视频，都存储在你的设备本地并始终由你掌控。
+      我们无法访问它们。删除应用，或通过“文件”和“照片”应用移除文件，即可从你的设备上删除这些内容。</p>
+
+    <h2>5. 设置</h2>
+    <p>本应用会将你的偏好设置（例如连接地址、端口和各项开关状态）保存在设备的标准本地设置存储中，以便在多次
+      启动之间保持。这些设置留在你的设备上，不会发送给我们。</p>
+
+    <h2>6. 网络串流详解</h2>
+    <p><strong>在你的本地网络内。</strong>VRL Cam 是一款用于将相机和虚拟形象数据发送给你运行的其他软件的工具。
+      当你启用某个发送器（VMC/OSC、FreeD、NDI）或发现功能（NDI、iFacialMocap）时，本应用会使用你指定的地址或在
+      局域网中发现的地址与本地网络中的设备通信。<strong>我们从不会看到此类流量。</strong>接收软件（例如 Warudo）
+      如何处理这些数据，受该软件自身的隐私实践约束，而非我们。</p>
+    <p><strong>通过互联网（VRL Link 与 VDO.Ninja）。</strong>VRL Link 是一项可选功能，让你可以将相机和虚拟形象
+      发送到不在你本地网络内的浏览器或接收端。为实现这一点，且仅在你开启该功能之后，会发生两件事：</p>
+    <ul>
+      <li><strong>授权。</strong>本应用会联系我们的授权服务器（由 VTOKU 部署在 Fly.io 上），为该会话获取一个短期
+        访问令牌。该请求包含本应用生成的一个随机的每次安装标识符，以及 Apple 对本应用为正版的签名证明。我们仅
+        将它们用于签发令牌和限制滥用频率；服务器日志仅存储一个加盐的单向哈希，绝不记录你的原始 IP 地址或任何可
+        还原的标识符，且不用于建立关于你的画像或为广告目的共享。</li>
+      <li><strong>串流本身。</strong>你的实时视频、音频和虚拟形象数据会流经一项第三方实时媒体服务
+        （<strong>LiveKit</strong>），由其中继给你分享房间链接的对象。这是实时中继：会话结束后，媒体不会在中继上
+        被录制或保留，我们也无法访问其内容。LiveKit 对传输过程的处理受其自身隐私政策约束。VDO.Ninja（WHIP）通过
+        其实时服务以相同方式工作。</li>
+    </ul>
+    <p>如果你从不启用 VRL Link 或 VDO.Ninja，本应用便绝不会联系我们的授权服务器或任何串流中继，你的任何数据也不会
+      通过这些途径离开你的设备或本地网络。</p>
+
+    <h2>7. 儿童隐私</h2>
+    <p>本应用分级为 4+，适合一般受众。由于它不收集任何个人数据，因此也不会收集儿童的任何个人数据。本应用并非
+      以数据收集为目的面向儿童。</p>
+
+    <h2>8. 购买</h2>
+    <p>VRL Cam 提供可选的应用内购买。购买完全由 <strong>Apple</strong> 通过 App Store 处理。VTOKU 不处理付款，
+      也不会收到你的姓名、卡号或账单信息。Apple 对你购买的处理受 Apple 隐私政策约束。我们只能看到 Apple 向所有
+      开发者提供的匿名汇总销售信息，这些信息无法识别你的身份。</p>
+
+    <h2>9. 第三方软件</h2>
+    <p>本应用包含第三方库（例如 NDI SDK 和开源组件），它们完全作为本应用的一部分在设备上运行，不会向我们回传数据。
+      可选的 VRL Link 和 VDO.Ninja 串流功能还会使用一项第三方实时媒体服务（LiveKit），如第&nbsp;6&nbsp;节所述，
+      仅在你开启串流期间传输你的直播流。Warudo、NDI、VMC、VRM 和 LiveKit 等商标归各自所有者所有；将其纳入本应用
+      并不意味着任何背书。参见<a href="support.html#acknowledgements">致谢</a>。</p>
+
+    <h2>10. 你的权利</h2>
+    <p>由于我们不收集或持有任何关于你的个人数据，因此我们没有任何个人数据可以代你访问、更正、导出或删除。你始终
+      完全掌控你自己设备上的内容。如果你对 GDPR 或 CCPA 等法律下的权利有疑问，请与我们联系，我们将提供帮助。</p>
+
+    <h2>11. 本政策的变更</h2>
+    <p>如果我们变更本政策，我们会更新本页顶部的日期并在此发布修订版本。重大变更将在适当情况下反映在未来的应用
+      更新说明中。</p>
+
+    <h2>12. 联系我们</h2>
+    <p>对本政策或本应用的隐私实践有疑问？请发送邮件至
+      <a href="mailto:support@vtoku.com">support@vtoku.com</a>，或使用我们的
+      <a href="https://vtoku.com/contact-us/">联系表单</a>。</p>
+
+    <hr>
+    <p class="muted">VTOKU LLC</p>
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="index.html"><img src="assets/app-icon.png" alt=""> VRL&nbsp;Cam</a>
+        <p class="muted" style="max-width:280px;margin-top:12px;">面向所有人的虚拟制作。一款 VTOKU 应用。</p>
+      </div>
+      <div>
+        <h4>产品</h4>
+        <ul>
+          <li><a href="index.html#features">功能</a></li>
+          <li><a href="docs/">文档</a></li>
+          <li><a href="support.html">支持</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>法律</h4>
+        <ul>
+          <li><a href="privacy.zh.html">隐私政策</a></li>
+          <li><a href="terms.html">条款与 EULA</a></li>
+          <li><a href="support.html#acknowledgements">致谢</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>公司</h4>
+        <ul>
+          <li><a href="https://vtoku.com">VTOKU.com</a></li>
+          <li><a href="https://vtoku.com/about-us/">关于</a></li>
+          <li><a href="https://vtoku.com/contact-us/">联系</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="legal">© 2026 VTOKU LLC. 保留所有权利。</span>
+      <span class="legal">VRM、Warudo、NDI 和 VMC 是各自所有者的商标。</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
