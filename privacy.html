@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Privacy Policy, VTOKU Cam</title>
-<meta name="description" content="VTOKU Cam privacy policy. The app collects no personal data; all processing happens on your device and all network streaming stays on your local network.">
+<title>Privacy Policy, VRL Cam</title>
+<meta name="description" content="VRL Cam privacy policy. The app collects no personal data; processing happens on your device, LAN streaming stays on your local network, and the optional VRL Link relay carries only the live stream you start.">
 <link rel="icon" href="assets/app-icon.png" sizes="any">
 <link rel="apple-touch-icon" href="assets/app-icon.png">
 <link rel="stylesheet" href="assets/style.css?v=3">
@@ -27,26 +27,35 @@
   <div class="page-head">
     <p class="eyebrow">Legal</p>
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: June 16, 2026 · Applies to VTOKU Cam (com.vtoku.cam)</p>
+    <p class="updated">Last updated: July 15, 2026 · Applies to VRL Cam (com.vtoku.cam)</p>
   </div>
 
   <main class="prose" style="padding-bottom:24px;">
     <div class="note">
-      <p><strong>The short version:</strong> VTOKU Cam does not collect, store, sell, or transmit any
-      personal data to VTOKU or to anyone else. There are no accounts, no analytics, no ads, and no
-      third-party tracking. Everything the app does happens on your device or on your own local network.</p>
+      <p><strong>The short version:</strong> VRL Cam does not collect, store, sell, or transmit any
+      personal data to VTOKU for its own use. There are no accounts, no analytics, no ads, and no
+      third-party tracking. Almost everything the app does happens on your device or on your own local
+      network. The one exception is <strong>VRL Link</strong> — an optional feature you turn on that
+      relays a live stream through our authorization server and a third-party real-time service; it
+      carries only the stream you choose to send, and only while you have it running (see section&nbsp;6).</p>
     </div>
 
     <h2>1. Who we are</h2>
-    <p>VTOKU Cam ("the app") is developed and published by <strong>VTOKU LLC</strong> ("VTOKU", "we",
+    <p>VRL Cam ("the app") is developed and published by <strong>VTOKU LLC</strong> ("VTOKU", "we",
       "us"), based in Honolulu, Hawai‘i, United States. This policy explains how the app handles
       information. You can reach us at <a href="mailto:support@vtoku.com">support@vtoku.com</a>.</p>
 
     <h2>2. Data we collect</h2>
-    <p><strong>None.</strong> The app contains no analytics SDKs, advertising SDKs, crash-reporting
-      services, or tracking technologies. We do not operate any server that the app sends your data to.
-      Apple's "App Tracking Transparency" does not apply because the app does not track you, and the
-      app's bundled privacy manifest declares no collected data types and no tracking domains.</p>
+    <p><strong>None for our own use.</strong> The app contains no analytics SDKs, advertising SDKs,
+      crash-reporting services, or tracking technologies, and we build no profile of you. Apple's "App
+      Tracking Transparency" does not apply because the app does not track you across other companies'
+      apps or websites, and the app's bundled privacy manifest declares no tracking domains.</p>
+    <p>We operate one server — the <strong>VRL Link authorization service</strong> — and it is used only
+      when <em>you</em> turn VRL Link on. It receives a random per-install identifier the app generates
+      (not tied to your name, Apple ID, or device serial) and Apple's signed proof that the app is a
+      genuine install, solely to issue a short-lived access credential for the live-streaming session
+      and to rate-limit abuse. We do not use this to identify you, and it is not sold or shared for
+      advertising. See section&nbsp;6 for the full picture.</p>
 
     <h2>3. How your content and device data are used (on-device only)</h2>
     <p>To do its job, the app accesses the following on your device. This information is processed
@@ -60,7 +69,7 @@
           <td>ARKit world tracking uses the camera to determine the device's position and orientation,
             and to composite your avatar into the live view.</td>
           <td>Processed on-device. The camera image is only sent off the device if <em>you</em> turn on
-            NDI or recording (see below).</td>
+            NDI, a stream (SRT / VRL Link / VDO.Ninja), or recording (see below).</td>
         </tr>
         <tr>
           <td><strong>Microphone</strong></td>
@@ -77,7 +86,15 @@
           <td>Sends and receives camera tracking, motion-capture, audio, and video (VMC/OSC, FreeD, NDI,
             iFacialMocap) with other apps and devices you choose on your network.</td>
           <td>Stays on your local network, sent only to the destinations you configure (for example your
-            computer running Warudo). It does not traverse our servers.</td>
+            computer running Warudo). This traffic does not traverse our servers.</td>
+        </tr>
+        <tr>
+          <td><strong>Internet (streaming)</strong></td>
+          <td>Optional outbound streaming you switch on: SRT to a server you specify, or VRL Link /
+            VDO.Ninja to send your camera and avatar to a browser or receiver over the internet.</td>
+          <td>SRT goes only to the address you enter. VRL Link and VDO.Ninja carry the live stream
+            through a third-party real-time relay (LiveKit); VRL Link also contacts our authorization
+            server first (see sections&nbsp;2 and&nbsp;6). Nothing is streamed until you enable it.</td>
         </tr>
       </tbody>
     </table>
@@ -93,18 +110,38 @@
       your device and are not sent to us.</p>
 
     <h2>6. Network streaming, explained</h2>
-    <p>VTOKU Cam is a tool for sending camera and avatar data to other software you run. When you enable
-      a sender (VMC/OSC, FreeD, NDI) or discovery (NDI, iFacialMocap), the app communicates with devices
-      on your local network using the addresses you specify or that are discovered on your LAN. <strong>We
-      never see this traffic.</strong> What the receiving software (for example Warudo) does with the data
-      is governed by that software's own privacy practices, not ours.</p>
+    <p><strong>On your local network.</strong> VRL Cam is a tool for sending camera and avatar data to
+      other software you run. When you enable a sender (VMC/OSC, FreeD, NDI) or discovery (NDI,
+      iFacialMocap), the app communicates with devices on your local network using the addresses you
+      specify or that are discovered on your LAN. <strong>We never see this traffic.</strong> What the
+      receiving software (for example Warudo) does with the data is governed by that software's own
+      privacy practices, not ours.</p>
+    <p><strong>Over the internet (VRL Link and VDO.Ninja).</strong> VRL Link is an optional feature that
+      lets you send your camera and avatar to a browser or receiver that isn't on your local network. To
+      make that work, two things happen, and only after you turn the feature on:</p>
+    <ul>
+      <li><strong>Authorization.</strong> The app contacts our authorization server (operated by VTOKU on
+        Fly.io) to obtain a short-lived access token for the session. The request includes a random
+        per-install identifier the app generates and Apple's signed proof that the app is genuine. We use
+        these only to issue the token and to rate-limit abuse; server logs store only a salted, one-way
+        hash — never your raw IP address or a reversible identifier — and are not used to build a profile
+        of you or shared for advertising.</li>
+      <li><strong>The stream itself.</strong> Your live video, audio, and avatar data flow through a
+        third-party real-time media service (<strong>LiveKit</strong>) that relays them to the people you
+        share your room link with. This is a live relay: the media is not recorded or retained on the
+        relay after the session, and we do not have access to its contents. LiveKit's handling of the
+        transit is governed by its own privacy policy. VDO.Ninja (WHIP) works the same way through its
+        real-time service.</li>
+    </ul>
+    <p>If you never enable VRL Link or VDO.Ninja, the app never contacts our authorization server or any
+      streaming relay, and none of your data leaves your device or local network by these paths.</p>
 
     <h2>7. Children's privacy</h2>
     <p>The app is rated 4+ and is suitable for general audiences. Because it collects no personal data,
       it collects none from children. It is not directed at children for the purpose of data collection.</p>
 
     <h2>8. Purchases</h2>
-    <p>VTOKU Cam offers an optional one-time "Pro" in-app purchase. Purchases are handled entirely by
+    <p>VRL Cam offers optional in-app purchases. Purchases are handled entirely by
       <strong>Apple</strong> through the App Store. VTOKU does not process payments and does not receive
       your name, card, or billing details. Apple's handling of your purchase is governed by Apple's
       privacy policy. We only see anonymous, aggregate sales information that Apple reports to all
@@ -112,9 +149,11 @@
 
     <h2>9. Third-party software</h2>
     <p>The app includes third-party libraries (for example the NDI SDK and open-source components) that
-      run entirely on-device as part of the app. They do not phone home to us. Trademarks such as Warudo,
-      NDI, VMC, and VRM belong to their respective owners; their inclusion does not imply endorsement.
-      See <a href="support.html#acknowledgements">Acknowledgements</a>.</p>
+      run entirely on-device as part of the app and do not phone home to us. The optional VRL Link and
+      VDO.Ninja streaming features additionally use a third-party real-time media service (LiveKit) that
+      carries your stream only while you have streaming turned on, as described in section&nbsp;6.
+      Trademarks such as Warudo, NDI, VMC, VRM, and LiveKit belong to their respective owners; their
+      inclusion does not imply endorsement. See <a href="support.html#acknowledgements">Acknowledgements</a>.</p>
 
     <h2>10. Your rights</h2>
     <p>Because we do not collect or hold any personal data about you, there is no personal data for us to
@@ -140,7 +179,7 @@
   <div class="container">
     <div class="footer-grid">
       <div>
-        <a class="brand" href="index.html"><img src="assets/app-icon.png" alt=""> VTOKU&nbsp;Cam</a>
+        <a class="brand" href="index.html"><img src="assets/app-icon.png" alt=""> VRL&nbsp;Cam</a>
         <p class="muted" style="max-width:280px;margin-top:12px;">Virtual production for all. A VTOKU app.</p>
       </div>
       <div>
