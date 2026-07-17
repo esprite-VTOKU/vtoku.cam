@@ -58,6 +58,14 @@ highlight + faint inner border).
   feature grid above it stays the standout, not one of three stacked glass layers.
 - `.section-tint`: a faint extra frosted band (via `::before`) to vary rhythm between sections.
 - `.reading`: a centered frosted sheet wrapping legal/docs prose for readability.
+- `.eyebrow-label`: small uppercase indigo label над a display heading (the section-head pattern
+  vtoku.com uses), so sections announce themselves instead of starting cold on a grid.
+- `.showcase` / `.feature-row` / `.device`: the homepage feature tour. Real app screenshots sit in a
+  phone `.device` frame with a faint viewfinder bracket (`.vf`), alternating left/right against the
+  copy. This replaced the uniform icon-card grid, which read as a generic template. Prefer showing a
+  real screenshot in a device over inventing another card.
+- The hero mascot is a **hero-only** character (not sticky down the page): she scrolls away and the
+  sections below start on clear ground, the way vtoku.com keeps its character to the hero.
 
 ## Brand assets
 
