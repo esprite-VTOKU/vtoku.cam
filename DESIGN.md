@@ -16,7 +16,11 @@ as one brand. Tokens here mirror `assets/style.css`. Read this before adding pag
   stays legible. Light text (`#F2F3F8` headings, `#A7AFC2` body) throughout.
 - One brand color. Indigo (`--accent #7C82D8`, shared with vtoku.com) for accents; solid fills use
   the deeper `#5E63B6`. On glass, brand text uses the lighter `--accent-deep` so it reads on dark.
-- Apple typography. System font stack (SF Pro), large bold headings in sentence case.
+- Type. Display headings (h1/h2) use **Archivo** — the wide face vtoku.com uses, self-hosted from
+  `assets/fonts/`, so the two sites share a headline voice. Body and card labels (h3) stay on the
+  SF Pro system stack for an Apple-native feel. Sentence case throughout.
+- Feature icons are **bare brand glyphs**, not gradient tiles. The rounded gradient icon-chip is the
+  most templated SaaS component; a plain stroked mark reads as drawn for this page.
 - Quiet motion. Small hover lifts, one fade-in. Respect `prefers-reduced-motion`.
 - Not everything is glass. Glass should feel chosen, not automatic. Keep some plain
   surfaces (flat or transparent) so the frosted panels have something to contrast against,

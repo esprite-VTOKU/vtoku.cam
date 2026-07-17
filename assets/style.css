@@ -3,6 +3,23 @@
    the Liquid Glass panels re-derived for a dark surface (dark translucent
    fills, a faint lit top edge, black shadows). Tokens mirror DESIGN.md. */
 
+/* Archivo — the wide display face vtoku.com uses for headings, self-hosted
+   (same patched subsets: U+02BB okina remapped onto Archivo's quoteleft).
+   Body stays SF Pro; only headings take Archivo, so the two sites share a
+   display voice while the app site keeps its Apple-native body type. */
+@font-face {
+  font-family: 'Archivo VT';
+  src: url('fonts/vtoku-archivo-latin.woff2') format('woff2');
+  font-weight: 100 900; font-stretch: 62% 125%; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Archivo VT';
+  src: url('fonts/vtoku-archivo-latin-ext.woff2') format('woff2');
+  font-weight: 100 900; font-stretch: 62% 125%; font-style: normal; font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 :root {
   --text: #F2F3F8;
   --text-dim: #A7AFC2;
@@ -54,10 +71,16 @@ body {
 a { color: var(--accent-bright); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-h1, h2, h3, h4 { letter-spacing: -.026em; line-height: 1.07; font-weight: 700; color: var(--text); }
+h1, h2, h3, h4 {
+  font-family: 'Archivo VT', var(--font);
+  font-stretch: 112%;                 /* Archivo's width axis gives headings presence */
+  letter-spacing: -.02em; line-height: 1.05; font-weight: 800; color: var(--text);
+}
 h1 { font-size: clamp(2.6rem, 7vw, 4.6rem); }
 h2 { font-size: clamp(1.7rem, 3.4vw, 2.6rem); margin-top: 0; }
-h3 { font-size: 1.2rem; font-weight: 600; letter-spacing: -.015em; }
+/* h3 is a card/label size — keep it on the body face so cards read as UI,
+   not headline. Only the big display headings take Archivo. */
+h3 { font-family: var(--font); font-stretch: normal; font-size: 1.2rem; font-weight: 600; letter-spacing: -.015em; }
 
 code, kbd {
   font-family: var(--mono); font-size: .88em;
@@ -130,6 +153,17 @@ section { padding: 72px 0; }
 .hero p.lede { color: var(--text-dim); font-size: 1.3rem; max-width: 660px; margin: 22px auto 34px; line-height: 1.5; letter-spacing: -.012em; }
 .hero-cta { display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap; }
 
+/* spec line — concrete capabilities as an editorial divider row, not chips.
+   Specificity is the fastest antidote to a generic template look, and this
+   is the site's version of vtoku.com's proof "kit strip". */
+.spec { display: flex; flex-wrap: wrap; row-gap: 6px; margin: 28px 0 0; max-width: 600px;
+  font-size: .9rem; color: var(--text-dim); letter-spacing: -.005em; }
+.spec span { padding: 0 14px; border-left: 1px solid var(--glass-border); line-height: 1.35; }
+.spec span:first-child { padding-left: 0; border-left: 0; }
+.spec b { color: var(--text); font-weight: 600; }
+.content-rail .spec { justify-content: flex-start; }
+@media (max-width: 980px) { .content-rail .spec { justify-content: center; margin-left: auto; margin-right: auto; } }
+
 /* ---------- feature grid ---------- */
 .grid { display: grid; gap: 20px; }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
@@ -147,12 +181,14 @@ section { padding: 72px 0; }
 .card:hover { transform: translateY(-4px); box-shadow: 0 16px 44px rgba(0,0,0,.55), inset 0 1px 0 var(--glass-edge); }
 .card h3 { margin: 0 0 8px; }
 .card p { color: var(--text-dim); margin: 0; font-size: .98rem; }
+/* bare brand glyph, not a gradient tile — the rounded gradient icon-chip is
+   the single most templated SaaS component; a plain stroked mark reads as
+   drawn-for-this-page and matches the inline glyphs in the outputs row. */
 .card .icon {
-  width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center;
-  background: linear-gradient(160deg, #7C82D8, #5E63B6); color: #fff; margin-bottom: 16px;
-  box-shadow: 0 8px 18px rgba(94,99,182,.42), inset 0 1px 0 rgba(255,255,255,.35);
+  width: auto; height: auto; border-radius: 0; display: block;
+  background: none; box-shadow: none; color: var(--accent); margin-bottom: 14px;
 }
-.card .icon svg { width: 24px; height: 24px; }
+.card .icon svg { width: 30px; height: 30px; }
 .card.feature-wide { grid-column: 1 / -1; }
 
 a.card { color: inherit; display: block; }
