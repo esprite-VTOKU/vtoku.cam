@@ -5,7 +5,7 @@
 > avatar in AR with face tracking, record
 > video, and go live anywhere with SRT and SRTLA bonded streaming. By VTOKU LLC (Honolulu, Hawai‘i).
 > iOS and iPadOS 26. Free to use with every app feature unlocked. Two optional subscriptions cover the
-> hosted VRL Link service: VRL Link at $15/month (personal use), and Pro at $150/year (adds a per-seat
+> hosted VRL Link service: VRL Link at $14.99/month (personal use), and Pro at $149.99/year (adds a per-user
 > commercial-use license for companies and creators earning $100k/yr or more). Currently in free
 > TestFlight beta. Brand tagline: "Go VRL" (VR meets IRL).
 
