@@ -73,8 +73,8 @@ a:hover { text-decoration: underline; }
 
 h1, h2, h3, h4 {
   font-family: 'Archivo VT', var(--font);
-  font-stretch: 112%;                 /* Archivo's width axis gives headings presence */
-  letter-spacing: -.02em; line-height: 1.05; font-weight: 800; color: var(--text);
+  font-stretch: normal;               /* normal width — the wide axis read as stretched */
+  letter-spacing: -.022em; line-height: 1.05; font-weight: 800; color: var(--text);
 }
 h1 { font-size: clamp(2.6rem, 7vw, 4.6rem); }
 h2 { font-size: clamp(1.7rem, 3.4vw, 2.6rem); margin-top: 0; }
@@ -130,8 +130,8 @@ section { padding: 72px 0; }
   transition: transform .15s ease, box-shadow .25s ease, background .2s ease;
 }
 .btn:hover { text-decoration: none; }
-.btn-primary { background: linear-gradient(180deg, #7C82D8, #5E63B6); color: #fff; box-shadow: 0 10px 28px rgba(94,99,182,.45), inset 0 1px 0 rgba(255,255,255,.30); }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(94,99,182,.58), inset 0 1px 0 rgba(255,255,255,.40); }
+.btn-primary { background: linear-gradient(180deg, #7C82D8, #5E63B6); color: #fff; box-shadow: 0 4px 14px rgba(94,99,182,.30), inset 0 1px 0 rgba(255,255,255,.22); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(94,99,182,.40), inset 0 1px 0 rgba(255,255,255,.32); }
 .btn-ghost {
   background: var(--glass-strong); color: var(--accent-deep); border-color: var(--glass-border);
   -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
@@ -149,7 +149,7 @@ section { padding: 72px 0; }
   background: var(--glass-strong); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
   border: 1px solid var(--glass-border); border-radius: 999px; padding: 6px 14px; box-shadow: inset 0 1px 0 var(--glass-edge); } /* unslop-ignore: capsule badge, Liquid Glass idiom */
 .hero h1 { margin: 22px 0 0; }
-.hero .vrl { color: var(--accent-bright); }
+.hero .vrl { color: inherit; }
 .hero p.lede { color: var(--text-dim); font-size: 1.3rem; max-width: 660px; margin: 22px auto 34px; line-height: 1.5; letter-spacing: -.012em; }
 .hero-cta { display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap; }
 
@@ -248,8 +248,8 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
 .feature-row > .feature-copy { flex: 1 1 0; }
 .feature-media { display: flex; justify-content: center; }
 .feature-copy h3 {
-  font-family: 'Archivo VT', var(--font); font-stretch: 110%; font-weight: 800;
-  font-size: clamp(1.5rem, 2.4vw, 2rem); letter-spacing: -.02em; line-height: 1.08; margin: 0 0 12px;
+  font-family: 'Archivo VT', var(--font); font-stretch: normal; font-weight: 800;
+  font-size: clamp(1.5rem, 2.4vw, 2rem); letter-spacing: -.022em; line-height: 1.08; margin: 0 0 12px;
 }
 .feature-copy p { color: var(--text-dim); margin: 0; font-size: 1.03rem; }
 .feature-copy p + p { margin-top: 12px; }
