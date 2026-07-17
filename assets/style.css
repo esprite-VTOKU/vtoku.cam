@@ -260,7 +260,7 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
   background: linear-gradient(160deg, #232a40, #10131c);
   border: 1px solid var(--glass-border);
   box-shadow: 0 36px 74px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.07); }
-.device img { display: block; width: 100%; border-radius: 34px; }
+.device img { display: block; width: 100%; height: auto; border-radius: 34px; }
 .device .vf { position: absolute; inset: -15px; pointer-events: none; opacity: .5;
   background:
     linear-gradient(var(--accent),var(--accent)) left 0    top 0/17px 2px,
