@@ -1,20 +1,21 @@
 # DESIGN.md — vtoku.cam
 
-Persistent design system for the **VTOKU Cam** website. Aesthetic: **soft frosted panels** with
-bright edge highlights and real depth, over a calm off-white background. It echoes iOS 26 Liquid
-Glass and uses the app's brand violet. Tokens here mirror `assets/style.css`. Read this before
-adding pages.
+Persistent design system for the **VTOKU Cam** website. Aesthetic: **frosted dark panels** with a
+faint lit top edge and real depth, over a near-black indigo ground. It echoes iOS 26 Liquid Glass
+and shares vtoku.com's dark theme: the same neutral ramp and indigo accent, so the two sites read
+as one brand. Tokens here mirror `assets/style.css`. Read this before adding pages.
 
 ## Principles
 
-- Calm background. The page sits on a single soft off-white solid (`#F5F3FB`), no gradient.
-  Panels read as light frosted cards held by their borders, inner top highlight, and soft shadow.
-- Frosted, layered, lit. Cards use ~26-50% white fill, a light hairline border, a bright inner top
-  highlight (`inset 0 1px 0`), and a soft violet-tinted drop shadow.
+- Dark ground. The page sits on a single near-black solid (`#0B0E14`, shared with vtoku.com), no
+  gradient. Panels read as dark frosted cards held by their borders, a faint inner top highlight,
+  and a soft black drop shadow.
+- Frosted, layered, lit. Cards use a dark translucent fill (~55-74% of `#1C212E`), a faint white
+  hairline border, a subtle inner top highlight (`inset 0 1px 0`), and a black drop shadow.
 - Readable first. Long text (legal, docs) sits inside a stronger frosted "sheet" (`.reading`) so it
-  stays legible. Dark text (`#1A1726`) throughout.
-- One brand color. Violet (`#6C5CE7`, from the app icon) for accents and buttons. The VRL wordmark
-  uses a violet-to-pink gradient text fill.
+  stays legible. Light text (`#F2F3F8` headings, `#A7AFC2` body) throughout.
+- One brand color. Indigo (`--accent #7C82D8`, shared with vtoku.com) for accents; solid fills use
+  the deeper `#5E63B6`. On glass, brand text uses the lighter `--accent-deep` so it reads on dark.
 - Apple typography. System font stack (SF Pro), large bold headings in sentence case.
 - Quiet motion. Small hover lifts, one fade-in. Respect `prefers-reduced-motion`.
 - Not everything is glass. Glass should feel chosen, not automatic. Keep some plain
@@ -23,19 +24,22 @@ adding pages.
 
 ## Color tokens
 
+Mirrors vtoku.com's dark palette (ground / raise / ink / dim / brand).
+
 | Token | Value | Use |
 |---|---|---|
-| body bg | `#F5F3FB` soft off-white solid | The canvas behind all panels |
-| `--glass` | `rgba(255,255,255,.26)` | Default panel fill |
-| `--glass-strong` | `rgba(255,255,255,.44)` | Reading sheet, ghost button, eyebrow pill |
-| `--glass-edge` | `rgba(255,255,255,.75)` | Inner top highlight |
-| `--glass-border` | `rgba(255,255,255,.55)` | Panel hairline |
-| `--text` | `#1A1726` | Primary text |
-| `--text-dim` | `#4C4860` | Secondary text |
-| `--accent` | `#6C5CE7` | Brand violet |
-| `--accent-deep` | `#4226A8` | Links/code/hover on glass |
+| body bg | `#0B0E14` near-black solid | The canvas behind all panels |
+| `--glass` | `rgba(28,33,46,.55)` | Default panel fill |
+| `--glass-strong` | `rgba(28,33,46,.74)` | Reading sheet, ghost button, eyebrow pill |
+| `--glass-edge` | `rgba(255,255,255,.08)` | Inner top highlight (faint on dark) |
+| `--glass-border` | `rgba(255,255,255,.10)` | Panel hairline |
+| `--text` | `#F2F3F8` | Primary text (headings) |
+| `--text-dim` | `#A7AFC2` | Secondary text (body) |
+| `--accent` | `#7C82D8` | Brand indigo, lifted for the dark ground |
+| `--accent-fill` | `#5E63B6` | Brand as-is, for solid button/icon fills |
+| `--accent-deep` | `#A9AEEA` | Brand text ON glass: light, so it reads on dark |
 
-Blur token: `--blur: saturate(150%) blur(12px)`. Glass shadow: `--shadow-glass` (drop + inner
+Blur token: `--blur: saturate(140%) blur(12px)`. Glass shadow: `--shadow-glass` (black drop + inner
 highlight + faint inner border).
 
 ## Components
@@ -53,7 +57,8 @@ highlight + faint inner border).
 
 ## Brand assets
 
-- `assets/app-icon.png` — the real app icon (chrome "VT" on violet). Nav mark, hero icon, favicon.
+- `assets/vtoku-logo-white.png` — white VTOKU wordmark, used as the nav brand mark on the dark ground.
+- `assets/app-icon.png` — the real app icon (chrome "VT" on violet). Hero icon and favicon.
 - `assets/ndi-logo.png` — official NDI logo for acknowledgements.
 
 ## Iconography
