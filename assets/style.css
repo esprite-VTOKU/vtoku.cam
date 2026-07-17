@@ -89,24 +89,27 @@ section { padding: 72px 0; }
   border-bottom: 1px solid rgba(255, 255, 255, .09);
   box-shadow: 0 1px 0 rgba(255,255,255,.05);
 }
+/* nav boxed to ~1140 centred like vtoku.com, so the logo lands ~150px in
+   (slightly wider than the 1100 content container, matching .com's header) */
+.nav > .container { max-width: 1180px; padding-left: 24px; padding-right: 24px; }
 .nav-inner { display: flex; align-items: center; height: 84px; position: relative; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text); letter-spacing: -.02em; font-size: 1.04rem; }
 .brand:hover { text-decoration: none; }
 .brand img { height: 28px; width: 28px; border-radius: 8px; display: block; box-shadow: var(--shadow-soft); }
-.brand img.brand-logo { height: 38px; width: auto; border-radius: 0; box-shadow: none; }
+.brand img.brand-logo { height: 48px; width: auto; border-radius: 0; box-shadow: none; }
 
 /* links sit left, right after the logo; the CTA is pushed to the far right
    (matches vtoku.com, where the menu is left-aligned and Account/cart are right) */
-.nav-links { display: flex; gap: 30px; align-items: center; flex: 1 1 auto; margin-left: 44px; }
-.nav-links > a { color: var(--text-dim); font-size: .95rem; font-weight: 500; white-space: nowrap; }
-.nav-links > a:hover { color: var(--text); text-decoration: none; }
+.nav-links { display: flex; gap: 32px; align-items: center; flex: 1 1 auto; margin-left: 40px; }
+.nav-links > a { color: rgba(255,255,255,.82); font-size: 1rem; font-weight: 500; white-space: nowrap; }
+.nav-links > a:hover { color: #fff; text-decoration: none; }
 .nav-links > a.active { color: #fff; }
 
 /* ---------- Services dropdown (mirrors vtoku.com) ---------- */
 .nav-dd { position: relative; }
-.nav-dd-toggle { display: inline-flex; align-items: center; gap: 5px; color: var(--text-dim);
-  font-size: .95rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
-.nav-dd-toggle:hover { color: var(--text); text-decoration: none; }
+.nav-dd-toggle { display: inline-flex; align-items: center; gap: 5px; color: rgba(255,255,255,.82);
+  font-size: 1rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.nav-dd-toggle:hover { color: #fff; text-decoration: none; }
 .nav-dd-toggle svg { width: 11px; height: 11px; opacity: .6; transition: transform .15s ease; }
 .nav-dd:hover .nav-dd-toggle svg, .nav-dd:focus-within .nav-dd-toggle svg { transform: rotate(180deg); }
 .nav-dd::after { content: ""; position: absolute; top: 100%; left: 0; right: 0; height: 16px; } /* hover bridge across the gap */
@@ -130,7 +133,7 @@ section { padding: 72px 0; }
 
 /* ---------- mobile hamburger ---------- */
 .nav-toggle { position: absolute; opacity: 0; pointer-events: none; }
-.nav-burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; margin: -8px; }
+.nav-burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; margin: -8px -8px -8px auto; }
 .nav-burger span { width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: transform .2s ease, opacity .2s ease; }
 
 @media (max-width: 860px) {
