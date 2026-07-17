@@ -1,24 +1,27 @@
-/* vtoku.cam — soft frosted panels over a calm off-white background.
-   Tokens mirror DESIGN.md. */
+/* vtoku.cam — frosted dark panels over a near-black indigo ground.
+   Matches vtoku.com's dark theme: same neutral ramp and indigo accent,
+   the Liquid Glass panels re-derived for a dark surface (dark translucent
+   fills, a faint lit top edge, black shadows). Tokens mirror DESIGN.md. */
 
 :root {
-  --text: #1A1726;
-  --text-dim: #4C4860;
-  --text-faint: #797490;
-  --accent: #6C5CE7;
-  --accent-bright: #5B49E0;
-  --accent-deep: #4226A8;
-  --accent-soft: rgba(108, 92, 231, .14);
-  --good: #15824B;
-  --warn: #9A5B00;
+  --text: #F2F3F8;
+  --text-dim: #A7AFC2;
+  --text-faint: #737A93;
+  --accent: #7C82D8;          /* brand indigo, lifted for the dark ground */
+  --accent-bright: #8A90E0;   /* links */
+  --accent-deep: #A9AEEA;     /* brand ON glass: light, so it reads on dark */
+  --accent-fill: #5E63B6;     /* brand as-is, for solid fills */
+  --accent-soft: rgba(124, 130, 216, .16);
+  --good: #4ED07F;
+  --warn: #E0A857;
 
-  /* glass */
-  --glass: rgba(255, 255, 255, .26);
-  --glass-strong: rgba(255, 255, 255, .44);
-  --glass-edge: rgba(255, 255, 255, .75);
-  --glass-border: rgba(255, 255, 255, .55);
-  --hairline: rgba(60, 40, 120, .12);
-  --blur: saturate(150%) blur(12px);
+  /* glass — dark translucent panels, not white ones */
+  --glass: rgba(28, 33, 46, .55);
+  --glass-strong: rgba(28, 33, 46, .74);
+  --glass-edge: rgba(255, 255, 255, .08);   /* faint lit top highlight */
+  --glass-border: rgba(255, 255, 255, .10); /* panel hairline */
+  --hairline: rgba(255, 255, 255, .10);
+  --blur: saturate(140%) blur(12px);
 
   --maxw: 1100px;
   --readw: 760px;
@@ -28,8 +31,8 @@
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
   --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
 
-  --shadow-glass: 0 10px 40px rgba(70, 50, 140, .16), inset 0 1px 0 var(--glass-edge), inset 0 0 0 1px rgba(255,255,255,.10);
-  --shadow-soft: 0 6px 24px rgba(70, 50, 140, .12);
+  --shadow-glass: 0 10px 40px rgba(0, 0, 0, .5), inset 0 1px 0 var(--glass-edge), inset 0 0 0 1px rgba(255,255,255,.04);
+  --shadow-soft: 0 6px 24px rgba(0, 0, 0, .42);
 }
 
 * { box-sizing: border-box; }
@@ -45,7 +48,7 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   min-height: 100vh;
-  background: #F5F3FB;
+  background: #0B0E14;
 }
 
 a { color: var(--accent-bright); text-decoration: none; }
@@ -58,10 +61,10 @@ h3 { font-size: 1.2rem; font-weight: 600; letter-spacing: -.015em; }
 
 code, kbd {
   font-family: var(--mono); font-size: .88em;
-  background: rgba(255,255,255,.5); border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,.06); border: 1px solid var(--glass-border);
   border-radius: 6px; padding: .08em .42em; color: var(--accent-deep);
 }
-::selection { background: rgba(108, 92, 231, .22); }
+::selection { background: rgba(124, 130, 216, .30); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 
 /* ---------- layout ---------- */
@@ -80,11 +83,11 @@ section { padding: 72px 0; }
 /* ---------- nav ---------- */
 .nav {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(255, 255, 255, .32);
+  background: rgba(11, 14, 20, .55);
   -webkit-backdrop-filter: var(--blur);
   backdrop-filter: var(--blur);
-  border-bottom: 1px solid var(--glass-border);
-  box-shadow: 0 1px 0 rgba(255,255,255,.4);
+  border-bottom: 1px solid rgba(255, 255, 255, .09);
+  box-shadow: 0 1px 0 rgba(255,255,255,.05);
 }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 58px; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text); letter-spacing: -.02em; font-size: 1.04rem; }
@@ -104,21 +107,21 @@ section { padding: 72px 0; }
   transition: transform .15s ease, box-shadow .25s ease, background .2s ease;
 }
 .btn:hover { text-decoration: none; }
-.btn-primary { background: linear-gradient(180deg, #7E6BF2, #5B49E0); color: #fff; box-shadow: 0 10px 28px rgba(108,92,231,.40), inset 0 1px 0 rgba(255,255,255,.35); }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(108,92,231,.52), inset 0 1px 0 rgba(255,255,255,.45); }
+.btn-primary { background: linear-gradient(180deg, #7C82D8, #5E63B6); color: #fff; box-shadow: 0 10px 28px rgba(94,99,182,.45), inset 0 1px 0 rgba(255,255,255,.30); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(94,99,182,.58), inset 0 1px 0 rgba(255,255,255,.40); }
 .btn-ghost {
   background: var(--glass-strong); color: var(--accent-deep); border-color: var(--glass-border);
   -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
   box-shadow: inset 0 1px 0 var(--glass-edge);
 }
-.btn-ghost:hover { color: var(--accent-deep); transform: translateY(-1px); background: rgba(255,255,255,.72); }
+.btn-ghost:hover { color: var(--accent-deep); transform: translateY(-1px); background: rgba(255,255,255,.10); }
 .badge-link { display: inline-block; transition: transform .15s ease; }
 .badge-link:hover { transform: translateY(-1px); }
 .badge-link img { height: 54px; width: auto; border-radius: 11px; box-shadow: var(--shadow-soft); }
 
 /* ---------- hero ---------- */
 .hero { position: relative; text-align: center; padding: 104px 0 88px; }
-.hero-icon { width: 100px; height: 100px; border-radius: 23px; box-shadow: 0 18px 50px rgba(70,50,140,.32); margin: 0 auto 28px; display: block; }
+.hero-icon { width: 100px; height: 100px; border-radius: 23px; box-shadow: 0 18px 50px rgba(0,0,0,.6); margin: 0 auto 28px; display: block; }
 .hero .eyebrow { display: inline-block; color: var(--accent-deep); font-weight: 600; letter-spacing: -.005em; font-size: .9rem;
   background: var(--glass-strong); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
   border: 1px solid var(--glass-border); border-radius: 999px; padding: 6px 14px; box-shadow: inset 0 1px 0 var(--glass-edge); } /* unslop-ignore: capsule badge, Liquid Glass idiom */
@@ -134,20 +137,20 @@ section { padding: 72px 0; }
 @media (max-width: 860px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } }
 
 .card {
-  background: rgba(255, 255, 255, .5);
-  -webkit-backdrop-filter: saturate(150%) blur(14px);
-  backdrop-filter: saturate(150%) blur(14px);
+  background: rgba(20, 25, 34, .62);
+  -webkit-backdrop-filter: saturate(140%) blur(14px);
+  backdrop-filter: saturate(140%) blur(14px);
   border: 1px solid var(--glass-border); border-radius: var(--radius);
   padding: 26px; box-shadow: var(--shadow-glass);
   transition: transform .2s ease, box-shadow .25s ease;
 }
-.card:hover { transform: translateY(-4px); box-shadow: 0 16px 44px rgba(70,50,140,.20), inset 0 1px 0 var(--glass-edge); }
+.card:hover { transform: translateY(-4px); box-shadow: 0 16px 44px rgba(0,0,0,.55), inset 0 1px 0 var(--glass-edge); }
 .card h3 { margin: 0 0 8px; }
 .card p { color: var(--text-dim); margin: 0; font-size: .98rem; }
 .card .icon {
   width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center;
-  background: linear-gradient(160deg, rgba(140,120,255,.95), rgba(91,73,224,.95)); color: #fff; margin-bottom: 16px;
-  box-shadow: 0 8px 18px rgba(108,92,231,.36), inset 0 1px 0 rgba(255,255,255,.4);
+  background: linear-gradient(160deg, #7C82D8, #5E63B6); color: #fff; margin-bottom: 16px;
+  box-shadow: 0 8px 18px rgba(94,99,182,.42), inset 0 1px 0 rgba(255,255,255,.35);
 }
 .card .icon svg { width: 24px; height: 24px; }
 .card.feature-wide { grid-column: 1 / -1; }
@@ -173,12 +176,12 @@ a.card:hover h3 { color: var(--accent-deep); }
 .section-head h2 { margin-bottom: 0; }
 .section-head p { color: var(--text-dim); max-width: 600px; margin: 4px auto 0; font-size: 1.1rem; }
 
-/* tinted glass band */
+/* tinted glass band — a faintly lighter strip to vary section rhythm on the dark ground */
 .section-tint { position: relative; }
 .section-tint::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
-  background: rgba(255,255,255,.30);
-  -webkit-backdrop-filter: saturate(150%) blur(8px); backdrop-filter: saturate(150%) blur(8px);
+  background: rgba(255,255,255,.03);
+  -webkit-backdrop-filter: saturate(140%) blur(8px); backdrop-filter: saturate(140%) blur(8px);
   border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border);
 }
 
@@ -227,10 +230,10 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
 /* ---------- callouts ---------- */
 .note {
   border: 1px solid var(--glass-border); border-left: 3px solid var(--accent);
-  background: rgba(255,255,255,.45); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  background: rgba(255,255,255,.05); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   border-radius: var(--radius-sm); padding: 15px 18px; margin: 22px 0; color: var(--text);
 }
-.note.caution { border-left-color: var(--warn); background: rgba(255, 244, 224, .6); }
+.note.caution { border-left-color: var(--warn); background: rgba(224, 168, 87, .12); }
 .note strong { color: var(--text); }
 .note p { margin: 0; color: var(--text-dim); }
 
@@ -239,13 +242,13 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
 .crumb a { color: var(--text-dim); }
 
 /* ---------- contact embed ---------- */
-.embed-frame { width: 100%; min-height: 760px; border: 1px solid var(--glass-border); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow-soft); }
+.embed-frame { width: 100%; min-height: 760px; border: 1px solid var(--glass-border); border-radius: var(--radius); background: var(--glass-strong); box-shadow: var(--shadow-soft); }
 
 /* docs image placeholders (replace .ph with an <img> once captured) */
 .docshot { margin: 26px 0; }
 .docshot .ph {
-  aspect-ratio: 16 / 10; border: 1.5px dashed rgba(108,92,231,.45); border-radius: 14px;
-  background: rgba(255,255,255,.35); display: grid; place-items: center; text-align: center;
+  aspect-ratio: 16 / 10; border: 1.5px dashed rgba(124,130,216,.45); border-radius: 14px;
+  background: rgba(255,255,255,.04); display: grid; place-items: center; text-align: center;
   color: var(--accent-deep); font-size: .9rem; font-weight: 500; padding: 20px;
 }
 .docshot.phone .ph { aspect-ratio: 9 / 19.5; max-width: 260px; margin: 0 auto; }
@@ -256,7 +259,7 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
 /* ---------- footer ---------- */
 .footer {
   margin-top: 56px; padding: 52px 0 40px;
-  background: rgba(255,255,255,.42);
+  background: rgba(20,25,34,.6);
   -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
   border-top: 1px solid var(--glass-border);
 }
@@ -293,7 +296,7 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
 .mascot-stage { position: relative; display: block; }
 .mascot-char { position: relative; z-index: 2; display: block; width: auto; max-width: 100%;
   max-height: calc(100vh - 80px); height: auto;
-  filter: drop-shadow(0 16px 34px rgba(70,50,140,.16));
+  filter: drop-shadow(0 16px 34px rgba(0,0,0,.5));
   animation: tp-in .8s ease-out both; will-change: opacity, transform; }
 
 /* single-image entrance: opacity + transform only (compositor-cheap, always aligned) */
@@ -320,7 +323,7 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
 /* content flows full width above the character */
 .content-rail { position: relative; z-index: 2; }
 .mascot-stage .sparkle { position: absolute; z-index: 3; width: 28px;
-  filter: drop-shadow(0 4px 8px rgba(108,92,231,.40)); animation: twinkle 3.2s ease-in-out infinite; }
+  filter: drop-shadow(0 4px 8px rgba(124,130,216,.45)); animation: twinkle 3.2s ease-in-out infinite; }
 .mascot-stage .ms1 { top: 4%; left: 1%; width: 36px; animation-delay: .1s; }
 .mascot-stage .ms2 { top: 28%; right: -1%; width: 24px; animation-delay: 1.0s; }
 .mascot-stage .ms3 { bottom: 14%; left: 2%; width: 22px; animation-delay: 1.8s; }
@@ -367,9 +370,9 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
   background: var(--accent-soft); }
 .plan li::after { content: ""; position: absolute; left: 5px; top: 7px; width: 6px; height: 3.5px;
   border-left: 2px solid var(--accent-deep); border-bottom: 2px solid var(--accent-deep); transform: rotate(-45deg); }
-.plan.featured { border-color: rgba(108,92,231,.5); box-shadow: 0 16px 48px rgba(108,92,231,.26), inset 0 1px 0 var(--glass-edge); }
+.plan.featured { border-color: rgba(124,130,216,.5); box-shadow: 0 16px 48px rgba(0,0,0,.55), inset 0 1px 0 var(--glass-edge); }
 .plan .tag { align-self: flex-start; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-  color: #fff; background: linear-gradient(180deg, #7E6BF2, #5B49E0); padding: 4px 11px; border-radius: 999px; margin-bottom: 12px; } /* unslop-ignore: capsule badge, Liquid Glass idiom */
+  color: #fff; background: linear-gradient(180deg, #7C82D8, #5E63B6); padding: 4px 11px; border-radius: 999px; margin-bottom: 12px; } /* unslop-ignore: capsule badge, Liquid Glass idiom */
 .plan .btn { margin-top: auto; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -380,14 +383,14 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
    blur so low-vision users get opaque surfaces instead of translucent glass.
    Mirrors the app's Reduce-Transparency handling (its glassScrim goes opaque). */
 @media (prefers-reduced-transparency: reduce) {
-  :root { --glass: #fff; --glass-strong: #fff; }
+  :root { --glass: #141922; --glass-strong: #1B2130; }
   .glass, .card, .nav, .footer, .btn-ghost, .reading, .shot, .note,
   .hero .eyebrow, .section-tint::before, code, kbd, .docshot .ph {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
-  .nav, .card, .footer, .note, .reading, .shot, code, kbd { background: #fff; }
-  .section-tint::before { background: rgba(255,255,255,.92); }
+  .nav, .card, .footer, .note, .reading, .shot, code, kbd { background: #141922; }
+  .section-tint::before { background: #11151d; }
 }
 
 /* ---------- liquid-glass refraction (progressive enhancement) ----------
