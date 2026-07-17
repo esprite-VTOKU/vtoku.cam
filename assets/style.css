@@ -89,13 +89,15 @@ section { padding: 72px 0; }
   border-bottom: 1px solid rgba(255, 255, 255, .09);
   box-shadow: 0 1px 0 rgba(255,255,255,.05);
 }
-.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 66px; position: relative; }
+.nav-inner { display: flex; align-items: center; height: 84px; position: relative; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text); letter-spacing: -.02em; font-size: 1.04rem; }
 .brand:hover { text-decoration: none; }
 .brand img { height: 28px; width: 28px; border-radius: 8px; display: block; box-shadow: var(--shadow-soft); }
-.brand img.brand-logo { height: 30px; width: auto; border-radius: 0; box-shadow: none; }
+.brand img.brand-logo { height: 38px; width: auto; border-radius: 0; box-shadow: none; }
 
-.nav-links { display: flex; gap: 24px; align-items: center; }
+/* links sit left, right after the logo; the CTA is pushed to the far right
+   (matches vtoku.com, where the menu is left-aligned and Account/cart are right) */
+.nav-links { display: flex; gap: 30px; align-items: center; flex: 1 1 auto; margin-left: 44px; }
 .nav-links > a { color: var(--text-dim); font-size: .95rem; font-weight: 500; white-space: nowrap; }
 .nav-links > a:hover { color: var(--text); text-decoration: none; }
 .nav-links > a.active { color: #fff; }
@@ -122,8 +124,8 @@ section { padding: 72px 0; }
 .nav-dd-menu a:hover { color: #fff; background: rgba(255,255,255,.06); text-decoration: none; }
 
 /* ---------- right-side CTA pill ---------- */
-.nav-cta { color: #fff !important; font-weight: 700; background: linear-gradient(180deg, #7C82D8, #5E63B6);
-  padding: 9px 18px; border-radius: 999px; box-shadow: 0 4px 14px rgba(94,99,182,.30), inset 0 1px 0 rgba(255,255,255,.22); }
+.nav-cta { margin-left: auto; color: #fff !important; font-weight: 700; background: linear-gradient(180deg, #7C82D8, #5E63B6);
+  padding: 10px 20px; border-radius: 999px; box-shadow: 0 4px 14px rgba(94,99,182,.30), inset 0 1px 0 rgba(255,255,255,.22); }
 .nav-cta:hover { color: #fff !important; transform: translateY(-1px); text-decoration: none; }
 
 /* ---------- mobile hamburger ---------- */
@@ -134,7 +136,8 @@ section { padding: 72px 0; }
 @media (max-width: 860px) {
   .nav-burger { display: flex; }
   .nav-links {
-    position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0;
+    position: absolute; top: 100%; left: 0; right: 0; margin-left: 0; flex: none;
+    flex-direction: column; align-items: stretch; gap: 0;
     padding: 6px 4px 16px; background: rgba(11, 14, 20, .97); border-bottom: 1px solid var(--glass-border);
     -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
     max-height: 0; overflow: hidden; opacity: 0; pointer-events: none;
