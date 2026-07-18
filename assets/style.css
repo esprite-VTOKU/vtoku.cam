@@ -487,6 +487,10 @@ img.shot { object-fit: cover; padding: 0; display: block; width: 100%; height: 1
    below starts on clear ground */
 .content-rail .hero { text-align: left; padding: 84px 0 60px; min-height: 800px;
   display: flex; flex-direction: column; justify-content: center; }
+/* the hero is a flex column; without an explicit width the .container (which
+   has margin:auto) shrink-wraps to its content and centres, pushing the copy
+   into the character. Pin it full width so the copy stays left. */
+.content-rail .hero > .container { width: 100%; }
 .content-rail .hero p.lede { margin-left: 0; margin-right: 0; max-width: 500px; }
 .content-rail .hero-cta { justify-content: flex-start; }
 .hero .cta-wrap { display: inline-block; }
