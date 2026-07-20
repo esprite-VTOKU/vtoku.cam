@@ -41,7 +41,7 @@
   <div class="page-head">
     <p class="eyebrow">Legal</p>
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: July 15, 2026 · Applies to VRL Cam (com.vtoku.cam)</p>
+    <p class="updated">Last updated: July 20, 2026 · Applies to VRL Cam (com.vtoku.cam)</p>
   </div>
 
   <main class="prose" style="padding-bottom:24px;">
@@ -51,7 +51,7 @@
       third-party tracking. Almost everything the app does happens on your device or on your own local
       network. The one exception is <strong>VRL Link</strong> — an optional feature you turn on that
       relays a live stream through our authorization server and a third-party real-time service; it
-      carries only the stream you choose to send, and only while you have it running (see section&nbsp;6).</p>
+      carries only the stream you choose to send, and only while you have it running (see section&nbsp;7).</p>
     </div>
 
     <h2>1. Who we are</h2>
@@ -69,7 +69,7 @@
       (not tied to your name, Apple ID, or device serial) and Apple's signed proof that the app is a
       genuine install, solely to issue a short-lived access credential for the live-streaming session
       and to rate-limit abuse. We do not use this to identify you, and it is not sold or shared for
-      advertising. See section&nbsp;6 for the full picture.</p>
+      advertising. See section&nbsp;7 for the full picture.</p>
 
     <h2>3. How your content and device data are used (on-device only)</h2>
     <p>To do its job, the app accesses the following on your device. This information is processed
@@ -83,7 +83,8 @@
           <td>ARKit world tracking uses the camera to determine the device's position and orientation,
             and to composite your avatar into the live view.</td>
           <td>Processed on-device. The camera image is only sent off the device if <em>you</em> turn on
-            NDI, a stream (SRT / VRL Link / VDO.Ninja), or recording (see below).</td>
+            NDI, a stream (SRT / VRL Link / VDO.Ninja), or recording (see below). Face capture with the
+            front (TrueDepth) camera is covered in section&nbsp;4.</td>
         </tr>
         <tr>
           <td><strong>Microphone</strong></td>
@@ -108,22 +109,47 @@
             VDO.Ninja to send your camera and avatar to a browser or receiver over the internet.</td>
           <td>SRT goes only to the address you enter. VRL Link and VDO.Ninja carry the live stream
             through a third-party real-time relay (LiveKit); VRL Link also contacts our authorization
-            server first (see sections&nbsp;2 and&nbsp;6). Nothing is streamed until you enable it.</td>
+            server first (see sections&nbsp;2 and&nbsp;7). Nothing is streamed until you enable it.</td>
         </tr>
       </tbody>
     </table>
 
-    <h2>4. Avatars and recordings are yours</h2>
+    <h2>4. Face data (TrueDepth camera) and depth data</h2>
+    <p><strong>What is collected.</strong> If you enable face capture, the app uses Apple's ARKit face
+      tracking on the front (TrueDepth) camera to derive, on your device, up to 52 numeric expression
+      values (for example, how far the jaw is open or an eyelid is closed) together with the position
+      and rotation of your head. The app never receives a photograph, video, depth map, or 3-D scan of
+      your face from this process, and the numeric values cannot be used to identify you. Face capture
+      is <strong>off by default</strong> and runs only while you have it switched on.</p>
+    <p><strong>What it is used for.</strong> One purpose only: animating your virtual avatar's facial
+      expression in real time while you use the app. Face data is not used for authentication or
+      identification, not used for advertising or analytics, and not used to train machine-learning
+      models.</p>
+    <p><strong>Storage, retention, and deletion.</strong> The expression values are processed in memory
+      frame by frame and discarded immediately; they are never written to disk, never stored, and never
+      retained after the frame is rendered. Because nothing is kept, there is nothing to delete. Videos
+      you record contain the rendered avatar — not your face data and not the front-camera image.</p>
+    <p><strong>Sharing.</strong> Face data is never sent to VTOKU and is never shared by us with any
+      third party. If you enable a motion-capture sender (VMC/OSC or iFacialMocap), the numeric
+      expression values are transmitted — at your direction — to the software you configure on your own
+      local network (for example Warudo on your computer), as described in section&nbsp;7. VRL Link and
+      the other streams carry the rendered video image of your avatar, not your face data.</p>
+    <p><strong>Rear depth (LiDAR).</strong> On devices with a LiDAR scanner, the app also reads
+      rear-camera scene depth to place the avatar in the room, handle occlusion, sample the floor, and
+      calibrate focus. Like face data, scene depth is processed on-device in real time, never stored,
+      and never transmitted.</p>
+
+    <h2>5. Avatars and recordings are yours</h2>
     <p>VRM avatar files you import, motion data you receive, and video takes you record are stored
       locally on your device and remain under your control. We have no access to them. Deleting the app,
       or removing files through the Files and Photos apps, removes that content from your device.</p>
 
-    <h2>5. Settings</h2>
+    <h2>6. Settings</h2>
     <p>The app saves your preferences (such as connection addresses, ports, and toggle states) in the
       device's standard local settings store so they persist between launches. These settings stay on
       your device and are not sent to us.</p>
 
-    <h2>6. Network streaming, explained</h2>
+    <h2>7. Network streaming, explained</h2>
     <p><strong>On your local network.</strong> VRL Cam is a tool for sending camera and avatar data to
       other software you run. When you enable a sender (VMC/OSC, FreeD, NDI) or discovery (NDI,
       iFacialMocap), the app communicates with devices on your local network using the addresses you
@@ -150,36 +176,36 @@
     <p>If you never enable VRL Link or VDO.Ninja, the app never contacts our authorization server or any
       streaming relay, and none of your data leaves your device or local network by these paths.</p>
 
-    <h2>7. Children's privacy</h2>
+    <h2>8. Children's privacy</h2>
     <p>The app is rated 4+ and is suitable for general audiences. Because it collects no personal data,
       it collects none from children. It is not directed at children for the purpose of data collection.</p>
 
-    <h2>8. Purchases</h2>
+    <h2>9. Purchases</h2>
     <p>VRL Cam offers optional in-app purchases. Purchases are handled entirely by
       <strong>Apple</strong> through the App Store. VTOKU does not process payments and does not receive
       your name, card, or billing details. Apple's handling of your purchase is governed by Apple's
       privacy policy. We only see anonymous, aggregate sales information that Apple reports to all
       developers, which does not identify you.</p>
 
-    <h2>9. Third-party software</h2>
+    <h2>10. Third-party software</h2>
     <p>The app includes third-party libraries (for example the NDI SDK and open-source components) that
       run entirely on-device as part of the app and do not phone home to us. The optional VRL Link and
       VDO.Ninja streaming features additionally use a third-party real-time media service (LiveKit) that
-      carries your stream only while you have streaming turned on, as described in section&nbsp;6.
+      carries your stream only while you have streaming turned on, as described in section&nbsp;7.
       Trademarks such as Warudo, NDI, VMC, VRM, and LiveKit belong to their respective owners; their
       inclusion does not imply endorsement. See <a href="support.html#acknowledgements">Acknowledgements</a>.</p>
 
-    <h2>10. Your rights</h2>
+    <h2>11. Your rights</h2>
     <p>Because we do not collect or hold any personal data about you, there is no personal data for us to
       access, correct, export, or delete on your behalf. You remain in full control of the content on
       your own device. If you have questions about your rights under laws such as the GDPR or CCPA,
       contact us and we will help.</p>
 
-    <h2>11. Changes to this policy</h2>
+    <h2>12. Changes to this policy</h2>
     <p>If we change this policy, we will update the date at the top of this page and post the revised
       version here. Material changes will be reflected in a future app update's notes where appropriate.</p>
 
-    <h2>12. Contact</h2>
+    <h2>13. Contact</h2>
     <p>Questions about this policy or the app's privacy practices? Email
       <a href="mailto:support@vtoku.com">support@vtoku.com</a> or use our
       <a href="https://vtoku.com/contact-us/">contact form</a>.</p>
