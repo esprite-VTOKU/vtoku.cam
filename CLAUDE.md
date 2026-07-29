@@ -4,9 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Marketing + support website for **VTOKU Cam** (`com.vtoku.cam`), a native iOS/iPadOS
-virtual-production camera app by VTOKU LLC. It is a **static site** (plain HTML + CSS, no
-framework, no build step, no JS toolchain) served on **GitHub Pages** at https://vtoku.cam.
+Marketing + support website for **VRL Cam** (`com.vtoku.cam`, promoted pre-launch as
+"VTOKU Cam"), a native iOS/iPadOS virtual-production camera app by VTOKU LLC. It is a
+**static site** (plain HTML + CSS, no framework, no build step, no JS toolchain) served on
+**GitHub Pages** at https://vtoku.cam. The app shipped on the App Store on 2026-07-22:
+https://apps.apple.com/us/app/vrl-cam/id6781006858.
 
 The site also doubles as the source of the App Store Connect URLs: Marketing (`/`),
 Support (`/support.html`), and Privacy (`/privacy.html`).
@@ -60,21 +62,17 @@ introducing new colors or one-off styles.
 
 ## Project-specific notes
 
-- Pre-launch, the primary CTA is **Join the beta** (`beta.html`), which embeds a Tally form
-  feeding a Notion "Beta Waitlist" database. The form id placeholder `REPLACE_WITH_TALLY_FORM_ID`
-  in `beta.html` still needs the real Tally form id (see README "Beta signups" + "TODO before launch").
-- **Monetization (locked 2026-07-16):** free app, every APP FEATURE unlocked, no feature gating.
-  Never write copy implying a purchase unlocks an app feature. Three paid things:
-  1. **VRL Link, $14.99/month** - auto-renewable sub for the hosted relay SERVICE (not an app
-     feature). Personal, indie use. ($15.00 does not exist as an Apple price point.)
-  2. **Pro, $149.99/year** - auto-renewable sub: VRL Link + a **commercial-use license**. Priced
-     below 12x monthly on purpose, so declaring commercial use is the CHEAPER path. **Per user**
-     (= one person on one Apple Account, defined in terms.html §3), no Family Sharing. Honor
-     system, no enforcement (Reaper model). Commercial = any company/org, or a creator earning
-     $100k/yr+.
-  3. **Paid animation packs** - one-time non-consumables (buy-to-own).
-  Both subs live in ONE App Store subscription group so users can't double-subscribe.
-  Output that costs us nothing stays free forever: NDI, SRT, HDMI, VDO.Ninja, recording, LiDAR.
+- **Launched.** The primary CTA site-wide is **Download on the App Store**
+  (https://apps.apple.com/us/app/vrl-cam/id6781006858, badge asset
+  `assets/app-store-badge.svg` with the `.badge-link` class). `beta.html` is kept as a live URL
+  (old links point at it) but now says the beta is over; the Tally waitlist form is gone.
+- **Monetization (as shipped, observed on the store 2026-07-29):** paid app, **US $14.99
+  one-time**, no in-app purchases listed. Every app feature included, no feature gating. This
+  supersedes the 2026-07-16 plan (free app + VRL Link $14.99/mo + Pro $149.99/yr subs), which
+  did NOT ship; do not write copy claiming the app is free, and do not mention the subs unless
+  they actually appear on the store. The hosted VRL Link service and the VRL Link for Windows
+  desktop app are free while in beta (access by emailing support@vtoku.com).
   NDI|HX was dropped (the NDI Advanced SDK license costs ~$5k) - never reintroduce it in copy.
-  Binding license definition lives in `terms.html`.
+  Binding license definition lives in `terms.html` (commercial-use terms still defined there;
+  reconcile with the owner before touching pricing copy again).
 - Contact / support inbox: `support@vtoku.com`.
