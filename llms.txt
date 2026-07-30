@@ -5,10 +5,9 @@
 > in real space, perform a VRM avatar in AR with face tracking, record video, and go live anywhere
 > with SRT and SRTLA bonded streaming. By VTOKU LLC (Honolulu, Hawai‘i). iOS and iPadOS 26.
 > Out now on the App Store as a one-time purchase of US $14.99 with every app feature included:
-> https://apps.apple.com/us/app/vrl-cam/id6781006858. The purchase includes the first month of the
-> hosted VRL Link service; after that VRL Link is $14.99/month, or Pro at $149.99/year includes
-> VRL Link plus a per-user commercial-use license (required for companies and for creators earning
-> $100k/yr or more). Brand tagline: "Go VRL" (VR meets IRL).
+> https://apps.apple.com/us/app/vrl-cam/id6781006858. The hosted VRL Link service is $14.99/month,
+> or Pro at $149.99/year includes VRL Link plus a per-user commercial-use license (required for
+> companies and for creators earning $100k/yr or more). Brand tagline: "Go VRL" (VR meets IRL).
 
 ## What you can do
 - Use your phone as a moving virtual camera in Warudo (sends camera pose over the network).

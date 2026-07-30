@@ -68,8 +68,10 @@ introducing new colors or one-off styles.
   (old links point at it) but now says the beta is over; the Tally waitlist form is gone.
 - **Monetization (owner-confirmed 2026-07-29):** paid app, **US $14.99 one-time**, every APP
   FEATURE included, no feature gating. Never write copy claiming the app is free, and never
-  imply a purchase unlocks an app feature. The purchase covers personal use and includes the
-  **first month of VRL Link**. Two auto-renewable subs (one subscription group):
+  imply a purchase unlocks an app feature. The purchase covers personal use. A planned
+  **first month of VRL Link included** (an ASC introductory offer, free x 1 month) is NOT yet
+  configured in App Store Connect - the owner asked (2026-07-29) that the site NOT mention it
+  until it is live. Two auto-renewable subs (one subscription group):
   1. **VRL Link, $14.99/month** - the hosted relay SERVICE (not an app feature), personal use.
   2. **Pro, $149.99/year** - VRL Link + a **commercial-use license**, per user (one person, one
      Apple Account, terms.html §3), honor system, no enforcement. Commercial = any company/org,
