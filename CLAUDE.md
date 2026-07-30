@@ -76,9 +76,12 @@ introducing new colors or one-off styles.
   2. **Pro, $149.99/year** - VRL Link + a **commercial-use license**, per user (one person, one
      Apple Account, terms.html §3), honor system, no enforcement. Commercial = any company/org,
      or a creator earning $100k/yr+.
-  As of 2026-07-29 the US store listing shows NO in-app purchases - if the subs aren't live in
-  App Store Connect yet, the site's pricing copy is ahead of the store. The VRL Link for Windows
-  desktop app is in private beta (access by emailing support@vtoku.com).
+  As of 2026-07-29 the subs are NOT live: no ASC products exist, the app's sale gate
+  (`StoreService.vrlSaleEnabled`) is false, and the server does not require a subscription -
+  so the hosted VRL Link service is currently FREE for everyone. The site copy says "free
+  right now, during the launch period" with the sub prices as planned pricing; keep that
+  framing until the subs actually go on sale. The VRL Link for Windows desktop app is in
+  private beta (access by emailing support@vtoku.com).
   NDI|HX was dropped (the NDI Advanced SDK license costs ~$5k) - never reintroduce it in copy.
   Binding license definition lives in `terms.html`.
 - Contact / support inbox: `support@vtoku.com`.
