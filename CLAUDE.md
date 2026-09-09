@@ -66,22 +66,22 @@ introducing new colors or one-off styles.
   (https://apps.apple.com/us/app/vrl-cam/id6781006858, badge asset
   `assets/app-store-badge.svg` with the `.badge-link` class). `beta.html` is kept as a live URL
   (old links point at it) but now says the beta is over; the Tally waitlist form is gone.
-- **Monetization (owner-confirmed 2026-07-29):** paid app, **US $14.99 one-time**, every APP
-  FEATURE included, no feature gating. Never write copy claiming the app is free, and never
-  imply a purchase unlocks an app feature. The purchase covers personal use. A planned
-  **first month of VRL Link included** (an ASC introductory offer, free x 1 month) is NOT yet
-  configured in App Store Connect - the owner asked (2026-07-29) that the site NOT mention it
-  until it is live. Two auto-renewable subs (one subscription group):
-  1. **VRL Link, $14.99/month** - the hosted relay SERVICE (not an app feature), personal use.
-  2. **Pro, $149.99/year** - VRL Link + a **commercial-use license**, per user (one person, one
+- **Monetization (owner-confirmed 2026-09-04):** the app is **FREE** (was $14.99 one-time until
+  2026-09-04), every APP FEATURE included, no feature gating. Never imply a purchase unlocks an
+  app feature. A planned **first month of VRL Link included** (an ASC introductory offer,
+  free x 1 month) is NOT yet configured in App Store Connect - the owner asked (2026-07-29)
+  that the site NOT mention it until it is live. Two auto-renewable subs (one subscription group):
+  1. **VRL Link, $4.99/month** - the hosted relay SERVICE (not an app feature), personal use.
+  2. **Pro, $49.99/year** - VRL Link + a **commercial-use license**, per user (one person, one
      Apple Account, terms.html §3), honor system, no enforcement. Commercial = any company/org,
-     or a creator earning $100k/yr+.
-  As of 2026-07-29 the subs are NOT live: no ASC products exist, the app's sale gate
-  (`StoreService.vrlSaleEnabled`) is false, and the server does not require a subscription -
-  so the hosted VRL Link service is currently FREE for everyone. The site copy says "free
-  right now, during the launch period" with the sub prices as planned pricing; keep that
-  framing until the subs actually go on sale. The VRL Link for Windows desktop app is in
-  private beta (access by emailing support@vtoku.com).
+     or a creator earning $100k/yr+. Priced under 12x monthly on purpose so declaring
+     commercial use is the cheaper path (owner-confirmed 2026-09-08).
+  As of 2026-09-08 the conversion is IN FLIGHT: both subs exist in ASC, the app's sale gate
+  (`StoreService.vrlSaleEnabled`) is true in v1.4 build 32, and the server flips to
+  require a subscription only after that build is live - until then the hosted VRL Link service
+  is still free. The site copy says "free right now, during the launch period" with the sub
+  prices as planned pricing; keep that framing until the subs actually go on sale. The VRL Link
+  for Windows desktop app is in private beta (access by emailing support@vtoku.com).
   NDI|HX was dropped (the NDI Advanced SDK license costs ~$5k) - never reintroduce it in copy.
   Binding license definition lives in `terms.html`.
 - Contact / support inbox: `support@vtoku.com`.
