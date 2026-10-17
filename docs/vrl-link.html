@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0B0E14">
 <title>VRL Link, VTOKU Cam docs</title>
-<meta name="description" content="VRL Link connects a remote performer to VTOKU Cam: receive their motion and voice to drive the avatar, and send your camera, video, and audio back over a two-way link.">
+<meta name="description" content="VRL Link connects a remote performer to VTOKU Cam: receive their motion and voice to drive the avatar, send your camera, video, and audio back, and trigger Warudo from the phone's action deck.">
 <link rel="icon" href="../assets/app-icon.png" sizes="any">
 <link rel="apple-touch-icon" href="../assets/app-icon.png">
 <link rel="stylesheet" href="../assets/style.css?v=9">
@@ -62,8 +62,18 @@
     </p>
     <p>Run <strong>VrlBridge-win-Setup.exe</strong>. It installs for your user account, adds a Start menu
       shortcut and updates itself. If Windows shows "Windows protected your PC", click
-      <strong>More info</strong>, then <strong>Run anyway</strong>. VRL Link for Windows is in beta;
-      email <a href="mailto:support@vtoku.com">support@vtoku.com</a> if you get stuck.</p>
+      <strong>More info</strong>, then <strong>Run anyway</strong>. When an update is ready, click
+      <strong>Update &amp; Restart</strong>; VRL Link ends the session cleanly before it restarts. VRL Link
+      for Windows is in beta; email <a href="mailto:support@vtoku.com">support@vtoku.com</a> if you get
+      stuck.</p>
+
+    <div class="note"><p><strong>What's new.</strong> VRL Link for Windows now remembers your room key,
+      camera and VMC targets, video output, and audio devices between launches, so you set it up once.
+      Turning VRL Link off and on, or relaunching, reconnects the phone without it being turned away as a
+      second device. If the link drops, the app says <strong>Connection lost</strong>, and you can cancel a
+      connect that's taking too long. Audio devices come back after you unplug and replug them, return
+      audio is smoother with less delay, and the phone's action buttons can now
+      <a href="#actions">trigger Warudo</a>.</p></div>
 
     <p>Once VRL Link is installed on the PC and connected to the same room, set up the phone side under
       <strong>Settings &rsaquo; VRL Link</strong>.</p>
@@ -117,6 +127,31 @@
       <a href="https://github.com/DistroAV/DistroAV" target="_blank" rel="noopener">DistroAV</a> NDI
       source instead.</p></div>
 
+    <h2 id="second-pc">Warudo on a second PC</h2>
+    <p>Warudo can run on a different computer from VRL Link. In Warudo, point the VMC Sender at the VRL
+      Link PC's local IP address instead of <code>127.0.0.1</code>. If you send the camera back, set the
+      camera target in VRL Link to the Warudo PC as well.</p>
+    <p>VRL Link accepts VMC from its own PC and from other machines on your local network, including
+      Tailscale addresses. Anything from outside your local network is ignored.</p>
+
+    <h2 id="actions">Trigger Warudo from the action deck</h2>
+    <p>The phone's <strong>ACTIONS</strong> deck can fire anything you build in Warudo: hotkeys,
+      expressions, props, or camera switches.</p>
+    <ol>
+      <li>On the phone, open <strong>Settings &rsaquo; Camera &rsaquo; Actions &amp; hotkeys</strong> and
+        give a slot an <strong>OSC action</strong> number.</li>
+      <li>In VRL Link, check the <strong>Actions port</strong> (default <code>39541</code>). In Warudo,
+        set the VRL Link plugin's <strong>Action Port</strong> to the same number.</li>
+      <li>In a Warudo blueprint, add an <strong>On vCam Action</strong> node and set
+        <strong>Action Number</strong> to the slot's number, or <code>0</code> to catch every action.</li>
+      <li>Wire <strong>On Action</strong> to whatever should happen. Tap the slot on the phone to test it.</li>
+    </ol>
+    <p>No <strong>On vCam Action</strong> node in Warudo? You need the latest VRL Link plugin; email
+      <a href="mailto:support@vtoku.com">support@vtoku.com</a> and we'll send it.</p>
+    <div class="note"><p><strong>Direct Wi-Fi?</strong> This works over VRL Link. When the phone sends
+      VMC straight to Warudo over your network, actions go to Warudo's VMC port, where only a receiver
+      that listens for <code>/vCam/action</code> can use them.</p></div>
+
     <h2>When to use VRL Link vs. Warudo</h2>
     <p>Use <a href="warudo.html">Warudo</a> when the performer and the PC are on your local network. Use
       VRL Link when the performer is somewhere else entirely: it carries motion, voice, camera, and video
@@ -130,6 +165,20 @@
         audio.</li>
       <li><strong>No remote audio:</strong> turn on Monitor PC audio and check the selected output
         device.</li>
+      <li><strong>"Connection lost":</strong> check the internet on both ends, then turn Connect off and
+        on. You can cancel a connect that hangs and try again.</li>
+      <li><strong>Audio goes to the wrong device:</strong> pick <strong>System Default</strong> to follow
+        whatever Windows uses, or pick a specific device to stay on it.</li>
+      <li><strong>Nothing from Warudo on another PC:</strong> both PCs must be on the same local network
+        (or Tailscale). See <a href="#second-pc">Warudo on a second PC</a>.</li>
+      <li><strong>Action buttons do nothing:</strong> make sure the Actions port in VRL Link and the
+        plugin's Action Port match, and that the node's Action Number matches the slot (or is
+        <code>0</code>).</li>
+      <li><strong>Start fresh:</strong> quit VRL Link and delete
+        <code>%APPDATA%\VrlBridge\settings.json</code>. VRL Link opens with default settings and asks
+        for the room key again.</li>
+      <li><strong>Still stuck:</strong> email <a href="mailto:support@vtoku.com">support@vtoku.com</a>
+        and attach <code>%LOCALAPPDATA%\VrlBridge\logs\vrlbridge.log</code>.</li>
     </ul>
 
     <hr>

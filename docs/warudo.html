@@ -102,6 +102,12 @@
     <p>VTOKU Cam can receive Warudo audio so the avatar's voice plays in sync on the phone. This uses a
       separate UDP path and self-corrects timing over long sessions.</p>
 
+    <h2>4. Trigger Warudo from the phone (optional)</h2>
+    <p>The phone's <strong>ACTIONS</strong> deck can fire Warudo hotkeys, expressions, props, and camera
+      switches through an <strong>On vCam Action</strong> blueprint node. This runs over
+      <a href="vrl-link.html#actions">VRL Link</a>; when the phone sends straight to Warudo over Wi-Fi,
+      only a receiver that listens for <code>/vCam/action</code> on the VMC port can use the actions.</p>
+
     <h2>Connecting across networks (VPN or Tailscale)</h2>
     <p>The phone and computer don't have to be on the same Wi-Fi. If they're on different networks, or
       you want to stream from somewhere else entirely, put them on the same virtual network first, then
