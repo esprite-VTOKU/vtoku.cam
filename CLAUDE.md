@@ -78,8 +78,9 @@ introducing new colors or one-off styles.
      commercial use is the cheaper path (owner-confirmed 2026-09-08).
   LIVE since 2026-09-11: v1.4 shipped with the paywall, both subs are approved and on sale,
   and the server requires a subscription. Copy states the prices as current, not planned;
-  never describe VRL Link as free. The VRL Link for Windows desktop app is in private beta
-  (access by emailing support@vtoku.com).
+  never describe VRL Link as free. The VRL Link for Windows desktop app is a public beta,
+  downloaded from GitHub (esprite-VTOKU/vrl-bridge-releases, `releases/latest/download/VrlBridge-win-Setup.exe`).
+  The installer is self-signed, so the copy tells users to expect the SmartScreen warning.
   NDI|HX was dropped (the NDI Advanced SDK license costs ~$5k) - never reintroduce it in copy.
   Binding license definition lives in `terms.html`.
 - Contact / support inbox: `support@vtoku.com`.
